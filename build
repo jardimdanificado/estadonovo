@@ -6,6 +6,6 @@ mkdir ./BUILD/1964_$current_time/
 
 cp -r ./src/data ./BUILD/1964_$current_time/ 
 
-cp -r ./src/home/jardel/1964engine/BUILD/1964_$current_time/ 
+cp -r ./src ./BUILD/1964_$current_time/
 
-gcc ./src/main.c -o ./BUILD/1964_$current_time/1964-linux.app -lraylib -lGL -lm -lpthread -ldl -lrt -lX11&&chmod +x ./BUILD/1964_$current_time/1964-linux.app
+gcc ./src/main.c -o ./BUILD/1964_$current_time/1964.elf -lGL -L./src/raylib -l:libraylib.a -lm -lpthread -ldl -lrt -lX11&&chmod +x ./BUILD/1964_$current_time/1964.elf
