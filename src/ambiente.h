@@ -5,9 +5,9 @@ struct AMBIENTE
 };
 typedef struct AMBIENTE AMBIENTE;
 
-void GRAVIT ( PERSONAGEM* personagem, AMBIENTE* ambiente )
+void GRAVIT ( PERSONAGEM* personagem, AMBIENTE* ambiente, MAPA mapa )
 {
-	if ( personagem->posicao.y >= 0&&personagem->pulando == false )
+	if ( PERSONAGEM_CHECARCHAO( *personagem,mapa) == false&&personagem->pulando == false )
 	{
 		personagem->posicao.y -= ambiente->gravidade;
 

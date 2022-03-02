@@ -2,7 +2,8 @@
 struct HITBOX_PERSONAGEM
 {
 	// 0
-	BoundingBox use,useR,atual;
+	BoundingBox use,useBase,atual;
+    BoundingBox frenteBase, pesBase, pesAtual, frenteAtual;
 	Model modelo;
 };
 typedef struct HITBOX_PERSONAGEM HITBOX_PERSONAGEM;
@@ -50,7 +51,7 @@ void PERSONAGEM_CONFIGSTART(PERSONAGEM* personagem)
 	personagem->equip.calca = 1;
 	personagem->rotacao = 0;
 	personagem->modelo.frame = 0;
-	personagem->posicao.y = 0;
+	personagem->posicao.y = 2;
 	personagem->posicao.x = 0;
 	personagem->posicao.z = 0;
 	personagem->velocidade = 0.1f;
@@ -61,12 +62,47 @@ void PERSONAGEM_CONFIGSTART(PERSONAGEM* personagem)
 	personagem->relogioVelho = 0;
 	//personagem->hitbox.atual = GetModelBoundingBox(personagem->modelo.atual);
 	personagem->hitbox.modelo = LoadModel("data/models/hitbox/action.glb");
-	personagem->hitbox.useR = GetModelBoundingBox(personagem->hitbox.modelo);
-	personagem->hitbox.atual = personagem->hitbox.useR;
+	personagem->hitbox.useBase = GetModelBoundingBox(personagem->hitbox.modelo);
+	personagem->hitbox.atual = personagem->hitbox.useBase;
 	UnloadModel(personagem->hitbox.modelo);
+    personagem->hitbox.modelo = LoadModel("data/models/hitbox/pes.glb");
+    personagem->hitbox.pesBase = GetModelBoundingBox(personagem->hitbox.modelo);
+    UnloadModel(personagem->hitbox.modelo);
+    personagem->hitbox.modelo = LoadModel("data/models/hitbox/frente.glb");
+    personagem->hitbox.frenteBase = GetModelBoundingBox(personagem->hitbox.modelo);
+    UnloadModel(personagem->hitbox.modelo);
 }
 
-void PERSONAGEM_USEANIM(PERSONAGEM* personagem)
+bool PERSONAGEM_CHECARCHAO(PERSONAGEM personagem, MAPA mapa)
+{
+    if(CheckCollisionBoxes(personagem.hitbox.pesAtual, mapa.hitboxH[0]))
+    {
+        return true;
+    }
+    else if(CheckCollisionBoxes(personagem.hitbox.pesAtual, mapa.hitboxV[0]))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool PERSONAGEM_CHECARPAREDE(PERSONAGEM personagem, MAPA mapa)
+{
+
+    if(CheckCollisionBoxes(personagem.hitbox.frenteAtual, mapa.hitboxV[0]))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+void PERSONAGEM_USEANIM(PERSONAGEM* personagem, ITEM item)
 {
 	if(personagem->relogioNovo > personagem->relogioVelho+10000)
 	{
@@ -85,21 +121,25 @@ void PERSONAGEM_USEANIM(PERSONAGEM* personagem)
 		case 0:
 		{
 			personagem->modelo.atual = personagem->modelo.use_default[0];
+            personagem->equip.calcaAtual = item.calca[personagem->equip.calca].use[0];
 //
 		}
 		break;
 		case 1:
 		{
 			personagem->modelo.atual = personagem->modelo.use_default[1];
+            personagem->equip.calcaAtual = item.calca[personagem->equip.calca].use[1];
 
 		}
 		break;
 		case 2:
 		{
 			personagem->modelo.atual = personagem->modelo.use_default[2];
+            personagem->equip.calcaAtual = item.calca[personagem->equip.calca].use[2];
 			if(personagem->usando == false)
 			{
 				personagem->modelo.atual = personagem->modelo.idle;
+                personagem->equip.calcaAtual = item.calca[personagem->equip.calca].idle;
 				msg = " ";
 			}
 
@@ -188,50 +228,52 @@ void PERSONAGEM_ANIMARUN(PERSONAGEM *personagem, char local_local, ITEM item)
 		break;
 	}
 }
-void PERSONAGEM_MOVEFRENTE(PERSONAGEM *personagem)
+void PERSONAGEM_MOVEFRENTE(PERSONAGEM *personagem, MAPA mapa)
 {
-	//0 ou 360
-	if(personagem->rotacao == 0||personagem->rotacao == 360)
-	{
-		personagem->posicao.z += personagem->velocidade;
-	}
-	//45
-	else if(personagem->rotacao == 45)
-	{
-		personagem->posicao.z += personagem->velocidade/1.5;
-		personagem->posicao.x += personagem->velocidade/1.5;
+	if(PERSONAGEM_CHECARPAREDE( *personagem, mapa) == false)
+    {//0 ou 360
+        if(personagem->rotacao == 0||personagem->rotacao == 360)
+        {
+            personagem->posicao.z += personagem->velocidade;
+        }
+        //45
+        else if(personagem->rotacao == 45)
+        {
+            personagem->posicao.z += personagem->velocidade/1.5;
+            personagem->posicao.x += personagem->velocidade/1.5;
 
-	}
-	//90
-	else if(personagem->rotacao == 90)
-		personagem->posicao.x += personagem->velocidade;
-	//135
-	else if(personagem->rotacao == 135)
-	{
-		personagem->posicao.z -= personagem->velocidade/1.5;
-		personagem->posicao.x += personagem->velocidade/1.5;
+        }
+        //90
+        else if(personagem->rotacao == 90)
+            personagem->posicao.x += personagem->velocidade;
+        //135
+        else if(personagem->rotacao == 135)
+        {
+            personagem->posicao.z -= personagem->velocidade/1.5;
+            personagem->posicao.x += personagem->velocidade/1.5;
 
-	}
-	//180
-	else if(personagem->rotacao == 180)
-		personagem->posicao.z -= personagem->velocidade;
-	//225
-	else if(personagem->rotacao == 225)
-	{
-		personagem->posicao.z -= personagem->velocidade/1.5;
-		personagem->posicao.x -= personagem->velocidade/1.5;
+        }
+        //180
+        else if(personagem->rotacao == 180)
+            personagem->posicao.z -= personagem->velocidade;
+        //225
+        else if(personagem->rotacao == 225)
+        {
+            personagem->posicao.z -= personagem->velocidade/1.5;
+            personagem->posicao.x -= personagem->velocidade/1.5;
 
-	}
-	//270
-	else if(personagem->rotacao == 270)
-		personagem->posicao.x -= personagem->velocidade;
-	//315
-	else if(personagem->rotacao == 315)
-	{
-		personagem->posicao.z += personagem->velocidade/1.5;
-		personagem->posicao.x -= personagem->velocidade/1.5;
+        }
+        //270
+        else if(personagem->rotacao == 270)
+            personagem->posicao.x -= personagem->velocidade;
+        //315
+        else if(personagem->rotacao == 315)
+        {
+            personagem->posicao.z += personagem->velocidade/1.5;
+            personagem->posicao.x -= personagem->velocidade/1.5;
 
-	}
+        }
+    }
 
 }
 
@@ -295,71 +337,85 @@ void PERSONAGEM_HITBOXUPDATE(PERSONAGEM* personagem)
 
 		free(PersonagemReservaHitboxLocal);
 
-		personagem->hitbox.atual.min.x = personagem->hitbox.useR.min.x + personagem->posicao.x;
-		personagem->hitbox.atual.max.x = personagem->hitbox.useR.max.x + personagem->posicao.x;
-		personagem->hitbox.atual.min.y = personagem->hitbox.useR.min.y + personagem->posicao.y;
-		personagem->hitbox.atual.max.y = personagem->hitbox.useR.max.y + personagem->posicao.y;
-		personagem->hitbox.atual.min.z = personagem->hitbox.useR.min.z + personagem->posicao.z;
-		personagem->hitbox.atual.max.z = personagem->hitbox.useR.max.z + personagem->posicao.z;
+		personagem->hitbox.atual.min.x = personagem->hitbox.useBase.min.x + personagem->posicao.x;
+		personagem->hitbox.atual.max.x = personagem->hitbox.useBase.max.x + personagem->posicao.x;
+		personagem->hitbox.atual.min.y = personagem->hitbox.useBase.min.y + personagem->posicao.y;
+		personagem->hitbox.atual.max.y = personagem->hitbox.useBase.max.y + personagem->posicao.y;
+		personagem->hitbox.atual.min.z = personagem->hitbox.useBase.min.z + personagem->posicao.z;
+		personagem->hitbox.atual.max.z = personagem->hitbox.useBase.max.z + personagem->posicao.z;
 
-		personagem->hitbox.use.min.y = personagem->hitbox.useR.min.y + personagem->posicao.y;
-		personagem->hitbox.use.max.y = personagem->hitbox.useR.max.y + personagem->posicao.y;
-
+		personagem->hitbox.use.min.y = personagem->hitbox.useBase.min.y + personagem->posicao.y;
+		personagem->hitbox.use.max.y = personagem->hitbox.useBase.max.y + personagem->posicao.y;
+        
+        personagem->hitbox.pesAtual.min.x = personagem->hitbox.pesBase.min.x + personagem->posicao.x;
+		personagem->hitbox.pesAtual.max.x = personagem->hitbox.pesBase.max.x + personagem->posicao.x;
+		personagem->hitbox.pesAtual.min.y = personagem->hitbox.pesBase.min.y + personagem->posicao.y;
+		personagem->hitbox.pesAtual.max.y = personagem->hitbox.pesBase.max.y + personagem->posicao.y;
+		personagem->hitbox.pesAtual.min.z = personagem->hitbox.pesBase.min.z + personagem->posicao.z;
+		personagem->hitbox.pesAtual.max.z = personagem->hitbox.pesBase.max.z + personagem->posicao.z;
+        
+        personagem->hitbox.frenteAtual.min.x = personagem->hitbox.frenteBase.min.x + personagem->posicao.x;
+		personagem->hitbox.frenteAtual.max.x = personagem->hitbox.frenteBase.max.x + personagem->posicao.x;
+		personagem->hitbox.frenteAtual.min.y = personagem->hitbox.frenteBase.min.y + personagem->posicao.y;
+		personagem->hitbox.frenteAtual.max.y = personagem->hitbox.frenteBase.max.y + personagem->posicao.y;
+		personagem->hitbox.frenteAtual.min.z = personagem->hitbox.frenteBase.min.z + personagem->posicao.z;
+		personagem->hitbox.frenteAtual.max.z = personagem->hitbox.frenteBase.max.z + personagem->posicao.z;
+        
 		if(personagem->rotacao == 0 )
 		{
-			personagem->hitbox.use.min.x = personagem->hitbox.useR.min.x + personagem->posicao.x;
-			personagem->hitbox.use.max.x = personagem->hitbox.useR.max.x + personagem->posicao.x;
-			personagem->hitbox.use.min.z = personagem->hitbox.useR.min.z + personagem->posicao.z+diferencaF(personagem->hitbox.useR.min.z,personagem->hitbox.useR.max.z);
-			personagem->hitbox.use.max.z = personagem->hitbox.useR.max.z + personagem->posicao.z+diferencaF(personagem->hitbox.useR.min.z,personagem->hitbox.useR.max.z);
+			personagem->hitbox.use.min.x = personagem->hitbox.useBase.min.x + personagem->posicao.x;
+			personagem->hitbox.use.max.x = personagem->hitbox.useBase.max.x + personagem->posicao.x;
+			personagem->hitbox.use.min.z = personagem->hitbox.useBase.min.z + personagem->posicao.z+diferencaF(personagem->hitbox.useBase.min.z,personagem->hitbox.useBase.max.z);
+			personagem->hitbox.use.max.z = personagem->hitbox.useBase.max.z + personagem->posicao.z+diferencaF(personagem->hitbox.useBase.min.z,personagem->hitbox.useBase.max.z);
 		}
 		else if(personagem->rotacao ==45)
 		{
-			personagem->hitbox.use.min.x = personagem->hitbox.useR.min.x + personagem->posicao.x +diferencaF(personagem->hitbox.useR.min.x,personagem->hitbox.useR.max.x);
-			personagem->hitbox.use.max.x = personagem->hitbox.useR.max.x + personagem->posicao.x +diferencaF(personagem->hitbox.useR.min.x,personagem->hitbox.useR.max.x);
-			personagem->hitbox.use.min.z = personagem->hitbox.useR.min.z + personagem->posicao.z +diferencaF(personagem->hitbox.useR.min.z,personagem->hitbox.useR.max.z);
-			personagem->hitbox.use.max.z = personagem->hitbox.useR.max.z + personagem->posicao.z +diferencaF(personagem->hitbox.useR.min.z,personagem->hitbox.useR.max.z);
+			personagem->hitbox.use.min.x = personagem->hitbox.useBase.min.x + personagem->posicao.x +diferencaF(personagem->hitbox.useBase.min.x,personagem->hitbox.useBase.max.x);
+			personagem->hitbox.use.max.x = personagem->hitbox.useBase.max.x + personagem->posicao.x +diferencaF(personagem->hitbox.useBase.min.x,personagem->hitbox.useBase.max.x);
+			personagem->hitbox.use.min.z = personagem->hitbox.useBase.min.z + personagem->posicao.z +diferencaF(personagem->hitbox.useBase.min.z,personagem->hitbox.useBase.max.z);
+			personagem->hitbox.use.max.z = personagem->hitbox.useBase.max.z + personagem->posicao.z +diferencaF(personagem->hitbox.useBase.min.z,personagem->hitbox.useBase.max.z);
 		}
 		else if(personagem->rotacao == 90)
 		{
-			personagem->hitbox.use.min.x = personagem->hitbox.useR.min.x + personagem->posicao.x +diferencaF(personagem->hitbox.useR.min.x,personagem->hitbox.useR.max.x);
-			personagem->hitbox.use.max.x = personagem->hitbox.useR.max.x + personagem->posicao.x +diferencaF(personagem->hitbox.useR.min.x,personagem->hitbox.useR.max.x);
-			personagem->hitbox.use.min.z = personagem->hitbox.useR.min.z + personagem->posicao.z;
-			personagem->hitbox.use.max.z = personagem->hitbox.useR.max.z + personagem->posicao.z;
+			personagem->hitbox.use.min.x = personagem->hitbox.useBase.min.x + personagem->posicao.x +diferencaF(personagem->hitbox.useBase.min.x,personagem->hitbox.useBase.max.x);
+			personagem->hitbox.use.max.x = personagem->hitbox.useBase.max.x + personagem->posicao.x +diferencaF(personagem->hitbox.useBase.min.x,personagem->hitbox.useBase.max.x);
+			personagem->hitbox.use.min.z = personagem->hitbox.useBase.min.z + personagem->posicao.z;
+			personagem->hitbox.use.max.z = personagem->hitbox.useBase.max.z + personagem->posicao.z;
 		}
 		else if(personagem->rotacao == 135)
 		{
-			personagem->hitbox.use.min.x = personagem->hitbox.useR.min.x + personagem->posicao.x +diferencaF(personagem->hitbox.useR.min.x,personagem->hitbox.useR.max.x);
-			personagem->hitbox.use.max.x = personagem->hitbox.useR.max.x + personagem->posicao.x +diferencaF(personagem->hitbox.useR.min.x,personagem->hitbox.useR.max.x);
-			personagem->hitbox.use.min.z = personagem->hitbox.useR.min.z + personagem->posicao.z -diferencaF(personagem->hitbox.useR.min.z,personagem->hitbox.useR.max.z);
-			personagem->hitbox.use.max.z = personagem->hitbox.useR.max.z + personagem->posicao.z -diferencaF(personagem->hitbox.useR.min.z,personagem->hitbox.useR.max.z);
+			personagem->hitbox.use.min.x = personagem->hitbox.useBase.min.x + personagem->posicao.x +diferencaF(personagem->hitbox.useBase.min.x,personagem->hitbox.useBase.max.x);
+			personagem->hitbox.use.max.x = personagem->hitbox.useBase.max.x + personagem->posicao.x +diferencaF(personagem->hitbox.useBase.min.x,personagem->hitbox.useBase.max.x);
+			personagem->hitbox.use.min.z = personagem->hitbox.useBase.min.z + personagem->posicao.z -diferencaF(personagem->hitbox.useBase.min.z,personagem->hitbox.useBase.max.z);
+			personagem->hitbox.use.max.z = personagem->hitbox.useBase.max.z + personagem->posicao.z -diferencaF(personagem->hitbox.useBase.min.z,personagem->hitbox.useBase.max.z);
 		}
 		else if(personagem->rotacao == 180)
 		{
-			personagem->hitbox.use.min.x = personagem->hitbox.useR.min.x + personagem->posicao.x;
-			personagem->hitbox.use.max.x = personagem->hitbox.useR.max.x + personagem->posicao.x;
-			personagem->hitbox.use.min.z = personagem->hitbox.useR.min.z + personagem->posicao.z -diferencaF(personagem->hitbox.useR.min.z,personagem->hitbox.useR.max.z);
-			personagem->hitbox.use.max.z = personagem->hitbox.useR.max.z + personagem->posicao.z -diferencaF(personagem->hitbox.useR.min.z,personagem->hitbox.useR.max.z);
+			personagem->hitbox.use.min.x = personagem->hitbox.useBase.min.x + personagem->posicao.x;
+			personagem->hitbox.use.max.x = personagem->hitbox.useBase.max.x + personagem->posicao.x;
+			personagem->hitbox.use.min.z = personagem->hitbox.useBase.min.z + personagem->posicao.z -diferencaF(personagem->hitbox.useBase.min.z,personagem->hitbox.useBase.max.z);
+			personagem->hitbox.use.max.z = personagem->hitbox.useBase.max.z + personagem->posicao.z -diferencaF(personagem->hitbox.useBase.min.z,personagem->hitbox.useBase.max.z);
 		}
 		else if(personagem->rotacao == 225)
 		{
-			personagem->hitbox.use.min.z = personagem->hitbox.useR.min.z + personagem->posicao.z -diferencaF(personagem->hitbox.useR.min.z,personagem->hitbox.useR.max.z);
-			personagem->hitbox.use.max.z = personagem->hitbox.useR.max.z + personagem->posicao.z -diferencaF(personagem->hitbox.useR.min.z,personagem->hitbox.useR.max.z);
-			personagem->hitbox.use.min.x = personagem->hitbox.useR.min.x + personagem->posicao.x -diferencaF(personagem->hitbox.useR.min.x,personagem->hitbox.useR.max.x);
-			personagem->hitbox.use.max.x = personagem->hitbox.useR.max.x + personagem->posicao.x -diferencaF(personagem->hitbox.useR.min.x,personagem->hitbox.useR.max.x);
+			personagem->hitbox.use.min.z = personagem->hitbox.useBase.min.z + personagem->posicao.z -diferencaF(personagem->hitbox.useBase.min.z,personagem->hitbox.useBase.max.z);
+			personagem->hitbox.use.max.z = personagem->hitbox.useBase.max.z + personagem->posicao.z -diferencaF(personagem->hitbox.useBase.min.z,personagem->hitbox.useBase.max.z);
+			personagem->hitbox.use.min.x = personagem->hitbox.useBase.min.x + personagem->posicao.x -diferencaF(personagem->hitbox.useBase.min.x,personagem->hitbox.useBase.max.x);
+			personagem->hitbox.use.max.x = personagem->hitbox.useBase.max.x + personagem->posicao.x -diferencaF(personagem->hitbox.useBase.min.x,personagem->hitbox.useBase.max.x);
 		}
 		else if(personagem->rotacao == 270)
 		{
-			personagem->hitbox.use.min.x = personagem->hitbox.useR.min.x + personagem->posicao.x -diferencaF(personagem->hitbox.useR.min.x,personagem->hitbox.useR.max.x);
-			personagem->hitbox.use.max.x = personagem->hitbox.useR.max.x + personagem->posicao.x -diferencaF(personagem->hitbox.useR.min.x,personagem->hitbox.useR.max.x);
-			personagem->hitbox.use.min.z = personagem->hitbox.useR.min.z + personagem->posicao.z;
-			personagem->hitbox.use.max.z = personagem->hitbox.useR.max.z + personagem->posicao.z;
+			personagem->hitbox.use.min.x = personagem->hitbox.useBase.min.x + personagem->posicao.x -diferencaF(personagem->hitbox.useBase.min.x,personagem->hitbox.useBase.max.x);
+			personagem->hitbox.use.max.x = personagem->hitbox.useBase.max.x + personagem->posicao.x -diferencaF(personagem->hitbox.useBase.min.x,personagem->hitbox.useBase.max.x);
+			personagem->hitbox.use.min.z = personagem->hitbox.useBase.min.z + personagem->posicao.z;
+			personagem->hitbox.use.max.z = personagem->hitbox.useBase.max.z + personagem->posicao.z;
 		}
 		else if(personagem->rotacao == 315)
 		{
-			personagem->hitbox.use.min.x = personagem->hitbox.useR.min.x + personagem->posicao.x -diferencaF(personagem->hitbox.useR.min.x,personagem->hitbox.useR.max.x);
-			personagem->hitbox.use.max.x = personagem->hitbox.useR.max.x + personagem->posicao.x -diferencaF(personagem->hitbox.useR.min.x,personagem->hitbox.useR.max.x);
-			personagem->hitbox.use.min.z = personagem->hitbox.useR.min.z + personagem->posicao.z+diferencaF(personagem->hitbox.useR.min.z,personagem->hitbox.useR.max.z);
-			personagem->hitbox.use.max.z = personagem->hitbox.useR.max.z + personagem->posicao.z+diferencaF(personagem->hitbox.useR.min.z,personagem->hitbox.useR.max.z);
+			personagem->hitbox.use.min.x = personagem->hitbox.useBase.min.x + personagem->posicao.x -diferencaF(personagem->hitbox.useBase.min.x,personagem->hitbox.useBase.max.x);
+			personagem->hitbox.use.max.x = personagem->hitbox.useBase.max.x + personagem->posicao.x -diferencaF(personagem->hitbox.useBase.min.x,personagem->hitbox.useBase.max.x);
+			personagem->hitbox.use.min.z = personagem->hitbox.useBase.min.z + personagem->posicao.z+diferencaF(personagem->hitbox.useBase.min.z,personagem->hitbox.useBase.max.z);
+			personagem->hitbox.use.max.z = personagem->hitbox.useBase.max.z + personagem->posicao.z+diferencaF(personagem->hitbox.useBase.min.z,personagem->hitbox.useBase.max.z);
 		}
 
 

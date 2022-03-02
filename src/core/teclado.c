@@ -1,4 +1,4 @@
-void TECLADO_MAIN ( PERSONAGEM * personagem , ITEM *item)
+void TECLADO_MAIN ( PERSONAGEM * personagem , ITEM *item, MAPA mapa)
 {
 	if ( IsKeyPressed ( KEY_RIGHT ) ||IsKeyPressed ( KEY_D ) )
 	{
@@ -24,7 +24,7 @@ void TECLADO_MAIN ( PERSONAGEM * personagem , ITEM *item)
 	if ( IsKeyDown ( KEY_UP ) || IsKeyDown ( KEY_W ) )
 	{
 		PERSONAGEM_ANIMARUN (*&personagem,'+',*item  );
-		PERSONAGEM_MOVEFRENTE (*&personagem );
+		PERSONAGEM_MOVEFRENTE (*&personagem , mapa);
 	}
 	if ( IsKeyDown ( KEY_LEFT_SHIFT ) )
 	{
@@ -44,9 +44,10 @@ void TECLADO_MAIN ( PERSONAGEM * personagem , ITEM *item)
 		personagem->modelo.atual = personagem->modelo.idle;
 		personagem->equip.calcaAtual = item->calca[1].idle;
 	}
-	if ( IsKeyPressed ( KEY_SPACE ) &&personagem->posicao.y <= 0.1 )
+	if ( IsKeyPressed ( KEY_SPACE ) &&PERSONAGEM_CHECARCHAO( *personagem, mapa) )
 	{
 		personagem->modelo.atual = personagem->modelo.use_default[0];
+        personagem->equip.calcaAtual = item->calca[personagem->equip.calca].use[0];
 		personagem->velocidadePulo = 0.2;
 		personagem->pulando = true;
 		personagem->pulo = clock();
@@ -77,6 +78,7 @@ void TECLADO_MAIN ( PERSONAGEM * personagem , ITEM *item)
 		personagem->pulando = false;
 		personagem->pulo = clock();
 		personagem->modelo.atual = personagem->modelo.idle;
+        personagem->equip.calcaAtual = item->calca[personagem->equip.calca].idle;
 	}
 	if ( IsKeyPressed ( KEY_E ) )
 	{
