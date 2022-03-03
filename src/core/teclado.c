@@ -19,7 +19,7 @@ void TECLADO_MAIN ( PERSONAGEM * personagem , ITEM *item, MAPA mapa)
 	if ( IsKeyDown ( KEY_DOWN ) ||IsKeyDown ( KEY_S ) )
 	{
 		PERSONAGEM_ANIMARUN (*&personagem,'-',*item );
-		PERSONAGEM_MOVETRAS (*&personagem );
+		PERSONAGEM_MOVETRAS (*&personagem , mapa);
 	}
 	if ( IsKeyDown ( KEY_UP ) || IsKeyDown ( KEY_W ) )
 	{

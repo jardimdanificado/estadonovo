@@ -133,14 +133,13 @@ int main ( void )
         DrawModelEx ( personagem.modelo.atual, personagem.posicao, ( Vector3 ){0.0f, 1.0f,0.0f}, personagem.rotacao, ( Vector3 ){1.0f, 1.0f,1.0f}, (Color){ 240, 199, 156, 255 }  );
 		if(personagem.equip.calca != 0)
 			DrawModelEx ( personagem.equip.calcaAtual, personagem.posicao, ( Vector3 ){0.0f, 1.0f,0.0f}, personagem.rotacao, ( Vector3 ){1.0f, 1.0f,1.0f}, WHITE );
-		DrawBoundingBox ( personagem.hitbox.use,BLACK );
+		//DrawBoundingBox ( personagem.hitbox.use,BLACK );
         //DrawBoundingBox ( mapa.hitboxH[0] ,BLACK );
-        DrawBoundingBox ( mapa.hitboxV[0] ,BLACK );
-        DrawBoundingBox ( personagem.hitbox.atual ,BLACK );
-		DrawBoundingBox ( personagem.hitbox.frenteAtual ,BLACK );
-        DrawBoundingBox ( personagem.hitbox.pesAtual ,BLACK );
-		DrawGrid ( 10, 1.0f );
-
+        //DrawBoundingBox ( mapa.hitboxV[0] ,BLACK );
+        //DrawBoundingBox ( personagem.hitbox.trasAtual ,BLACK );
+		//DrawBoundingBox ( personagem.hitbox.frenteAtual ,BLACK );
+        //DrawBoundingBox ( personagem.hitbox.pesAtual ,BLACK );
+		//DrawGrid ( 10, 1.0f );
 		EndMode3D();
 		EndDrawing();
 	}
