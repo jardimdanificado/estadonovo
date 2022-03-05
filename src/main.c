@@ -1,13 +1,8 @@
 #include "raylib/raylib.h"
-#include "raylib/raymath.h"
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-//#define MAX_GLTF_MODELS  8
-
-#define RLIGHTS_IMPLEMENTATION
-#include "raylib/rlights.h"
 
 #if defined(PLATFORM_DESKTOP)
     #define GLSL_VERSION            330
@@ -16,29 +11,17 @@
 #endif
 
 
-struct TEXTO
-{
-	// 0
-	Font font;
-	char *msg;
-	float tamanho;
-	Vector2 posicao;
-
-};
-typedef struct TEXTO TEXTO;
-
-struct MINMAX
-{
-	float min, max;
-};
-typedef struct MINMAX MINMAX;
-
 struct MAPA
 {
 	Model modelo[2];
+    
     BoundingBox hitboxH[10],hitboxV[10];
     Model dummy;
+    
     int mapaAtual;
+    
+    BoundingBox item[10];
+    bool pegouItem[10];
 };
 typedef struct MAPA MAPA;
 
@@ -56,6 +39,7 @@ char *msg;
 #include "core/map.c"
 #include "ambiente.h"
 #include "core/load.c"
+#include "core/render.c"
 #include "core/teclado.c"
 
 int main ( void )
@@ -63,7 +47,7 @@ int main ( void )
 	const int screenW = 600;
 	const int screenH = 240;
 	//SetConfigFlags(FLAG_MSAA_4X_HINT);
-	START_WINDOW(screenW,screenH);
+	RENDER_START_WINDOW(screenW,screenH);
 
 
 	clock_t *relogio;
@@ -80,10 +64,12 @@ int main ( void )
 	PERSONAGEM personagem;
 	ITEM item;
     MAPA mapa;
-	LOADALL_MODELS(&personagem,&item,&mapa);
+	LOADALL_MODELS(&personagem,&item);
 	PERSONAGEM_CONFIGSTART ( &personagem );
-    MAPA_START(&mapa);
+    MAPA_START(&mapa, item);
 	personagem.equip.calcaAtual = item.calca[1].idle;
+    personagem.equip.chapeuAtual = item.chapeu[1].idle;
+    personagem.equip.camisaAtual = item.camisa[1].idle;
 	msg = malloc ( sizeof ( char ) *50 );
 	msg = "Signed Distance Fields";
 
@@ -101,11 +87,11 @@ int main ( void )
 			camera.target = personagem.posicao;
 
 		UpdateCamera ( &camera );
-		GRAVIT ( &personagem, &ambiente, mapa );
-
+		GRAVIDADE ( &personagem, &ambiente, mapa );
+        //printf("abjahdshadha");
 		if ( personagem.usando != false )
 		{
-			PERSONAGEM_USEANIM ( &personagem , item);
+			PERSONAGEM_USEANIM ( &personagem , &mapa, item);
 		}
 		else
 		{
@@ -120,31 +106,10 @@ int main ( void )
 		//----------------------------------------------------------------------------------
 		// Draw
 		//----------------------------------------------------------------------------------
-		BeginDrawing();
-
-		ClearBackground ( DARKBROWN );
-
-		DrawTextEx ( font, msg, fontPosition, 16, 0, BLACK );
-
-		// 			CheckCollisionBoxes();
-		BeginMode3D ( camera );
-        DrawModel(mapa.modelo[mapa.mapaAtual],( Vector3 ){0.0f, 0.0f,0.0f}, 1.0f, WHITE);
-        //DrawModelEx ( mapa.modelo[mapa.mapaAtual], ( Vector3 ){0.0f, 0.0f,0.0f}, ( Vector3 ){0.0f, 1.0f,0.0f}, personagem.rotacao, ( Vector3 ){1.0f, 1.0f,1.0f}, WHITE );
-        DrawModelEx ( personagem.modelo.atual, personagem.posicao, ( Vector3 ){0.0f, 1.0f,0.0f}, personagem.rotacao, ( Vector3 ){1.0f, 1.0f,1.0f}, (Color){ 240, 199, 156, 255 }  );
-		if(personagem.equip.calca != 0)
-			DrawModelEx ( personagem.equip.calcaAtual, personagem.posicao, ( Vector3 ){0.0f, 1.0f,0.0f}, personagem.rotacao, ( Vector3 ){1.0f, 1.0f,1.0f}, WHITE );
-		//DrawBoundingBox ( personagem.hitbox.use,BLACK );
-        //DrawBoundingBox ( mapa.hitboxH[0] ,BLACK );
-        //DrawBoundingBox ( mapa.hitboxV[0] ,BLACK );
-        //DrawBoundingBox ( personagem.hitbox.trasAtual ,BLACK );
-		//DrawBoundingBox ( personagem.hitbox.frenteAtual ,BLACK );
-        //DrawBoundingBox ( personagem.hitbox.pesAtual ,BLACK );
-		//DrawGrid ( 10, 1.0f );
-		EndMode3D();
-		EndDrawing();
+		RENDER(personagem, mapa, item, camera, font, fontPosition);
 	}
 
-	UNLOADALL_MODELS(&personagem, &item);
+	UNLOADALL_MODELS(&personagem, &item, &mapa);
 	free ( relogio );
 	free ( msg );
 

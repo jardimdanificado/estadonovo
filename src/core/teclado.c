@@ -16,11 +16,19 @@ void TECLADO_MAIN ( PERSONAGEM * personagem , ITEM *item, MAPA mapa)
 		personagem->rotacao += 45;
 
 	}
+	if(IsKeyPressed ( KEY_DOWN ) ||IsKeyPressed ( KEY_S ))
+    {
+        personagem->modelo.frame = 0;
+    }
 	if ( IsKeyDown ( KEY_DOWN ) ||IsKeyDown ( KEY_S ) )
 	{
 		PERSONAGEM_ANIMARUN (*&personagem,'-',*item );
 		PERSONAGEM_MOVETRAS (*&personagem , mapa);
 	}
+	if(IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+    {
+        personagem->modelo.frame = 0;
+    }
 	if ( IsKeyDown ( KEY_UP ) || IsKeyDown ( KEY_W ) )
 	{
 		PERSONAGEM_ANIMARUN (*&personagem,'+',*item  );
@@ -37,17 +45,32 @@ void TECLADO_MAIN ( PERSONAGEM * personagem , ITEM *item, MAPA mapa)
 	if ( IsKeyReleased ( KEY_UP ) || IsKeyReleased ( KEY_W ) )
 	{
 		personagem->modelo.atual = personagem->modelo.idle;
-		personagem->equip.calcaAtual = item->calca[1].idle;
+        if(personagem->equip.calca != 0)
+            personagem->equip.calcaAtual = item->calca[personagem->equip.calca].idle;
+        if(personagem->equip.chapeu != 0)
+            personagem->equip.chapeuAtual = item->chapeu[personagem->equip.chapeu].idle;
+        if(personagem->equip.camisa != 0)
+            personagem->equip.camisaAtual = item->camisa[personagem->equip.camisa].idle;
 	}
 	if ( IsKeyReleased ( KEY_DOWN ) || IsKeyReleased ( KEY_S ) )
 	{
 		personagem->modelo.atual = personagem->modelo.idle;
-		personagem->equip.calcaAtual = item->calca[1].idle;
+        if(personagem->equip.calca != 0)
+            personagem->equip.calcaAtual = item->calca[personagem->equip.calca].idle;
+        if(personagem->equip.chapeu != 0)
+            personagem->equip.chapeuAtual = item->chapeu[personagem->equip.chapeu].idle;
+        if(personagem->equip.camisa != 0)
+            personagem->equip.camisaAtual = item->camisa[personagem->equip.camisa].idle;
 	}
 	if ( IsKeyPressed ( KEY_SPACE ) &&PERSONAGEM_CHECARCHAO( *personagem, mapa) )
 	{
 		personagem->modelo.atual = personagem->modelo.use_default[0];
-        personagem->equip.calcaAtual = item->calca[personagem->equip.calca].use[0];
+        if(personagem->equip.calca != 0)
+            personagem->equip.calcaAtual = item->calca[personagem->equip.calca].use[0];
+        if(personagem->equip.chapeu != 0)
+            personagem->equip.chapeuAtual = item->chapeu[personagem->equip.chapeu].use[0];
+        if(personagem->equip.camisa != 0)
+            personagem->equip.camisaAtual = item->camisa[personagem->equip.camisa].use[0];
 		personagem->velocidadePulo = 0.2;
 		personagem->pulando = true;
 		personagem->pulo = clock();
@@ -78,10 +101,16 @@ void TECLADO_MAIN ( PERSONAGEM * personagem , ITEM *item, MAPA mapa)
 		personagem->pulando = false;
 		personagem->pulo = clock();
 		personagem->modelo.atual = personagem->modelo.idle;
-        personagem->equip.calcaAtual = item->calca[personagem->equip.calca].idle;
+        if(personagem->equip.calca != 0)
+            personagem->equip.calcaAtual = item->calca[personagem->equip.calca].idle;
+        if(personagem->equip.chapeu != 0)
+            personagem->equip.chapeuAtual = item->chapeu[personagem->equip.chapeu].idle;
+        if(personagem->equip.camisa != 0)
+            personagem->equip.camisaAtual = item->camisa[personagem->equip.camisa].idle;
 	}
 	if ( IsKeyPressed ( KEY_E ) )
 	{
-		PERSONAGEM_USE (*&personagem );
-		msg = " voce nao pegou nada ";}
+        personagem->modelo.frame = 0;
+		PERSONAGEM_USE_PRESS (*&personagem );
+    }
 }
