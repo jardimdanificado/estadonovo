@@ -6,6 +6,6 @@ Camera CAMERA_START(Camera *camera)
 	camera->up = ( Vector3 ){0.0f, 1.0f, 0.0f};
 	camera->fovy = 30.0f;
 	camera->projection = CAMERA_PERSPECTIVE;
-	SetCameraMode ( *camera, CAMERA_FREE );
+	SetCameraMode ( *camera, CAMERA_CUSTOM );
 	return (*camera);
 }

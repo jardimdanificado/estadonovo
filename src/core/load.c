@@ -3,15 +3,15 @@
 
 void LOADALL_MODELS(PERSONAGEM* personagem,ITEM* item)
 {
-	personagem->modelo.idle = LoadModel("./data/models/idle/2.glb");
-	personagem->modelo.run[0] = LoadModel("./data/models/run/0.glb");
-	personagem->modelo.run[1] = LoadModel("./data/models/run/1.glb");
-	personagem->modelo.run[2] = LoadModel("./data/models/run/2.glb");
-	personagem->modelo.run[3] = LoadModel("./data/models/run/3.glb");
-	personagem->modelo.run[4] = LoadModel("./data/models/run/4.glb");
-	personagem->modelo.use_default[0] = LoadModel("./data/models/use_default/0.glb");
-	personagem->modelo.use_default[1] = LoadModel("./data/models/use_default/1.glb");
-	personagem->modelo.use_default[2] = LoadModel("./data/models/use_default/2.glb");
+	personagem->modelo.idle = LoadModel("./data/models/personagem/idle/2.glb");
+	personagem->modelo.run[0] = LoadModel("./data/models/personagem/run/0.glb");
+	personagem->modelo.run[1] = LoadModel("./data/models/personagem/run/1.glb");
+	personagem->modelo.run[2] = LoadModel("./data/models/personagem/run/2.glb");
+	personagem->modelo.run[3] = LoadModel("./data/models/personagem/run/3.glb");
+	personagem->modelo.run[4] = LoadModel("./data/models/personagem/run/4.glb");
+	personagem->modelo.use_default[0] = LoadModel("./data/models/personagem/use_default/0.glb");
+	personagem->modelo.use_default[1] = LoadModel("./data/models/personagem/use_default/1.glb");
+	personagem->modelo.use_default[2] = LoadModel("./data/models/personagem/use_default/2.glb");
 
 	
     
