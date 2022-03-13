@@ -2,41 +2,76 @@
 void PERSONAGEM_USE(PERSONAGEM *personagem, MAPA* mapa)
 {
     
-    if(CheckCollisionBoxes(personagem->hitbox.use, mapa->item[1])||CheckCollisionBoxes(personagem->hitbox.atual , mapa->item[1]))
+    if(CheckCollisionBoxes(personagem->hitbox.use, mapa->item[1].hitbox)||CheckCollisionBoxes(personagem->hitbox.atual , mapa->item[1].hitbox))
     {
-        mapa->pegouItem[1] = true;
+        mapa->item[1].pegou = true;
         if(mapa->mapaAtual == 0)
         {
             personagem->equip.chapeu = 1;
-            mapa->item[1] = (BoundingBox){(Vector3){0,0,0}, (Vector3){0,0,0}};
+            mapa->item[1].hitbox = (BoundingBox){(Vector3){0,0,0}, (Vector3){0,0,0}};
+            msg = " voce pegou um item ";
+            personagem->relogioLogs = clock();
         }
         
     }
-    else if(CheckCollisionBoxes(personagem->hitbox.use, mapa->item[0])||CheckCollisionBoxes(personagem->hitbox.atual , mapa->item[0]))
+    else if(CheckCollisionBoxes(personagem->hitbox.use, mapa->item[0].hitbox)||CheckCollisionBoxes(personagem->hitbox.atual , mapa->item[0].hitbox))
     {
-        mapa->pegouItem[0] = true;
+        mapa->item[0].pegou = true;
         if(mapa->mapaAtual == 0)
         {
             personagem->equip.calca = 1;
-            mapa->item[0] = (BoundingBox){(Vector3){0,0,0}, (Vector3){0,0,0}};
+            mapa->item[0].hitbox = (BoundingBox){(Vector3){0,0,0}, (Vector3){0,0,0}};
+            msg = " voce pegou um item ";
+            personagem->relogioLogs = clock();
         }
         
     }
-    else if(CheckCollisionBoxes(personagem->hitbox.use, mapa->item[2])||CheckCollisionBoxes(personagem->hitbox.atual , mapa->item[2]))
+    else if(CheckCollisionBoxes(personagem->hitbox.use, mapa->item[2].hitbox)||CheckCollisionBoxes(personagem->hitbox.atual , mapa->item[2].hitbox))
     {
-        mapa->pegouItem[2] = true;
+        mapa->item[2].pegou = true;
         if(mapa->mapaAtual == 0)
         {
             personagem->equip.camisa = 1;
-            mapa->item[2] = (BoundingBox){(Vector3){0,0,0}, (Vector3){0,0,0}};
+            mapa->item[2].hitbox = (BoundingBox){(Vector3){0,0,0}, (Vector3){0,0,0}};
+            msg = " voce pegou um item ";
+            personagem->relogioLogs = clock();
         }
         
     }
-    else
+    else if(CheckCollisionBoxes(personagem->hitbox.use, mapa->porta[0].hitbox)||CheckCollisionBoxes(personagem->hitbox.atual , mapa->porta[0].hitbox))
     {
-        msg = " voce nao pegou nada ";
+        if(mapa->porta[0].aberta == false)
+        {
+            mapa->porta[0].abrindo = true;
+            msg = " voce abre a porta ";
+            personagem->relogioLogs = clock();
+            
+        }
+        else if(mapa->porta[0].aberta == true)
+        {
+            mapa->porta[0].fechando = true;
+            msg = " voce fecha a porta ";
+            personagem->relogioLogs = clock();
+            
+        }
     }
-    
+    else if(CheckCollisionBoxes(personagem->hitbox.use, mapa->porta[1].hitbox)||CheckCollisionBoxes(personagem->hitbox.atual , mapa->porta[1].hitbox))
+    {
+        if(mapa->porta[1].aberta == false)
+        {
+            mapa->porta[1].abrindo = true;
+            msg = " voce abre a porta ";
+            personagem->relogioLogs = clock();
+            
+        }
+        else if(mapa->porta[1].aberta == true)
+        {
+            mapa->porta[1].fechando = true;
+            msg = " voce fecha a porta ";
+            personagem->relogioLogs = clock();
+            
+        }
+    }
 }
 
 void PERSONAGEM_USE_PRESS(PERSONAGEM* personagem)

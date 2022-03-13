@@ -3,7 +3,6 @@ struct ITEMUNI
 	Model idle;
 	Model run[5];
     Model use[3];
-    Model drop;
 };
 typedef struct ITEMUNI ITEMUNI;
 

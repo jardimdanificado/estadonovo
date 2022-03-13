@@ -11,26 +11,12 @@
 #endif
 
 
-struct MAPA
-{
-	Model modelo[2];
-    
-    BoundingBox hitboxH[10],hitboxV[10];
-    Model dummy;
-    
-    int mapaAtual;
-    
-    BoundingBox item[10];
-    bool pegouItem[10];
-};
-typedef struct MAPA MAPA;
-
 
 
 
 char *msg;
 
-
+#include "core/premap.h"
 #include "core/camera.c"
 #include "core/et.c"
 #include "core/font.c"
@@ -64,18 +50,18 @@ int main ( void )
 	PERSONAGEM personagem;
 	ITEM item;
     MAPA mapa;
-	LOADALL_MODELS(&personagem,&item);
+	LOADALL_MODELS(&mapa,&personagem,&item);
 	PERSONAGEM_CONFIGSTART ( &personagem );
-    MAPA_START(&mapa, item);
+    MAPA_START(&mapa);
 	personagem.equip.calcaAtual = item.calca[1].idle;
     personagem.equip.chapeuAtual = item.chapeu[1].idle;
     personagem.equip.camisaAtual = item.camisa[1].idle;
 	msg = malloc ( sizeof ( char ) *50 );
-	msg = "Signed Distance Fields";
+	msg = " ";
 
 
 	Font font = FONT_START(screenH);
-	Vector2 fontPosition = { 40, screenH/2.0f - 50 };
+	Vector2 fontPosition = { 0, 0 };
 
 	// Ambient light level (some basic lighting)
 
@@ -84,7 +70,7 @@ int main ( void )
 	while ( !WindowShouldClose() )      // Detect window close button or ESC key
 	{
 		if ( IsMouseButtonDown ( MOUSE_MIDDLE_BUTTON ) == false )
-			camera.target = personagem.posicao;
+			camera.target =  (Vector3){personagem.posicao.x,personagem.posicao.y+2,personagem.posicao.z};
 
 		UpdateCamera ( &camera );
 		GRAVIDADE ( &personagem, &ambiente, mapa );
@@ -106,7 +92,22 @@ int main ( void )
 		//----------------------------------------------------------------------------------
 		// Draw
 		//----------------------------------------------------------------------------------
-		RENDER(personagem, mapa, item, camera, font, fontPosition);
+        
+        if(mapa.porta[0].abrindo||mapa.porta[0].fechando)
+        {
+            PORTA_ANIM(&mapa,0);
+        }
+        else if(mapa.porta[1].abrindo||mapa.porta[1].fechando)
+        {
+            PORTA_ANIM(&mapa,1);
+        }
+        
+        if(clock() > personagem.relogioLogs+(2*(CLOCKS_PER_SEC/10)))
+        {
+            msg = " ";
+        }
+        RENDER_CAMERAUPDATE(personagem, mapa, &camera);
+		RENDER(personagem, mapa, camera, font, fontPosition);
 	}
 
 	UNLOADALL_MODELS(&personagem, &item, &mapa);

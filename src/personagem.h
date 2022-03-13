@@ -4,7 +4,7 @@ struct HITBOX_PERSONAGEM
 	// 0
 	BoundingBox use,useBase,atual;
     BoundingBox frenteBase, trasBase, pesBase, pesAtual, frenteAtual, trasAtual;
-    BoundingBox frente90, frente180, frente270, tras90, tras180, tras270, pes90, pes180, pes270;
+    BoundingBox frente45, frente90, frente135, frente180, frente225, frente270, frente315,tras45, tras90,tras135 , tras180, tras225, tras270, tras315, pes90, pes180, pes270;
 	Model modelo;
 };
 typedef struct HITBOX_PERSONAGEM HITBOX_PERSONAGEM;
@@ -38,7 +38,7 @@ struct PERSONAGEM
 	HITBOX_PERSONAGEM hitbox;
 	float rotacao;
 	float velocidade, velocidadePulo;
-	clock_t relogioVelho, relogioNovo, pulo;
+	clock_t relogioVelho, relogioNovo, pulo, relogioLogs;
 	bool pulando, usando;
 };
 typedef struct PERSONAGEM PERSONAGEM;

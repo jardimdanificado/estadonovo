@@ -1,4 +1,5 @@
  
+
 Camera CAMERA_START(Camera *camera)
 {
 	camera->position = ( Vector3 ){10.0f, 10.0f, 10.0f};

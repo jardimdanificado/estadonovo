@@ -1,7 +1,7 @@
  
 bool PERSONAGEM_CHECARCHAO(PERSONAGEM personagem, MAPA mapa)
 {
-    if(CheckCollisionBoxes(personagem.hitbox.pesAtual, mapa.hitboxH[0]))
+    if(CheckCollisionBoxes(personagem.hitbox.pesAtual, mapa.hitboxHorizontal[0]))
     {
         return true;
     }
@@ -15,25 +15,45 @@ bool PERSONAGEM_CHECARPAREDE(PERSONAGEM personagem, MAPA mapa, char opcao)
 {
     if(opcao == '+')
     {
-        if(CheckCollisionBoxes(personagem.hitbox.frenteAtual, mapa.hitboxV[0]))
+        for(int i = 0; i <10; i++)
         {
-            return true;
-        }
-        else
-        {
-            return false;
+            if(CheckCollisionBoxes(personagem.hitbox.frenteAtual, mapa.hitboxVertical[i]))
+            {
+                return true;
+            }
+            else if(i<5&&CheckCollisionBoxes(personagem.hitbox.frenteAtual, mapa.porta[0].hitbox))
+            {
+                return true;
+            }
+            else if(i<5&&CheckCollisionBoxes(personagem.hitbox.frenteAtual, mapa.porta[1].hitbox))
+            {
+                return true;
+            }
+                
         }
         
+        return false;
     }
     else if(opcao == '-')
     {
-        if(CheckCollisionBoxes(personagem.hitbox.trasAtual, mapa.hitboxV[0]))
+        for(int i = 0; i <10; i++)
         {
-            return true;
+            if(CheckCollisionBoxes(personagem.hitbox.trasAtual, mapa.hitboxVertical[i]))
+            {
+                return true;
+            }
+            else if(i<5&&CheckCollisionBoxes(personagem.hitbox.frenteAtual, mapa.porta[0].hitbox))
+            {
+                return true;
+            }
+            else if(i<5&&CheckCollisionBoxes(personagem.hitbox.frenteAtual, mapa.porta[1].hitbox))
+            {
+                return true;
+            }
+                
         }
-        else
-        {
-            return false;
-        }
+        
+        return false;
+
     }
 }
