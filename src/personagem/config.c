@@ -6,6 +6,7 @@ void PERSONAGEM_CONFIGSTART(PERSONAGEM* personagem)
 	personagem->equip.oculos = 0;
 	personagem->equip.sapato = 0;
 	personagem->equip.calca = 0;
+    personagem->equip.arma = 0;
 	personagem->rotacao = 180;
 	personagem->modelo.frame = 0;
 	personagem->posicao.y = 0;

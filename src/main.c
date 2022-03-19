@@ -20,7 +20,7 @@ char *msg;
 #include "core/camera.c"
 #include "core/et.c"
 #include "core/font.c"
-#include "core/item.c"
+#include "core/item.h"
 #include "personagem.h"
 #include "core/map.c"
 #include "ambiente.h"
@@ -41,7 +41,7 @@ int main ( void )
 
 	Camera camera = { 0 };
 	camera = CAMERA_START(&camera);
-
+    
     
 
 	AMBIENTE ambiente;
@@ -56,22 +56,19 @@ int main ( void )
 	personagem.equip.calcaAtual = item.calca[1].idle;
     personagem.equip.chapeuAtual = item.chapeu[1].idle;
     personagem.equip.camisaAtual = item.camisa[1].idle;
+    personagem.equip.armaAtual = item.arma[1].idle;
 	msg = malloc ( sizeof ( char ) *50 );
 	msg = " ";
-
-
 	Font font = FONT_START(screenH);
 	Vector2 fontPosition = { 0, 0 };
 
 	// Ambient light level (some basic lighting)
 
 	SetTargetFPS ( 60 );
-
+    camera.target =  (Vector3){personagem.posicao.x,personagem.posicao.y+2,personagem.posicao.z};
+    
 	while ( !WindowShouldClose() )      // Detect window close button or ESC key
 	{
-		if ( IsMouseButtonDown ( MOUSE_MIDDLE_BUTTON ) == false )
-			camera.target =  (Vector3){personagem.posicao.x,personagem.posicao.y+2,personagem.posicao.z};
-
 		UpdateCamera ( &camera );
 		GRAVIDADE ( &personagem, &ambiente, mapa );
         //printf("abjahdshadha");

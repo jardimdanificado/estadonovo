@@ -11,8 +11,8 @@ typedef struct HITBOX_PERSONAGEM HITBOX_PERSONAGEM;
 
 struct EQUIPAMENTO
 {
-	int chapeu, oculos, camisa, calca, sapato;
-	Model chapeuAtual,oculosAtual,camisaAtual,calcaAtual,sapatoAtual;
+	int chapeu, oculos, camisa, calca, sapato, arma;
+	Model chapeuAtual,oculosAtual,camisaAtual,calcaAtual,sapatoAtual, armaAtual;
 };
 typedef struct EQUIPAMENTO EQUIPAMENTO;
 

@@ -72,6 +72,17 @@ void PERSONAGEM_USE(PERSONAGEM *personagem, MAPA* mapa)
             
         }
     }
+    else if(CheckCollisionBoxes(personagem->hitbox.use, mapa->item[3].hitbox)||CheckCollisionBoxes(personagem->hitbox.atual , mapa->item[3].hitbox))
+    {
+        mapa->item[3].pegou = true;
+        if(mapa->mapaAtual == 0)
+        {
+            personagem->equip.arma = 1;
+            mapa->item[3].hitbox = (BoundingBox){(Vector3){0,0,0}, (Vector3){0,0,0}};
+            msg = " voce pegou um 38tao ";
+            personagem->relogioLogs = clock();
+        }
+    }
 }
 
 void PERSONAGEM_USE_PRESS(PERSONAGEM* personagem)

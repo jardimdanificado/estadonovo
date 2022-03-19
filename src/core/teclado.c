@@ -51,6 +51,8 @@ void TECLADO_MAIN ( PERSONAGEM * personagem , ITEM *item, MAPA mapa)
             personagem->equip.chapeuAtual = item->chapeu[personagem->equip.chapeu].idle;
         if(personagem->equip.camisa != 0)
             personagem->equip.camisaAtual = item->camisa[personagem->equip.camisa].idle;
+        if(personagem->equip.arma != 0)
+            personagem->equip.armaAtual = item->arma[personagem->equip.arma].idle;
 	}
 	if ( IsKeyReleased ( KEY_DOWN ) || IsKeyReleased ( KEY_S ) )
 	{
@@ -61,6 +63,8 @@ void TECLADO_MAIN ( PERSONAGEM * personagem , ITEM *item, MAPA mapa)
             personagem->equip.chapeuAtual = item->chapeu[personagem->equip.chapeu].idle;
         if(personagem->equip.camisa != 0)
             personagem->equip.camisaAtual = item->camisa[personagem->equip.camisa].idle;
+        if(personagem->equip.arma != 0)
+            personagem->equip.armaAtual = item->arma[personagem->equip.arma].idle;
 	}
 	if ( IsKeyPressed ( KEY_SPACE ) &&PERSONAGEM_CHECARCHAO( *personagem, mapa) )
 	{
@@ -71,6 +75,8 @@ void TECLADO_MAIN ( PERSONAGEM * personagem , ITEM *item, MAPA mapa)
             personagem->equip.chapeuAtual = item->chapeu[personagem->equip.chapeu].use[0];
         if(personagem->equip.camisa != 0)
             personagem->equip.camisaAtual = item->camisa[personagem->equip.camisa].use[0];
+        if(personagem->equip.arma != 0)
+            personagem->equip.armaAtual = item->arma[personagem->equip.arma].idle;
 		personagem->velocidadePulo = 0.2;
 		personagem->pulando = true;
 		personagem->pulo = clock();
@@ -107,6 +113,8 @@ void TECLADO_MAIN ( PERSONAGEM * personagem , ITEM *item, MAPA mapa)
             personagem->equip.chapeuAtual = item->chapeu[personagem->equip.chapeu].idle;
         if(personagem->equip.camisa != 0)
             personagem->equip.camisaAtual = item->camisa[personagem->equip.camisa].idle;
+        if(personagem->equip.arma != 0)
+            personagem->equip.armaAtual = item->arma[personagem->equip.arma].idle;
 	}
 	if ( IsKeyPressed ( KEY_E ) )
 	{

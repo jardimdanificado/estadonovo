@@ -47,9 +47,20 @@ void LOADALL_MODELS(MAPA* mapa,PERSONAGEM* personagem,ITEM* item)
 	item->camisa[1].use[1] = LoadModel("./data/models/equips/camisa/1/use/1.glb");
 	item->camisa[1].use[2] = LoadModel("./data/models/equips/camisa/1/use/2.glb");
     
+    item->arma[1].idle = LoadModel("./data/models/equips/arma/1/idle/2.glb");
+	item->arma[1].run[0] = LoadModel("./data/models/equips/arma/1/run/0.glb");
+	item->arma[1].run[1] = LoadModel("./data/models/equips/arma/1/run/1.glb");
+	item->arma[1].run[2] = LoadModel("./data/models/equips/arma/1/run/2.glb");
+	item->arma[1].run[3] = LoadModel("./data/models/equips/arma/1/run/3.glb");
+	item->arma[1].run[4] = LoadModel("./data/models/equips/arma/1/run/4.glb");
+    item->arma[1].use[0] = LoadModel("./data/models/equips/arma/1/use/0.glb");
+    
     mapa->item[0].modelo = LoadModel("./data/models/map/level0/calca_drop.glb");
     mapa->item[1].modelo = LoadModel("./data/models/map/level0/chapeu_drop.glb");
     mapa->item[2].modelo = LoadModel("./data/models/map/level0/camisa_drop.glb");
+    mapa->item[3].modelo = LoadModel("./data/models/map/level0/38_drop.glb");
+    
+    mapa->props[0].modelo = LoadModel("./data/models/map/level0/banquinhos0.glb");
     
     char texto_local[39];
     for(int i = 0; i <4; i++)
@@ -62,6 +73,9 @@ void LOADALL_MODELS(MAPA* mapa,PERSONAGEM* personagem,ITEM* item)
         snprintf(texto_local, 39, "./data/models/map/level0/porta1-%d.glb", i);
         mapa->porta[1].modelo[i] = LoadModel(texto_local);
     }
+    
+    mapa->porta[2].modelo[0] = LoadModel("./data/models/map/level0/porta2-0.glb");
+    mapa->porta[3].modelo[0] = LoadModel("./data/models/map/level0/porta3-0.glb");
 
 }
 
@@ -71,6 +85,7 @@ void UNLOADALL_MODELS(PERSONAGEM* personagem, ITEM* item, MAPA* mapa)
 	UnloadModel(item->calca[1].idle);
     UnloadModel(item->chapeu[1].idle);
     UnloadModel(item->camisa[1].idle);
+    UnloadModel(item->arma[1].idle);
 
 	for ( int i = 0; i < sizeof ( personagem->modelo.run ); i++ )
 		UnloadModel ( personagem->modelo.run[i] );
@@ -84,8 +99,11 @@ void UNLOADALL_MODELS(PERSONAGEM* personagem, ITEM* item, MAPA* mapa)
     for ( int i = 0; i < sizeof ( item->chapeu[1].run ); i++ )
 		UnloadModel ( item->chapeu[1].run[i] );
     
-    for ( int i = 0; i < sizeof ( item->chapeu[1].run ); i++ )
+    for ( int i = 0; i < sizeof ( item->camisa[1].run ); i++ )
 		UnloadModel ( item->camisa[1].run[i] );
+    
+    for ( int i = 0; i < sizeof ( item->arma[1].run ); i++ )
+		UnloadModel ( item->arma[1].run[i] );
     
     for ( int i = 0; i < sizeof ( item->calca[1].use ); i++ )
 		UnloadModel ( item->calca[1].use[i] );
@@ -93,17 +111,24 @@ void UNLOADALL_MODELS(PERSONAGEM* personagem, ITEM* item, MAPA* mapa)
     for ( int i = 0; i < sizeof ( item->chapeu[1].use ); i++ )
 		UnloadModel ( item->chapeu[1].use[i] );
     
-    for ( int i = 0; i < sizeof ( item->chapeu[1].use ); i++ )
+    for ( int i = 0; i < sizeof ( item->camisa[1].use ); i++ )
 		UnloadModel ( item->camisa[1].use[i] );
+    
+    UnloadModel ( item->arma[1].use[0] );
     
     for(int i = 0; i <4; i++)
         UnloadModel(mapa->porta[0].modelo[i]);
-
- 
+    
+    for(int i = 0; i <4; i++)
+        UnloadModel(mapa->porta[1].modelo[i]);
+    
+    UnloadModel(mapa->porta[2].modelo[0]);
+    UnloadModel(mapa->porta[3].modelo[0]);
     UnloadModel(mapa->item[0].modelo);
     UnloadModel(mapa->item[1].modelo);
     UnloadModel(mapa->item[2].modelo);
-    
+    UnloadModel(mapa->item[3].modelo);
+    UnloadModel(mapa->props[0].modelo);
     UnloadModel(mapa->modelo[0]);
 
 }

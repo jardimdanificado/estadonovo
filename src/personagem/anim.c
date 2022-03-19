@@ -23,6 +23,8 @@ void PERSONAGEM_USEANIM(PERSONAGEM* personagem, MAPA *mapa, ITEM item)
                 personagem->equip.chapeuAtual = item.chapeu[personagem->equip.chapeu].use[0];
             if(personagem->equip.camisa != 0)
                 personagem->equip.camisaAtual = item.camisa[personagem->equip.camisa].use[0];
+            if(personagem->equip.arma != 0)
+                personagem->equip.armaAtual = item.arma[personagem->equip.arma].use[0];
 		}
 		break;
 		case 1:
@@ -34,6 +36,8 @@ void PERSONAGEM_USEANIM(PERSONAGEM* personagem, MAPA *mapa, ITEM item)
                 personagem->equip.chapeuAtual = item.chapeu[personagem->equip.chapeu].use[1];
             if(personagem->equip.camisa != 0)
                 personagem->equip.camisaAtual = item.camisa[personagem->equip.camisa].use[1];
+            if(personagem->equip.arma != 0)
+                personagem->equip.armaAtual = item.arma[personagem->equip.arma].use[0];
             PERSONAGEM_USE(*&personagem, *&mapa);
 
 		}
@@ -47,6 +51,8 @@ void PERSONAGEM_USEANIM(PERSONAGEM* personagem, MAPA *mapa, ITEM item)
                 personagem->equip.chapeuAtual = item.chapeu[personagem->equip.chapeu].use[2];
             if(personagem->equip.camisa != 0)
                 personagem->equip.camisaAtual = item.camisa[personagem->equip.camisa].use[2];
+            if(personagem->equip.arma != 0)
+                personagem->equip.armaAtual = item.arma[personagem->equip.arma].use[0];
 			if(personagem->usando == false)
 			{
 				personagem->modelo.atual = personagem->modelo.idle;
@@ -55,7 +61,9 @@ void PERSONAGEM_USEANIM(PERSONAGEM* personagem, MAPA *mapa, ITEM item)
                 if(personagem->equip.chapeu != 0)
                     personagem->equip.chapeuAtual = item.chapeu[personagem->equip.chapeu].idle;
                 if(personagem->equip.camisa != 0)
-                personagem->equip.camisaAtual = item.camisa[personagem->equip.camisa].idle;
+                    personagem->equip.camisaAtual = item.camisa[personagem->equip.camisa].idle;
+                if(personagem->equip.arma != 0)
+                    personagem->equip.armaAtual = item.arma[personagem->equip.arma].idle;
 				//msg = " ";
 			}
 		}
@@ -108,6 +116,8 @@ void PERSONAGEM_ANIMARUN(PERSONAGEM *personagem, char local_local, ITEM item)
                 personagem->equip.chapeuAtual = item.chapeu[personagem->equip.chapeu].run[0];
             if(personagem->equip.camisa != 0)
                 personagem->equip.camisaAtual = item.camisa[personagem->equip.camisa].run[0];
+            if(personagem->equip.arma != 0)
+                personagem->equip.armaAtual = item.arma[personagem->equip.arma].run[0];
             
 		}
 		break;
@@ -120,6 +130,8 @@ void PERSONAGEM_ANIMARUN(PERSONAGEM *personagem, char local_local, ITEM item)
                 personagem->equip.chapeuAtual = item.chapeu[personagem->equip.chapeu].run[1];
             if(personagem->equip.camisa != 0)
                 personagem->equip.camisaAtual = item.camisa[personagem->equip.camisa].run[1];
+            if(personagem->equip.arma != 0)
+                personagem->equip.armaAtual = item.arma[personagem->equip.arma].run[1];
 		}
 		break;
 		case 2:
@@ -131,6 +143,8 @@ void PERSONAGEM_ANIMARUN(PERSONAGEM *personagem, char local_local, ITEM item)
                 personagem->equip.chapeuAtual = item.chapeu[personagem->equip.chapeu].run[2];
             if(personagem->equip.camisa != 0)
                 personagem->equip.camisaAtual = item.camisa[personagem->equip.camisa].run[2];
+            if(personagem->equip.arma != 0)
+                personagem->equip.armaAtual = item.arma[personagem->equip.arma].run[2];
 
 		}
 		break;
@@ -143,6 +157,8 @@ void PERSONAGEM_ANIMARUN(PERSONAGEM *personagem, char local_local, ITEM item)
                 personagem->equip.chapeuAtual = item.chapeu[personagem->equip.chapeu].run[3];
             if(personagem->equip.camisa != 0)
                 personagem->equip.camisaAtual = item.camisa[personagem->equip.camisa].run[3];
+            if(personagem->equip.arma != 0)
+                personagem->equip.armaAtual = item.arma[personagem->equip.arma].run[3];
 
 		}
 		break;
@@ -155,6 +171,8 @@ void PERSONAGEM_ANIMARUN(PERSONAGEM *personagem, char local_local, ITEM item)
                 personagem->equip.chapeuAtual = item.chapeu[personagem->equip.chapeu].run[4];
             if(personagem->equip.camisa != 0)
                 personagem->equip.camisaAtual = item.camisa[personagem->equip.camisa].run[4];
+            if(personagem->equip.arma != 0)
+                personagem->equip.armaAtual = item.arma[personagem->equip.arma].run[4];
 		}
 		break;
 	}

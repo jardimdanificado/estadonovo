@@ -17,13 +17,19 @@ struct MAPA_ITEM
 };
 typedef struct MAPA_ITEM MAPA_ITEM;
 
+struct MAPA_PROPS
+{
+    Model modelo;
+	BoundingBox hitbox;
+};
+typedef struct MAPA_PROPS MAPA_PROPS;
+
 struct MAPA
 {
 	Model modelo[2];
-    
     BoundingBox hitboxHorizontal[10],hitboxVertical[10];
     Model dummy;
-    
+    MAPA_PROPS props[10];
     int mapaAtual;
     BoundingBox area[10];
     MAPA_ITEM item[10];

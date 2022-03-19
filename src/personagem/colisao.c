@@ -29,6 +29,10 @@ bool PERSONAGEM_CHECARPAREDE(PERSONAGEM personagem, MAPA mapa, char opcao)
             {
                 return true;
             }
+            else if(CheckCollisionBoxes(personagem.hitbox.frenteAtual, mapa.props[0].hitbox))
+            {
+                return true;
+            }
                 
         }
         
