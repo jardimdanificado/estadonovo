@@ -110,8 +110,8 @@ int main ( void )
     SetExitKey(KEY_END);
 	while ( !WindowShouldClose()&&menu.sair == false )      // Detect window close button or ESC key
 	{
-        if(IsKeyPressed(KEY_B))
-            AIHUMAN_DEFINEALVO(&humano, 0, personagem.posicao);
+        //if(IsKeyPressed(KEY_B))
+        AIHUMAN_DEFINEALVO(&humano, 0, personagem.posicao);
         
         AIHUMAN_MOVIMENTO(personagem, mapa, &humano, 0, item);
         
