@@ -1,0 +1,46 @@
+SIZE 14
+
+link0 ./data/models/personagem/body/cabeca.iqm
+link1 ./data/models/personagem/body/pescoco.iqm
+link2 ./data/models/personagem/body/peitoral.iqm
+link3 ./data/models/personagem/body/barriga.iqm
+link4 ./data/models/personagem/body/maodireita.iqm
+link5 ./data/models/personagem/body/maoesquerda.iqm
+link6 ./data/models/personagem/body/bracodireito.iqm
+link7 ./data/models/personagem/body/bracoesquerdo.iqm
+link8 ./data/models/personagem/body/ombrodireito.iqm
+link9 ./data/models/personagem/body/ombroesquerdo.iqm
+link10 ./data/models/personagem/body/coxadireita.iqm
+link11 ./data/models/personagem/body/coxaesquerda.iqm
+link12 ./data/models/personagem/body/pernadireita.iqm
+link13 ./data/models/personagem/body/pernaesquerda.iqm
+
+name0 player-cabeca
+name1 player-pescoco
+name2 player-peitoral
+name3 player-barriga
+name4 player-maod
+name5 player-maoe
+name6 player-bracod
+name7 player-bracoe
+name8 player-ombrod
+name9 player-ombroe
+name10 player-coxad
+name11 player-coxae
+name12 player-pernad
+name13 player-pernae
+
+animated0 true
+animated1 true
+animated2 true
+animated3 true
+animated4 true
+animated5 true
+animated6 true
+animated7 true
+animated8 true
+animated9 true
+animated10 true
+animated11 true
+animated12 true
+animated13 true

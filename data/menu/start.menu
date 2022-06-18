@@ -1,0 +1,6 @@
+MAX 2
+link0 ./data/temp/lang.menu
+txt0 %menu0
+txt1 %menu1
+f0 OFFLOOP
+f1 EXIT

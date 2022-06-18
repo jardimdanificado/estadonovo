@@ -1,0 +1,14 @@
+“Here’s to those who inspire you and don’t even know it.” —Anonymous
+
+
+My especial thanks to:
+
+Leonardo Reis (https://github.com/reonardoleis) - Wrote the windows build files, and built Estado Novo for windows the first time.
+
+Kayoa - Composed main theme music.
+
+assblasterplastered (https://sketchfab.com/assblasterplastered) - Made the base mesh used for player and npcs. License is included in path data/models/personagem/license.txt
+
+raylib (https://www.raylib.com/) - Robust lib for opengl manipulation and game development.
+
+Pavel Pertsev(https://github.com/morhetz) - Created gruvbox color scheme.

@@ -1,0 +1,161 @@
+// ⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯⣯
+// ⣯⣇⣇⣇⣇⣇⣇⣇⣯⠁⠀⠀⠀⠀⢻⣧⣏⣇⣇⣇⣇⣇⣇⣇⣇⣇⣇⣇⣇⣇
+// ⣏⣧⣇⣇⣇⣇⣇⣇⣯⠀⠀⠀⠀⠀⢠⣇⣧⣇⣇⣇⣇⣇⣇⣇⣇⣇⣇⣇⣇⣯
+// ⣧⣏⣇⣇⣇⣧⣧⣯⣯⡀⠀⠀⣤⣶⣿⣧⣏⣏⣇⣇⣇⣇⣇⣇⣇⣇⣇⣇⣇⣇
+// ⣯⣯⣇⣧⣯⠛⠉⣿⣇⣇⠀⠀⣯⣏⣇⣇⣧⣧⣇⣧⣇⣇⣇⣇⣇⣇⣇⣇⣇⣏
+// ⣯⣯⠟⠁⠀⠀⣤⣿⣧⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⣇⣇⣇⣇⣇⣇⣇⣇⣇⣇⣇
+// ⣯⠋⠀⠀⣴⣿⣇⣧⣯⣯⠀⠀⢰⣶⣶⣶⣶⣶⣶⣇⣏⣏⣧⣇⣇⣇⣇⣇⣇⣇
+// ⡏⠀⠀⣾⣯⣯⣏⣧⣏⣯⠀⠀⠈⠋⠋⠋⠋⠋⠋⠋⠋⠋⣯⣧⣧⣇⣇⣇⣧⣇
+// ⡂⠀⠀⣇⣧⣯⣧⣇⣇⣯⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣄⠀⠀⢫⣧⣏⣇⣇⣧⣇
+// ⣧⠀⠀⣿⣇⣯⣏⣯⣇⣇⣧⣏⣏⣇⣧⣧⣏⡏⠙⣧⣏⣦⠀⠀⠻⣧⣇⣇⣏⣇
+// ⣏⣄⠀⠈⢿⣧⣇⣇⣇⣇⣧⣏⣏⣏⣏⣯⠋⠀⠀⣼⣧⣯⣷⠀⠀⠙⣯⠏⢻⣏
+// ⣯⣏⣦⠀⠀⠈⠛⢿⣇⣧⣇⣧⣇⠟⠋⠀⠀⢀⣾⣇⣧⣇⣯⣿⡀⠀⠀⠀⣠⣿
+// ⣇⣇⣇⣏⣶⣤⣀⠀⠀⠀⠀⠀⠀⠀⣀⣤⣾⣯⣯⣯⣧⣧⣧⣇⣏⣦⣮⣮⣮⣮
+
+void TECLADO_MAIN(MENU *menu, Font font, Font fontTitle, Font fontSubTitle, LOGO logo, DATA *data)
+{
+    if(IsKeyPressed(KEY_ESCAPE))
+    {
+        MQEXIT = MQMenu("data/menu/esc.menu", false,  * &data, font, fontTitle, fontSubTitle, &logo,  screenH);
+    }
+    if(IsKeyPressed(KEY_TAB))
+    {
+
+    }
+    if(IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
+    {
+        if(data->game.rotacao.personagem[0] == 0)
+            data->game.rotacao.personagem[0] = 360;
+        //             data.game.posicao.personagem[0].x -= 0.03f;
+        data->game.rotacao.personagem[0] -= 6;
+    }
+    if(IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
+    {
+        if(data->game.rotacao.personagem[0] == 360)
+            data->game.rotacao.personagem[0] = 0;
+        //             data.game.posicao.personagem[0].x += 0.03f;
+        data->game.rotacao.personagem[0] += 6;
+
+    }
+    if(IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
+    {
+        if(data->game.boolean.personagem[0].mirando == false)
+        {
+            data->game.boolean.personagem[0].andando = true;
+            data->game.boolean.personagem[0].andandoPraTras = true;
+        }
+    }
+    if(IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
+    {
+        if(data->game.boolean.personagem[0].mirando == false)
+        {
+            data->game.posicao.personagem[0] = MQPlayerMove(data->game.posicao.personagem[0], data->game.rotacao.personagem[0], (data->game.velocidade.personagem[0].velocidade) * (-1));
+        }
+    }
+    if(IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+    {
+        if(data->game.boolean.personagem[0].mirando == false)
+        {
+            data->game.boolean.personagem[0].andando = true;
+        }
+    }
+    if(IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
+    {
+        if(data->game.boolean.personagem[0].mirando == false)
+        {
+            data->game.posicao.personagem[0] = MQPlayerMove(data->game.posicao.personagem[0], data->game.rotacao.personagem[0], data->game.velocidade.personagem[0].velocidade);
+        }
+    }
+    if(IsKeyDown(KEY_LEFT_SHIFT))
+    {
+        data->game.velocidade.personagem[0].velocidade = 0.2f;
+    }
+    if(IsKeyReleased(KEY_LEFT_SHIFT))
+    {
+        data->game.velocidade.personagem[0].velocidade = 0.1f;
+    }
+    if(IsKeyReleased(KEY_UP) || IsKeyReleased(KEY_W))
+    {
+        if(data->game.boolean.personagem[0].andando == true)
+            data->game.boolean.personagem[0].andando = false;
+    }
+    if(IsKeyReleased(KEY_DOWN) || IsKeyReleased(KEY_S))
+    {
+        data->game.boolean.personagem[0].andando = false;
+        data->game.boolean.personagem[0].andandoPraTras = false;
+    }
+    if(IsKeyPressed(KEY_SPACE) /*&&MQPlayerCheckFloor( *data )*/)
+    {
+        if(data->game.boolean.personagem[0].mirando == false)
+        {
+            data->game.velocidade.personagem[0].velocidadePulo = 0.2;
+            data->game.boolean.personagem[0].pulando = true;
+            data->session.relogio.personagem[0].pulo = clock();
+        }
+    }
+    if(IsKeyDown(KEY_SPACE))
+    {
+        if(data->game.boolean.personagem[0].mirando == false)
+        {
+            if(data->game.boolean.personagem[0].pulando == true)
+                data->game.posicao.personagem[0].y += data->game.velocidade.personagem[0].velocidade * 2;
+            if(clock() >= data->session.relogio.personagem[0].pulo + 5000 && clock() < data->session.relogio.personagem[0].pulo + 7500)
+            {
+                data->game.velocidade.personagem[0].velocidadePulo = 0.1;
+            }
+            else if(clock() >= data->session.relogio.personagem[0].pulo + 7500 && clock() < data->session.relogio.personagem[0].pulo + 9000)
+            {
+                data->game.velocidade.personagem[0].velocidadePulo = 0.05;
+            }
+            else if(clock() >= data->session.relogio.personagem[0].pulo + 9000 && clock() < data->session.relogio.personagem[0].pulo + 10000)
+            {
+                data->game.velocidade.personagem[0].velocidadePulo = 0.025;
+            }
+            else if(clock() > data->session.relogio.personagem[0].pulo + 10000)
+            {
+                data->game.boolean.personagem[0].pulando = false;
+            }
+        }
+    }
+    if(IsKeyReleased(KEY_SPACE))
+    {
+        if(data->game.boolean.personagem[0].mirando == false)
+        {
+            data->game.boolean.personagem[0].pulando = false;
+            data->session.relogio.personagem[0].pulo = clock();
+        }
+    }
+    if(IsKeyPressed(KEY_E))
+    {
+
+        data->game.boolean.personagem[0].usando = true;
+
+        data->session.relogio.personagem[0].relogioNovo = 0;
+        data->session.relogio.personagem[0].relogioVelho = 0;
+        MQPlayerUse( *&data, 0);
+        data->game.boolean.personagem[0].usando = false;
+    }
+    if(IsKeyPressed(KEY_F))
+    {
+        data->game.boolean.personagem[0].pulando = false;
+        if(data->game.ponteiro.personagem[0].item.arma > 0)
+        {
+
+            data->game.boolean.personagem[0].mirando = true;
+        }
+    }
+    if(IsKeyReleased(KEY_F))
+    {
+        if(data->game.ponteiro.personagem[0].item.arma > 0)
+        {
+            data->game.boolean.personagem[0].mirando = false;
+        }
+    }
+    if(IsKeyPressed(KEY_G))
+    {
+        if(data->game.ponteiro.personagem[0].item.arma != 0 || data->game.ponteiro.personagem[0].item.calca != 0 || data->game.ponteiro.personagem[0].item.camisa != 0 || data->game.ponteiro.personagem[0].item.chapeu != 0 || data->game.ponteiro.personagem[0].item.oculos != 0 || data->game.ponteiro.personagem[0].item.sapato != 0)
+        {
+
+        }
+    }
+}

@@ -1,0 +1,34 @@
+SIZEMENU 8
+%menu0 Jogar
+%menu1 Sair
+%menu2 Salvar
+%menu3 Carregar
+%menu4 Voltar+ao+jogo
+%menu5 Equipamentos
+%menu6 Itens
+%menu7 Salvar/Carregar
+
+SIZEACT 4
+%act0 Você+abriu+a+porta
+%act1 Você+fechou+a+porta
+%act2 A+porta+esta+trancada
+%act3 Você+pegou
+
+SIZEGUN 1
+%gun0 38+do+estado
+
+SIZEHAT 1
+%hat0 chapeu+do+estado
+
+SIZEGLASS 1
+%glass0 oculos+do+estado
+
+SIZEPANTS 1
+%pants0 calca+do+estado
+
+SIZESHIRT 1
+%shirt0 colete+do+estado
+
+SIZESHOES 1
+%shoes0 sapato+do+estado
+
