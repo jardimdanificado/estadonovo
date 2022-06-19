@@ -1,8 +1,8 @@
 bool MQCheckCollisionPoint(Vector3 inPosi,BoundingBox target, int size)
 {
     BoundingBox localhitbox;
-    localhitbox.min = (Vector3) {inPosi.x - size/2, inPosi.y - size/2, inPosi.z - size/2};
-    localhitbox.max = (Vector3) {inPosi.x + size/2, inPosi.y + size/2, inPosi.z + size/2};
+    localhitbox.min = (Vector3) {inPosi.x - (size/2), inPosi.y - (size/2), inPosi.z - (size/2)};
+    localhitbox.max = (Vector3) {inPosi.x + (size/2), inPosi.y + (size/2), inPosi.z + (size/2)};
     return(CheckCollisionBoxes(target, localhitbox));
 }
 
@@ -25,92 +25,37 @@ bool* MQCheckHitboxPoints(BoundingBox input, BoundingBox target)
     //19 18 23
     //26 25 24
 
-    BoundingBox hitboxLocal2;
-    bool facemeio[9],facemin[9],facemax[9],resultado[27];
+    bool resultado[27];
 
-    hitboxLocal2.min = (Vector3) {input.max.x/2 - 0.01, input.max.y/2 - 0.01, input.min.z - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x/2 + 0.01, input.max.y/2 + 0.01, input.min.z + 0.01};
-    resultado[0] = MQCheckHitboxPoints(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.max.x - 0.01, input.max.y/2 - 0.01, input.min.z - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x + 0.01, input.max.y/2 + 0.01, input.min.z + 0.01};
-    facemin[1] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.max.x - 0.01, input.max.y - 0.01, input.min.z - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x + 0.01, input.max.y + 0.01, input.min.z + 0.01};
-    facemin[2] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.max.x/2 - 0.01, input.max.y - 0.01, input.min.z - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x/2 + 0.01, input.max.y + 0.01, input.min.z + 0.01};
-    facemin[3] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.min.x - 0.01, input.max.y - 0.01, input.min.z - 0.01};
-    hitboxLocal2.max = (Vector3) {input.min.x + 0.01, input.max.y + 0.01, input.min.z + 0.01};
-    facemin[4] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.min.x - 0.01, input.max.y/2 - 0.01, input.min.z - 0.01};
-    hitboxLocal2.max = (Vector3) {input.min.x + 0.01, input.max.y/2 + 0.01, input.min.z + 0.01};
-    facemin[5] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.min.x - 0.01, input.min.y - 0.01, input.min.z - 0.01};
-    hitboxLocal2.max = (Vector3) {input.min.x + 0.01, input.min.y + 0.01, input.min.z + 0.01};
-    facemin[6] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.max.x/2 - 0.01, input.min.y - 0.01, input.min.z - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x/2 + 0.01, input.min.y + 0.01, input.min.z + 0.01};
-    facemin[7] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.max.x - 0.01, input.min.y - 0.01, input.min.z - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x + 0.01, input.min.y + 0.01, input.min.z + 0.01};
-    facemin[8] = CheckCollisionBoxes(target, hitboxLocal2);
+    resultado[0] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.min.z}, target, 0.1);
+    resultado[1] = MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.min.z}, target, 0.1);
+    resultado[2] = MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.min.z}, target, 0.1);
+    resultado[3] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.min.z}, target, 0.1);
+    resultado[4] = MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.min.z}, target, 0.1);
+    resultado[5] = MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.min.z}, target, 0.1);
+    resultado[6] = MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.min.z}, target, 0.1);
+    resultado[7] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.min.z}, target, 0.1);
+    resultado[8] = MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.min.z}, target, 0.1);
 
-    hitboxLocal2.min = (Vector3) {input.max.x/2 - 0.01, input.max.y/2 - 0.01, input.max.z/2 - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x/2 + 0.01, input.max.y/2 + 0.01, input.max.z/2 + 0.01};
-    facemax[0] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.max.x - 0.01, input.max.y/2 - 0.01, input.max.z/2 - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x + 0.01, input.max.y/2 + 0.01, input.max.z/2 + 0.01};
-    facemax[1] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.max.x - 0.01, input.max.y - 0.01, input.max.z - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x + 0.01, input.max.y + 0.01, input.max.z + 0.01};
-    facemax[2] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.max.x/2 - 0.01, input.max.y - 0.01, input.max.z - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x/2 + 0.01, input.max.y + 0.01, input.max.z + 0.01};
-    facemax[3] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.min.x - 0.01, input.max.y - 0.01, input.max.z - 0.01};
-    hitboxLocal2.max = (Vector3) {input.min.x + 0.01, input.max.y + 0.01, input.max.z + 0.01};
-    facemax[4] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.min.x - 0.01, input.max.y/2 - 0.01, input.max.z - 0.01};
-    hitboxLocal2.max = (Vector3) {input.min.x + 0.01, input.max.y/2 + 0.01, input.max.z + 0.01};
-    facemax[5] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.min.x - 0.01, input.min.y - 0.01, input.max.z - 0.01};
-    hitboxLocal2.max = (Vector3) {input.min.x + 0.01, input.min.y + 0.01, input.max.z + 0.01};
-    facemax[6] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.max.x/2 - 0.01, input.min.y - 0.01, input.max.z - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x/2 + 0.01, input.min.y + 0.01, input.max.z + 0.01};
-    facemax[7] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.max.x - 0.01, input.min.y - 0.01, input.max.z/2 - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x + 0.01, input.min.y + 0.01, input.max.z/2 + 0.01};
-    facemax[8] = CheckCollisionBoxes(target, hitboxLocal2);
+    resultado[9] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.min.z/2}, target, 0.1);
+    resultado[10] = MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.min.z/2}, target, 0.1);
+    resultado[11] = MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.min.z/2}, target, 0.1);
+    resultado[12] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.min.z/2}, target, 0.1);
+    resultado[13] = MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.min.z/2}, target, 0.1);
+    resultado[14] = MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.min.z/2}, target, 0.1);
+    resultado[15] = MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.min.z/2}, target, 0.1);
+    resultado[16] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.min.z/2}, target, 0.1);
+    resultado[17] = MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.min.z/2}, target, 0.1);
 
-    hitboxLocal2.min = (Vector3) {input.max.x/2 - 0.01, input.max.y/2 - 0.01, input.max.z/2 - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x/2 + 0.01, input.max.y/2 + 0.01, input.max.z/2 + 0.01};
-    facemeio[0] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.max.x - 0.01, input.max.y/2 - 0.01, input.max.z/2 - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x + 0.01, input.max.y/2 + 0.01, input.max.z/2 + 0.01};
-    facemeio[1] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.max.x - 0.01, input.max.y - 0.01, input.max.z/2 - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x + 0.01, input.max.y + 0.01, input.max.z/2 + 0.01};
-    facemeio[2] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.max.x/2 - 0.01, input.max.y - 0.01, input.max.z/2 - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x/2 + 0.01, input.max.y + 0.01, input.max.z/2 + 0.01};
-    facemeio[3] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.min.x - 0.01, input.max.y - 0.01, input.max.z/2 - 0.01};
-    hitboxLocal2.max = (Vector3) {input.min.x + 0.01, input.max.y + 0.01, input.max.z/2 + 0.01};
-    facemeio[4] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.min.x - 0.01, input.max.y/2 - 0.01, input.max.z/2 - 0.01};
-    hitboxLocal2.max = (Vector3) {input.min.x + 0.01, input.max.y/2 + 0.01, input.max.z/2 + 0.01};
-    facemeio[5] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.min.x - 0.01, input.min.y - 0.01, input.max.z/2 - 0.01};
-    hitboxLocal2.max = (Vector3) {input.min.x + 0.01, input.min.y + 0.01, input.max.z/2 + 0.01};
-    facemeio[6] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.max.x/2 - 0.01, input.min.y - 0.01, input.max.z/2 - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x/2 + 0.01, input.min.y + 0.01, input.max.z/2 + 0.01};
-    facemeio[7] = CheckCollisionBoxes(target, hitboxLocal2);
-    hitboxLocal2.min = (Vector3) {input.max.x - 0.01, input.min.y - 0.01, input.max.z/2 - 0.01};
-    hitboxLocal2.max = (Vector3) {input.max.x + 0.01, input.min.y + 0.01, input.max.z/2 + 0.01};
-    facemeio[8] = CheckCollisionBoxes(target, hitboxLocal2);
+    resultado[18] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.max.z}, target, 0.1);
+    resultado[19] = MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.max.z}, target, 0.1);
+    resultado[20] = MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.max.z}, target, 0.1);
+    resultado[21] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.max.z}, target, 0.1);
+    resultado[22] = MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.max.z}, target, 0.1);
+    resultado[23] = MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.max.z}, target, 0.1);
+    resultado[24] = MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.max.z}, target, 0.1);
+    resultado[25] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.max.z}, target, 0.1);
+    resultado[26] = MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.max.z}, target, 0.1);
 
     //resultbox
     //2  3  4
@@ -124,38 +69,10 @@ bool* MQCheckHitboxPoints(BoundingBox input, BoundingBox target)
     //20 21 22
     //19 18 23
     //26 25 24
-
-    resultado[0] = facemin[0];
-    resultado[1] = facemin[1];
-    resultado[2] = facemin[2];
-    resultado[3] = facemin[3];
-    resultado[4] = facemin[4];
-    resultado[5] = facemin[5];
-    resultado[6] = facemin[6];
-    resultado[7] = facemin[7];
-    resultado[8] = facemin[8];
-    resultado[9] = facemeio[0];
-    resultado[10] = facemeio[1];
-    resultado[11] = facemeio[2];
-    resultado[12] = facemeio[3];
-    resultado[13] = facemeio[4];
-    resultado[14] = facemeio[5];
-    resultado[15] = facemeio[6];
-    resultado[16] = facemeio[7];
-    resultado[17] = facemeio[8];
-    resultado[18] = facemax[0];
-    resultado[19] = facemax[1];
-    resultado[20] = facemax[2];
-    resultado[21] = facemax[3];
-    resultado[22] = facemax[4];
-    resultado[23] = facemax[5];
-    resultado[24] = facemax[6];
-    resultado[25] = facemax[7];
-    resultado[26] = facemax[8];
     return resultado;
 }
 
-float MQReturnWallCollisionPoint(DATA data, char *hitboxID,float LocalRotation)
+float MQReturnCollisionCube(DATA data, char *hitboxID,float LocalRotation)
 {
     int hitboxIndex = atoi(abinCoreReturnData("./data/temp/hitbox.temp", hitboxID));
     int hitboxMax = atoi(abinCoreReturnData("./data/temp/hitbox.temp", "SIZE"));
@@ -166,14 +83,14 @@ float MQReturnWallCollisionPoint(DATA data, char *hitboxID,float LocalRotation)
         {
             bool LocalBool[27] = MQCheckHitboxPoints( hitboxLocal, data.file.hitbox[i]);
             
-            if(LocalRotation>=315||LocalRotation<45)
-                return data.file.hitbox[i].min.z;
-            else if(LocalRotation>=45||LocalRotation<135)
-                return data.file.hitbox[i].min.x;
-            else if(LocalRotation>=135||LocalRotation<225)
-                return data.file.hitbox[i].max.z;
-            else if(LocalRotation>=225||LocalRotation<315)
-                return data.file.hitbox[i].max.x;
+            //if(LocalRotation>=315||LocalRotation<45)
+            //    return data.file.hitbox[i].min.z;
+            //else if(LocalRotation>=45||LocalRotation<135)
+            //    return data.file.hitbox[i].min.x;
+            //else if(LocalRotation>=135||LocalRotation<225)
+            //    return data.file.hitbox[i].max.z;
+            //else if(LocalRotation>=225||LocalRotation<315)
+            //    return data.file.hitbox[i].max.x;
         }
         else if(i == hitboxMax)
         {
