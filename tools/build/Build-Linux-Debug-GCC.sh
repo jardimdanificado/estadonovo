@@ -10,7 +10,7 @@ cp -r /../../data/ /../../../BUILD/EstadoNovo_$current_time/
 
 cp /../../credits.text /../../../BUILD/EstadoNovo_$current_time/
 
-cp /../../1964/config.text /../../../BUILD/EstadoNovo_$current_time/
+cp /../../src/1964/config.text /../../../BUILD/EstadoNovo_$current_time/
 
 cp /../../debug /../../../BUILD/EstadoNovo_$current_time/debug.AppImage&&cd /../../../BUILD/EstadoNovo_$current_time/&&./debug.AppImage
 

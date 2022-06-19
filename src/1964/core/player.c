@@ -25,37 +25,33 @@ bool* MQCheckHitboxPoints(BoundingBox input, BoundingBox target)
     //19 18 23
     //26 25 24
 
-    bool resultado[27];
-
-    resultado[0] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.min.z}, target, 0.1);
-    resultado[1] = MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.min.z}, target, 0.1);
-    resultado[2] = MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.min.z}, target, 0.1);
-    resultado[3] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.min.z}, target, 0.1);
-    resultado[4] = MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.min.z}, target, 0.1);
-    resultado[5] = MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.min.z}, target, 0.1);
-    resultado[6] = MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.min.z}, target, 0.1);
-    resultado[7] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.min.z}, target, 0.1);
-    resultado[8] = MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.min.z}, target, 0.1);
-
-    resultado[9] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.min.z/2}, target, 0.1);
-    resultado[10] = MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.min.z/2}, target, 0.1);
-    resultado[11] = MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.min.z/2}, target, 0.1);
-    resultado[12] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.min.z/2}, target, 0.1);
-    resultado[13] = MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.min.z/2}, target, 0.1);
-    resultado[14] = MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.min.z/2}, target, 0.1);
-    resultado[15] = MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.min.z/2}, target, 0.1);
-    resultado[16] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.min.z/2}, target, 0.1);
-    resultado[17] = MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.min.z/2}, target, 0.1);
-
-    resultado[18] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.max.z}, target, 0.1);
-    resultado[19] = MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.max.z}, target, 0.1);
-    resultado[20] = MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.max.z}, target, 0.1);
-    resultado[21] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.max.z}, target, 0.1);
-    resultado[22] = MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.max.z}, target, 0.1);
-    resultado[23] = MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.max.z}, target, 0.1);
-    resultado[24] = MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.max.z}, target, 0.1);
-    resultado[25] = MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.max.z}, target, 0.1);
-    resultado[26] = MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.max.z}, target, 0.1);
+    return ((bool[]){MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.min.z}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.min.z}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.min.z}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.min.z}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.min.z}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.min.z}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.min.z}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.min.z}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.min.z}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.max.z/2}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.max.z/2}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.max.z/2}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.max.z/2}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.max.z/2}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.max.z/2}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.max.z/2}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.max.z/2}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.max.z/2}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.max.z}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.max.z}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.max.z}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.max.z}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.max.z}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.max.z}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.max.z}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.max.z}, target, 0.1),
+    MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.max.z}, target, 0.1)});
 
     //resultbox
     //2  3  4
@@ -69,7 +65,6 @@ bool* MQCheckHitboxPoints(BoundingBox input, BoundingBox target)
     //20 21 22
     //19 18 23
     //26 25 24
-    return resultado;
 }
 
 float MQReturnCollisionCube(DATA data, char *hitboxID,float LocalRotation)
@@ -81,7 +76,8 @@ float MQReturnCollisionCube(DATA data, char *hitboxID,float LocalRotation)
     for(int i = 0; i < hitboxMax; i++)
         if(CheckCollisionBoxes(data.file.hitbox[i], hitboxLocal) && i != hitboxIndex)
         {
-            bool LocalBool[27] = MQCheckHitboxPoints( hitboxLocal, data.file.hitbox[i]);
+            bool LocalBool = (bool)malloc(sizeof(bool)*27);
+            MQCheckHitboxPoints( hitboxLocal, data.file.hitbox[i]);
             
             //if(LocalRotation>=315||LocalRotation<45)
             //    return data.file.hitbox[i].min.z;
