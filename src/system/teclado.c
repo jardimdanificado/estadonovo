@@ -51,6 +51,17 @@ void TECLADO_MAIN(MENU *menu, Font font, Font fontTitle, Font fontSubTitle, LOGO
         {
             data->game.posicao.personagem[0] = MQPlayerMove(data->game.posicao.personagem[0], data->game.rotacao.personagem[0], (data->game.velocidade.personagem[0].velocidade) * (-1));
         }
+        Vector3 Vec3buff = MQCheckWall(*data,"player-peitoral",360-(data->game.rotacao.personagem[0]));
+        if(Vec3buff.x != __INT_MAX__)
+        {
+            if(data->game.posicao.personagem[0].x+0.2 > Vec3buff.x&&data->game.posicao.personagem[0].x-2<Vec3buff.x)
+                data->game.posicao.personagem[0].x = Vec3buff.x;
+        } 
+        if(Vec3buff.z != __INT_MAX__)
+        {
+            if(data->game.posicao.personagem[0].z+0.2 > Vec3buff.z&&data->game.posicao.personagem[0].z-2<Vec3buff.z)
+                data->game.posicao.personagem[0].z = Vec3buff.z;
+        }
     }
     if(IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
     {
@@ -64,6 +75,17 @@ void TECLADO_MAIN(MENU *menu, Font font, Font fontTitle, Font fontSubTitle, LOGO
         if(data->game.boolean.personagem[0].mirando == false)
         {
             data->game.posicao.personagem[0] = MQPlayerMove(data->game.posicao.personagem[0], data->game.rotacao.personagem[0], data->game.velocidade.personagem[0].velocidade);
+        }
+        Vector3 Vec3buff = MQCheckWall(*data,"player-peitoral",data->game.rotacao.personagem[0]);
+        if(Vec3buff.x != __INT_MAX__)
+        {
+            if(data->game.posicao.personagem[0].x+0.2 > Vec3buff.x&&data->game.posicao.personagem[0].x-2<Vec3buff.x)
+                data->game.posicao.personagem[0].x = Vec3buff.x;
+        } 
+        if(Vec3buff.z != __INT_MAX__)
+        {
+            if(data->game.posicao.personagem[0].z+0.2 > Vec3buff.z&&data->game.posicao.personagem[0].z-2<Vec3buff.z)
+                data->game.posicao.personagem[0].z = Vec3buff.z;
         }
     }
     if(IsKeyDown(KEY_LEFT_SHIFT))

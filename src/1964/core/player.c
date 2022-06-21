@@ -6,7 +6,7 @@ bool MQCheckCollisionPoint(Vector3 inPosi,BoundingBox target, int size)
     return(CheckCollisionBoxes(target, localhitbox));
 }
 
-bool* MQCheckHitboxPoints(BoundingBox input, BoundingBox target)
+bool* MQReturnCollisionCube(BoundingBox input, BoundingBox target)
 {
     //imagine a cube
     
@@ -25,33 +25,37 @@ bool* MQCheckHitboxPoints(BoundingBox input, BoundingBox target)
     //19 18 23
     //26 25 24
 
-    return ((bool[]){MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.min.z}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.min.z}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.min.z}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.min.z}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.min.z}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.min.z}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.min.z}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.min.z}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.min.z}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.max.z/2}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.max.z/2}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.max.z/2}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.max.z/2}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.max.z/2}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.max.z/2}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.max.z/2}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.max.z/2}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.max.z/2}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.max.z}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.max.z}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.max.z}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.max.z}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.max.z}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.max.z}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.max.z}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.max.z}, target, 0.1),
-    MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.max.z}, target, 0.1)});
+    return ((bool[]){
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.min.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.min.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.min.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.min.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.min.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.min.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.min.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.min.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.min.z}, target, 0.02),
+        
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.max.z/2}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.max.z/2}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.max.z/2}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.max.z/2}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.max.z/2}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.max.z/2}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.max.z/2}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.max.z/2}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.max.z/2}, target, 0.02),
+        
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.max.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.max.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.max.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.max.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.max.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.max.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.max.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.max.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.max.z}, target, 0.02)
+    });
 
     //resultbox
     //2  3  4
@@ -67,7 +71,7 @@ bool* MQCheckHitboxPoints(BoundingBox input, BoundingBox target)
     //26 25 24
 }
 
-float MQReturnCollisionCube(DATA data, char *hitboxID,float LocalRotation)
+Vector3 MQCheckWall(DATA data, char *hitboxID,float LocalRotation)
 {
     int hitboxIndex = atoi(abinCoreReturnData("./data/temp/hitbox.temp", hitboxID));
     int hitboxMax = atoi(abinCoreReturnData("./data/temp/hitbox.temp", "SIZE"));
@@ -76,23 +80,76 @@ float MQReturnCollisionCube(DATA data, char *hitboxID,float LocalRotation)
     for(int i = 0; i < hitboxMax; i++)
         if(CheckCollisionBoxes(data.file.hitbox[i], hitboxLocal) && i != hitboxIndex)
         {
-            bool LocalBool = (bool)malloc(sizeof(bool)*27);
-            MQCheckHitboxPoints( hitboxLocal, data.file.hitbox[i]);
-            
-            //if(LocalRotation>=315||LocalRotation<45)
-            //    return data.file.hitbox[i].min.z;
-            //else if(LocalRotation>=45||LocalRotation<135)
-            //    return data.file.hitbox[i].min.x;
-            //else if(LocalRotation>=135||LocalRotation<225)
-            //    return data.file.hitbox[i].max.z;
-            //else if(LocalRotation>=225||LocalRotation<315)
-            //    return data.file.hitbox[i].max.x;
+            bool *LocalBool;
+            LocalBool = malloc(sizeof(bool)*27);
+            LocalBool = MQReturnCollisionCube( hitboxLocal, data.file.hitbox[i]);
+            int localint=0;
+            for(int i = 0;i<27;i++)
+            {
+                localint += LocalBool[i];
+            }
+
+            if(localint != 0&&i != hitboxMax)
+            {
+                if(LocalRotation>=315&&LocalRotation<=360&&hitboxLocal.max.z > data.file.hitbox[i].min.z)
+                {
+                    if(LocalBool[21]+LocalBool[18]*LocalBool[25]!=0)
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].min.z});
+                    else
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,__INT_MAX__});
+                }
+                else if(LocalRotation>=0&&LocalRotation<45&&hitboxLocal.max.z > data.file.hitbox[i].min.z)
+                {
+                    if(LocalBool[21]+LocalBool[18]*LocalBool[25]!=0)
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].min.z});
+                    else
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,__INT_MAX__});
+                }
+                else if(LocalRotation>=45&&LocalRotation<90&&hitboxLocal.max.x > data.file.hitbox[i].min.x)
+                {
+                    if(LocalBool[11]+LocalBool[10]*LocalBool[17]!=0)
+                        return ((Vector3){data.file.hitbox[i].min.x,__INT_MAX__,__INT_MAX__});
+                    else
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,__INT_MAX__});
+                }
+                else if(LocalRotation>=90&&LocalRotation<135&&hitboxLocal.max.x > data.file.hitbox[i].min.x)
+                {
+                    if(LocalBool[11]+LocalBool[10]*LocalBool[17]!=0)
+                        return ((Vector3){data.file.hitbox[i].min.x,__INT_MAX__,__INT_MAX__});
+                    else
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,__INT_MAX__});
+                }
+                else if(LocalRotation>=135&&LocalRotation<180&&hitboxLocal.max.z > data.file.hitbox[i].max.z)
+                {
+                    if(LocalBool[3]+LocalBool[0]*LocalBool[7]!=0)
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].max.z});
+                    else
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,__INT_MAX__});
+                }
+                else if(LocalRotation>=180&&LocalRotation<225&&hitboxLocal.max.z < data.file.hitbox[i].max.z)
+                {
+                    if(LocalBool[3]+LocalBool[0]*LocalBool[7]!=0)
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].max.z});
+                    else
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,__INT_MAX__});
+                }
+                else if(LocalRotation>=225&&LocalRotation<270&&hitboxLocal.max.x < data.file.hitbox[i].max.x)
+                {
+                    if(LocalBool[3]+LocalBool[0]*LocalBool[7]!=0)
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].max.x});
+                    else
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,__INT_MAX__});
+                }
+                else if(LocalRotation>=270&&LocalRotation<315&&hitboxLocal.max.x < data.file.hitbox[i].max.x)
+                {
+                    if(LocalBool[3]+LocalBool[0]*LocalBool[7]!=0)
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].max.x});
+                    else
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,__INT_MAX__});
+                }
+            } 
         }
-        else if(i == hitboxMax)
-        {
-            return MQFALSE;
-        }
-    return MQFALSE;
+    return ((Vector3){__INT_MAX__,__INT_MAX__,__INT_MAX__});
 }
 
 bool MQCheckFloorFromHeight(DATA data, float point)

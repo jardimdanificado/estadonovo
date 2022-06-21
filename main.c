@@ -89,18 +89,26 @@ int main(void)
         data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.x, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.y, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.z
     };
     SetExitKey(KEY_END);
-
-
+    Vector3 Vec3buff;
     while(!WindowShouldClose() && MQEXIT == false)
     {
         camera.target = (Vector3)
         {
             data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.x, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.y, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.z
         };
-//         camera.target = ( Vector3 )
-//         {
-//             data.game.posicao.personagem[0].x,data.game.posicao.personagem[0].y+2,data.game.posicao.personagem[0].z
-//         };
+
+        Vec3buff = MQCheckWall(data,"player-cabeca",data.game.rotacao.personagem[0]);
+        if(Vec3buff.x != __INT_MAX__)
+        {
+            if(data.game.posicao.personagem[0].x+0.2 > Vec3buff.x&&data.game.posicao.personagem[0].x-2<Vec3buff.x)
+                data.game.posicao.personagem[0].x = Vec3buff.x;
+        } 
+        if(Vec3buff.z != __INT_MAX__)
+        {
+            if(data.game.posicao.personagem[0].z+0.2 > Vec3buff.z&&data.game.posicao.personagem[0].z-2<Vec3buff.z)
+                data.game.posicao.personagem[0].z = Vec3buff.z;
+        }
+
         SetExitKey(KEY_END);
         if(menu.esc == false)
         {
@@ -122,6 +130,8 @@ int main(void)
                     data.game.posicao.personagem[0].y = MQReturnFloorCollisionPoint(data, "player-pernae");
             }
 
+            
+
             for(int i = 0; i < MAXOBJ; i++)
             {
                 if(data.file.mapa.porta.slots[i].abrindo || data.file.mapa.porta.slots[i].fechando)
@@ -130,12 +140,7 @@ int main(void)
                         MQDoorAnim(&data);
                 }
             }
-//             MQBulletUpdate ( &data,  1 );
-//             if ( clock() > data.session.relogio.personagem[0].relogioLogs+ ( 2* ( CLOCKS_PER_SEC/10 ) ) )
-//             {
-//                 //msg = " ";
-//             }
-            //MQCameraUpdate ( data, &camera );
+            snprintf(msg,255,"%f",data.game.rotacao.personagem[0]);
             MQRender(&data, camera, font, menu);
         }
         else if(menu.esc == true)
