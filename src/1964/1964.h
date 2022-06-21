@@ -336,6 +336,7 @@ struct DATA_ponteiroPERSONAGEM
 {
     DATA_PONTEIROitem item;
     float lastFloorHeight;
+    int tempoGravit;
 };
 typedef struct DATA_ponteiroPERSONAGEM DATA_ponteiroPERSONAGEM;
 

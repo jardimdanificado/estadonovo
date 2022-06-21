@@ -172,9 +172,9 @@ Font MQFontStart(char *FontLoc, int FontSize)
 //GRAVITY
 //-----------------------------------
 
-float MQGravit(Vector3 posicao, float gravidade)
+float MQGravit(Vector3 posicao, float gravidade, int tempo)
 {
-    return(posicao.y - gravidade / 60);
+    return(posicao.y - (gravidade/60)*(tempo/3));
 }
 
 //-----------------------------------

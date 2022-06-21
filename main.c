@@ -97,7 +97,7 @@ int main(void)
             data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.x, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.y, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.z
         };
 
-        Vec3buff = MQCheckWall(data,"player-cabeca",data.game.rotacao.personagem[0]);
+        /* Vec3buff = MQCheckWall(data,"player-cabeca",data.game.rotacao.personagem[0]);
         if(Vec3buff.x != __INT_MAX__)
         {
             if(data.game.posicao.personagem[0].x+0.2 > Vec3buff.x&&data.game.posicao.personagem[0].x-2<Vec3buff.x)
@@ -107,7 +107,7 @@ int main(void)
         {
             if(data.game.posicao.personagem[0].z+0.2 > Vec3buff.z&&data.game.posicao.personagem[0].z-2<Vec3buff.z)
                 data.game.posicao.personagem[0].z = Vec3buff.z;
-        }
+        } */
 
         SetExitKey(KEY_END);
         if(menu.esc == false)
@@ -123,14 +123,16 @@ int main(void)
             {
                 if(MQReturnFloorCollisionPoint(data, "player-pernae") == MQFALSE)
                 {
-                    data.game.posicao.personagem[0].y = MQGravit(data.game.posicao.personagem[0], 1);
+                    data.game.posicao.personagem[0].y = MQGravit(data.game.posicao.personagem[0], 1, data.game.ponteiro.personagem[0].tempoGravit);
                     data.game.ponteiro.personagem[0].lastFloorHeight = data.game.posicao.personagem[0].y;
+                    data.game.ponteiro.personagem[0].tempoGravit++;
                 }
                 else if(data.game.ponteiro.personagem[0].lastFloorHeight != data.game.posicao.personagem[0].y)
+                {
                     data.game.posicao.personagem[0].y = MQReturnFloorCollisionPoint(data, "player-pernae");
+                    data.game.ponteiro.personagem[0].tempoGravit = 0;
+                }
             }
-
-            
 
             for(int i = 0; i < MAXOBJ; i++)
             {
@@ -140,7 +142,7 @@ int main(void)
                         MQDoorAnim(&data);
                 }
             }
-            snprintf(msg,255,"%f",data.game.rotacao.personagem[0]);
+            snprintf(msg,255,"%d",data.game.ponteiro.personagem[0].tempoGravit);
             MQRender(&data, camera, font, menu);
         }
         else if(menu.esc == true)

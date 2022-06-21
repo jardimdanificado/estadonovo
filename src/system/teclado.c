@@ -54,12 +54,12 @@ void TECLADO_MAIN(MENU *menu, Font font, Font fontTitle, Font fontSubTitle, LOGO
         Vector3 Vec3buff = MQCheckWall(*data,"player-peitoral",360-(data->game.rotacao.personagem[0]));
         if(Vec3buff.x != __INT_MAX__)
         {
-            if(data->game.posicao.personagem[0].x+0.2 > Vec3buff.x&&data->game.posicao.personagem[0].x-2<Vec3buff.x)
+            if(data->game.posicao.personagem[0].x+0.1 > Vec3buff.x&&data->game.posicao.personagem[0].x-0.1<Vec3buff.x)
                 data->game.posicao.personagem[0].x = Vec3buff.x;
         } 
         if(Vec3buff.z != __INT_MAX__)
         {
-            if(data->game.posicao.personagem[0].z+0.2 > Vec3buff.z&&data->game.posicao.personagem[0].z-2<Vec3buff.z)
+            if(data->game.posicao.personagem[0].z+0.1 > Vec3buff.z&&data->game.posicao.personagem[0].z-0.1<Vec3buff.z)
                 data->game.posicao.personagem[0].z = Vec3buff.z;
         }
     }
@@ -76,16 +76,33 @@ void TECLADO_MAIN(MENU *menu, Font font, Font fontTitle, Font fontSubTitle, LOGO
         {
             data->game.posicao.personagem[0] = MQPlayerMove(data->game.posicao.personagem[0], data->game.rotacao.personagem[0], data->game.velocidade.personagem[0].velocidade);
         }
-        Vector3 Vec3buff = MQCheckWall(*data,"player-peitoral",data->game.rotacao.personagem[0]);
+        Vector3 Vec3buff = MQCheckWall(*data,"player-barriga",data->game.rotacao.personagem[0]);
         if(Vec3buff.x != __INT_MAX__)
         {
-            if(data->game.posicao.personagem[0].x+0.2 > Vec3buff.x&&data->game.posicao.personagem[0].x-2<Vec3buff.x)
+            if(data->game.posicao.personagem[0].x+0.5 > Vec3buff.x&&data->game.posicao.personagem[0].x-0.5<Vec3buff.x)
                 data->game.posicao.personagem[0].x = Vec3buff.x;
         } 
         if(Vec3buff.z != __INT_MAX__)
         {
-            if(data->game.posicao.personagem[0].z+0.2 > Vec3buff.z&&data->game.posicao.personagem[0].z-2<Vec3buff.z)
+            if(data->game.posicao.personagem[0].z+0.5 > Vec3buff.z&&data->game.posicao.personagem[0].z-0.5<Vec3buff.z)
                 data->game.posicao.personagem[0].z = Vec3buff.z;
+        }
+
+
+        if(MQWALLEXCLUDEINDEX != __INT_MAX__)
+        {
+            MQWALLEXCLUDE=true;
+            Vec3buff = MQCheckWall(*data,"player-barriga",data->game.rotacao.personagem[0]);
+            if(Vec3buff.x != __INT_MAX__)
+            {
+                if(data->game.posicao.personagem[0].x+0.5 > Vec3buff.x&&data->game.posicao.personagem[0].x-0.5<Vec3buff.x)
+                    data->game.posicao.personagem[0].x = Vec3buff.x;
+            } 
+            if(Vec3buff.z != __INT_MAX__)
+            {
+                if(data->game.posicao.personagem[0].z+0.5 > Vec3buff.z&&data->game.posicao.personagem[0].z-0.5<Vec3buff.z)
+                    data->game.posicao.personagem[0].z = Vec3buff.z;
+            }
         }
     }
     if(IsKeyDown(KEY_LEFT_SHIFT))
@@ -106,7 +123,7 @@ void TECLADO_MAIN(MENU *menu, Font font, Font fontTitle, Font fontSubTitle, LOGO
         data->game.boolean.personagem[0].andando = false;
         data->game.boolean.personagem[0].andandoPraTras = false;
     }
-    if(IsKeyPressed(KEY_SPACE) /*&&MQPlayerCheckFloor( *data )*/)
+    if(IsKeyPressed(KEY_SPACE))
     {
         if(data->game.boolean.personagem[0].mirando == false)
         {
@@ -117,27 +134,7 @@ void TECLADO_MAIN(MENU *menu, Font font, Font fontTitle, Font fontSubTitle, LOGO
     }
     if(IsKeyDown(KEY_SPACE))
     {
-        if(data->game.boolean.personagem[0].mirando == false)
-        {
-            if(data->game.boolean.personagem[0].pulando == true)
-                data->game.posicao.personagem[0].y += data->game.velocidade.personagem[0].velocidade * 2;
-            if(clock() >= data->session.relogio.personagem[0].pulo + 5000 && clock() < data->session.relogio.personagem[0].pulo + 7500)
-            {
-                data->game.velocidade.personagem[0].velocidadePulo = 0.1;
-            }
-            else if(clock() >= data->session.relogio.personagem[0].pulo + 7500 && clock() < data->session.relogio.personagem[0].pulo + 9000)
-            {
-                data->game.velocidade.personagem[0].velocidadePulo = 0.05;
-            }
-            else if(clock() >= data->session.relogio.personagem[0].pulo + 9000 && clock() < data->session.relogio.personagem[0].pulo + 10000)
-            {
-                data->game.velocidade.personagem[0].velocidadePulo = 0.025;
-            }
-            else if(clock() > data->session.relogio.personagem[0].pulo + 10000)
-            {
-                data->game.boolean.personagem[0].pulando = false;
-            }
-        }
+        data->game.posicao.personagem[0].y +=0.5;
     }
     if(IsKeyReleased(KEY_SPACE))
     {
