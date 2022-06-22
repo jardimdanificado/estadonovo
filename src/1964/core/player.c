@@ -1,8 +1,8 @@
 bool MQCheckCollisionPoint(Vector3 inPosi,BoundingBox target, int size)
 {
     BoundingBox localhitbox;
-    localhitbox.min = (Vector3) {inPosi.x - (size/2), inPosi.y - (size/2), inPosi.z - (size/2)};
-    localhitbox.max = (Vector3) {inPosi.x + (size/2), inPosi.y + (size/2), inPosi.z + (size/2)};
+    localhitbox.min = (Vector3) {inPosi.x - (size/2), inPosi.y, inPosi.z - (size/2)};
+    localhitbox.max = (Vector3) {inPosi.x + (size/2), inPosi.y + size, inPosi.z + (size/2)};
     return(CheckCollisionBoxes(target, localhitbox));
 }
 
@@ -104,13 +104,13 @@ Vector3 MQCheckWall(DATA data, char *hitboxID,float LocalRotation)
                 {
                     MQWALLEXCLUDEINDEX=i;
                     if(hitboxLocal.max.z-0.5 < data.file.hitbox[i].min.z&&hitboxLocal.max.x-0.5 < data.file.hitbox[i].min.x)
-                        return ((Vector3){data.file.hitbox[i].min.x,__INT_MAX__,data.file.hitbox[i].min.z});
+                        return ((Vector3){data.file.hitbox[i].min.x-0.3,__INT_MAX__,data.file.hitbox[i].min.z-0.3});
                         
                     else if(hitboxLocal.max.z-0.5 < data.file.hitbox[i].min.z)
-                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].min.z});
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].min.z-0.3});
 
                     else if(hitboxLocal.max.x-0.5 < data.file.hitbox[i].min.x)
-                        return ((Vector3){data.file.hitbox[i].min.x,__INT_MAX__,__INT_MAX__});
+                        return ((Vector3){data.file.hitbox[i].min.x-0.3,__INT_MAX__,__INT_MAX__});
                 }
 
 
@@ -118,13 +118,13 @@ Vector3 MQCheckWall(DATA data, char *hitboxID,float LocalRotation)
                 {
                     MQWALLEXCLUDEINDEX=i;
                     if(hitboxLocal.min.z+0.5 > data.file.hitbox[i].max.z&&hitboxLocal.max.x-0.5 < data.file.hitbox[i].min.x)
-                        return ((Vector3){data.file.hitbox[i].min.x,__INT_MAX__,data.file.hitbox[i].max.z});
+                        return ((Vector3){data.file.hitbox[i].min.x-0.3,__INT_MAX__,data.file.hitbox[i].max.z+0.3});
                         
                     else if(hitboxLocal.min.z+0.5 > data.file.hitbox[i].max.z)
-                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].max.z});
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].max.z+0.3});
 
                     else if(hitboxLocal.max.x-0.5 < data.file.hitbox[i].min.x)
-                        return ((Vector3){data.file.hitbox[i].min.x,__INT_MAX__,__INT_MAX__});
+                        return ((Vector3){data.file.hitbox[i].min.x-0.3,__INT_MAX__,__INT_MAX__});
                 }
 
 
@@ -132,13 +132,13 @@ Vector3 MQCheckWall(DATA data, char *hitboxID,float LocalRotation)
                 {
                     MQWALLEXCLUDEINDEX=i;
                     if(hitboxLocal.min.z+0.5 > data.file.hitbox[i].max.z&&hitboxLocal.min.x+0.5 > data.file.hitbox[i].max.x)
-                        return ((Vector3){data.file.hitbox[i].min.x,__INT_MAX__,data.file.hitbox[i].max.z});
+                        return ((Vector3){data.file.hitbox[i].min.x-0.3,__INT_MAX__,data.file.hitbox[i].max.z+0.3});
                         
                     else if(hitboxLocal.min.z+0.5 > data.file.hitbox[i].max.z)
-                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].max.z});
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].max.z+0.3});
 
                     else if(hitboxLocal.min.x+0.5 > data.file.hitbox[i].max.x)
-                        return ((Vector3){data.file.hitbox[i].max.x,__INT_MAX__,__INT_MAX__});
+                        return ((Vector3){data.file.hitbox[i].max.x+0.3,__INT_MAX__,__INT_MAX__});
                 }
 
 
@@ -146,13 +146,13 @@ Vector3 MQCheckWall(DATA data, char *hitboxID,float LocalRotation)
                 {
                     MQWALLEXCLUDEINDEX=i;
                     if(hitboxLocal.max.z-0.5 < data.file.hitbox[i].min.z&&hitboxLocal.min.x+0.5 > data.file.hitbox[i].max.x)
-                        return ((Vector3){data.file.hitbox[i].min.x,__INT_MAX__,data.file.hitbox[i].max.z});
+                        return ((Vector3){data.file.hitbox[i].min.x-0.3,__INT_MAX__,data.file.hitbox[i].max.z+0.3});
                         
                     else if(hitboxLocal.max.z-0.5 < data.file.hitbox[i].min.z)
-                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].min.z});
+                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].min.z-0.3});
 
                     else if(hitboxLocal.min.x+0.5 > data.file.hitbox[i].max.x)
-                        return ((Vector3){data.file.hitbox[i].max.x,__INT_MAX__,__INT_MAX__});
+                        return ((Vector3){data.file.hitbox[i].max.x+0.3,__INT_MAX__,__INT_MAX__});
                 }
             } 
             MQWALLEXCLUDEINDEX = __INT_MAX__;
@@ -166,11 +166,13 @@ bool MQCheckFloorFromHeight(DATA data, float point)
     int hitboxMax = atoi(abinCoreReturnData("./data/temp/hitbox.temp", "SIZE"));
 
     BoundingBox hitboxLocal;
-    hitboxLocal.min = (Vector3) {point - 0.5, point -8, point - 0.5};
-    hitboxLocal.max = (Vector3) {point + 0.5, point, point + 0.5};
+    hitboxLocal.min = (Vector3) {point - 0.5, point, point - 0.5};
+    hitboxLocal.max = (Vector3) {point + 0.5, point+1.5, point + 0.5};
 
+    
     for(int i = 0; i < hitboxMax; i++)
-        if(CheckCollisionBoxes(data.file.hitbox[i], hitboxLocal) && hitboxLocal.min.y > data.file.hitbox[i].max.y - 0.12)
+    {   
+        if(CheckCollisionBoxes(data.file.hitbox[i], hitboxLocal) && hitboxLocal.min.y > data.file.hitbox[i].max.y)
         {
             return true;
         }
@@ -178,17 +180,27 @@ bool MQCheckFloorFromHeight(DATA data, float point)
         {
             return false;
         }
+    }
     return false;
 }
 
-float MQReturnFloorCollisionPoint(DATA data, char *hitboxID)
+float MQReturnFloorCollisionPoint(DATA data, Vector3 posi)
 {
-    int hitboxIndex = atoi(abinCoreReturnData("./data/temp/hitbox.temp", hitboxID));
+    bool LocalBool = false;
     int hitboxMax = atoi(abinCoreReturnData("./data/temp/hitbox.temp", "SIZE"));
-    BoundingBox hitboxLocal = data.file.hitbox[hitboxIndex], reserva;
+    Vector3 seila;
+    
 
     for(int i = 0; i < hitboxMax; i++)
-        if(CheckCollisionBoxes(data.file.hitbox[i], hitboxLocal) && i != hitboxIndex)
+    {
+        seila = MQDifferenceVec3(data.file.hitbox[i].min,(Vector3) {posi.x, posi.y, posi.z});
+        if(seila.x+seila.y*seila.z==0)
+            LocalBool= true;
+        else
+            LocalBool = false;
+
+
+        if(MQCheckCollisionPoint(posi, data.file.hitbox[i], 1) && LocalBool == false)
         {
             return data.file.hitbox[i].max.y;
         }
@@ -196,47 +208,8 @@ float MQReturnFloorCollisionPoint(DATA data, char *hitboxID)
         {
             return MQFALSE;
         }
-        
+    }   
     return MQFALSE;
-}
-
-bool MQPlayerCheckWall(DATA data,   char opcao)
-{
-    if(opcao == '+')
-    {
-        for(int i = 0; i < MAXOBJ; i++)
-        {
-            if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.hitboxVertical[i]))
-            {
-                return true;
-            }
-            else if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.props[i].hitbox))
-            {
-                return true;
-            }
-            else if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.porta.slots[i].hitbox))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-    else if(opcao == '-')
-    {
-        for(int i = 0; i < MAXOBJ; i++)
-        {
-            if(CheckCollisionBoxes(data.game.hitbox.personagem[0].trasAtual, data.file.mapa.hitboxVertical[i]))
-            {
-                return true;
-            }
-            else if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.porta.slots[i].hitbox))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
 }
 
 void MQPlayerConfigStart(DATA *data, int quem, Vector3 posi)
@@ -271,6 +244,8 @@ void MQPlayerConfigStart(DATA *data, int quem, Vector3 posi)
     data->game.boolean.personagem[quem].pulando = false;
     data->game.boolean.personagem[quem].usando = false;
     data->game.boolean.personagem[quem].andandoPraTras = false;
+    data->game.boolean.personagem[quem].encontrouParedeX = false;
+    data->game.boolean.personagem[quem].encontrouParedeZ = false;
     data->session.relogio.personagem[quem].relogioNovo = 0;
     data->session.relogio.personagem[quem].relogioVelho = 0;
 }

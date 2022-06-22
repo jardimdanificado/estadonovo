@@ -310,7 +310,7 @@ typedef struct DATA_FRAMECOUNT DATA_FRAMECOUNT;
 
 struct DATA_COUNTER
 {
-    DATA_FRAMECOUNT frames;
+    DATA_FRAMECOUNT frames, gravitFrame;
 };
 typedef struct DATA_COUNTER DATA_COUNTER;
 
@@ -348,7 +348,7 @@ typedef struct DATA_PONTEIRO DATA_PONTEIRO;
 
 struct DATA_booleanPERSONAGEM
 {
-    bool pulando, usando, andando, mirando, dropando, andandoPraTras;
+    bool pulando, usando, andando, mirando, dropando, andandoPraTras, encontrouParedeX,encontrouParedeZ;
 };
 typedef struct DATA_booleanPERSONAGEM DATA_booleanPERSONAGEM;
 

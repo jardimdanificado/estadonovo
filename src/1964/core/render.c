@@ -111,12 +111,10 @@ void MQRenderLogo(Font fontTitle, Font fontSubTitle, LOGO *logo)
 void MQRenderPlayerItem(DATA *data, int quem, int qualAnim)
 {
     int modelIndex;
-    MQPlayerUpdateBodyBox( *&data, quem, qualAnim);
     snprintf(ABINCACHE16, 16, "calca%d", data->game.ponteiro.personagem[quem].item.calca);
-    if(data->game.ponteiro.personagem[quem].item.calca != 0 && data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16))].meshCount != 0)
-    {
-        modelIndex = atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16));
-        snprintf(ABINCACHE32, 32, "anim%d", data->game.ponteiro.personagem[quem].item.calca);
+    modelIndex = atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16));
+    if(data->game.ponteiro.personagem[quem].item.calca != 0 && data->file.model[modelIndex].meshCount != 0)
+    {        snprintf(ABINCACHE32, 32, "anim%d", data->game.ponteiro.personagem[quem].item.calca);
         UpdateModelAnimation(data->file.model[modelIndex], data->file.anim[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE32))][qualAnim], data->game.contador.frames.personagem[quem]);
         DrawModelEx(data->file.model[modelIndex], data->game.posicao.personagem[quem], (Vector3)
         {
@@ -127,11 +125,12 @@ void MQRenderPlayerItem(DATA *data, int quem, int qualAnim)
         }, COR_ROUPA0);
     }
     snprintf(ABINCACHE16, 16, "camisa%d", data->game.ponteiro.personagem[quem].item.camisa);
-    if(data->game.ponteiro.personagem[quem].item.camisa != 0 && data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16))].meshCount != 0)
+    modelIndex = atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16));
+    if(data->game.ponteiro.personagem[quem].item.camisa != 0 && data->file.model[modelIndex].meshCount != 0)
     {
         snprintf(ABINCACHE32, 32, "anim%d", data->game.ponteiro.personagem[quem].item.camisa);
-        UpdateModelAnimation(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16))], data->file.anim[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE32))][qualAnim], data->game.contador.frames.personagem[quem]);
-        DrawModelEx(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16))], data->game.posicao.personagem[quem], (Vector3)
+        UpdateModelAnimation(data->file.model[modelIndex], data->file.anim[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE32))][qualAnim], data->game.contador.frames.personagem[quem]);
+        DrawModelEx(data->file.model[modelIndex], data->game.posicao.personagem[quem], (Vector3)
         {
             0.0f, 1.0f, 0.0f
         }, data->game.rotacao.personagem[quem], (Vector3)
@@ -140,11 +139,12 @@ void MQRenderPlayerItem(DATA *data, int quem, int qualAnim)
         }, COR_ROUPA0);
     }
     snprintf(ABINCACHE16, 16, "chapeu%d", data->game.ponteiro.personagem[quem].item.chapeu);
-    if(data->game.ponteiro.personagem[quem].item.chapeu != 0 && data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16))].meshCount != 0)
+    modelIndex = atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16));
+    if(data->game.ponteiro.personagem[quem].item.chapeu != 0 && data->file.model[modelIndex].meshCount != 0)
     {
         snprintf(ABINCACHE32, 32, "anim%d", data->game.ponteiro.personagem[quem].item.chapeu);
-        UpdateModelAnimation(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16))], data->file.anim[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE32))][qualAnim], data->game.contador.frames.personagem[quem]);
-        DrawModelEx(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16))], data->game.posicao.personagem[quem], (Vector3)
+        UpdateModelAnimation(data->file.model[modelIndex], data->file.anim[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE32))][qualAnim], data->game.contador.frames.personagem[quem]);
+        DrawModelEx(data->file.model[modelIndex], data->game.posicao.personagem[quem], (Vector3)
         {
             0.0f, 1.0f, 0.0f
         }, data->game.rotacao.personagem[quem], (Vector3)
@@ -153,11 +153,12 @@ void MQRenderPlayerItem(DATA *data, int quem, int qualAnim)
         }, COR_ROUPA0);
     }
     snprintf(ABINCACHE16, 16, "oculos%d", data->game.ponteiro.personagem[quem].item.oculos);
-    if(data->game.ponteiro.personagem[quem].item.oculos != 0 && data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16))].meshCount != 0)
+    modelIndex = atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16));
+    if(data->game.ponteiro.personagem[quem].item.oculos != 0 && data->file.model[modelIndex].meshCount != 0)
     {
         snprintf(ABINCACHE32, 32, "anim%d", data->game.ponteiro.personagem[quem].item.oculos);
-        UpdateModelAnimation(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16))], data->file.anim[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE32))][qualAnim], data->game.contador.frames.personagem[quem]);
-        DrawModelEx(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16))], data->game.posicao.personagem[quem], (Vector3)
+        UpdateModelAnimation(data->file.model[modelIndex], data->file.anim[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE32))][qualAnim], data->game.contador.frames.personagem[quem]);
+        DrawModelEx(data->file.model[modelIndex], data->game.posicao.personagem[quem], (Vector3)
         {
             0.0f, 1.0f, 0.0f
         }, data->game.rotacao.personagem[quem], (Vector3)
@@ -166,11 +167,12 @@ void MQRenderPlayerItem(DATA *data, int quem, int qualAnim)
         }, COR_ROUPA0);
     }
     snprintf(ABINCACHE16, 16, "sapato%d", data->game.ponteiro.personagem[quem].item.sapato);
-    if(data->game.ponteiro.personagem[quem].item.sapato != 0 && data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16))].meshCount != 0)
+    modelIndex = atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16));
+    if(data->game.ponteiro.personagem[quem].item.sapato != 0 && data->file.model[modelIndex].meshCount != 0)
     {
         snprintf(ABINCACHE32, 32, "anim%d", data->game.ponteiro.personagem[quem].item.sapato);
-        UpdateModelAnimation(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16))], data->file.anim[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE32))][qualAnim], data->game.contador.frames.personagem[quem]);
-        DrawModelEx(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE16))], data->game.posicao.personagem[quem], (Vector3)
+        UpdateModelAnimation(data->file.model[modelIndex], data->file.anim[atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE32))][qualAnim], data->game.contador.frames.personagem[quem]);
+        DrawModelEx(data->file.model[modelIndex], data->game.posicao.personagem[quem], (Vector3)
         {
             0.0f, 1.0f, 0.0f
         }, data->game.rotacao.personagem[quem], (Vector3)
@@ -179,6 +181,7 @@ void MQRenderPlayerItem(DATA *data, int quem, int qualAnim)
         }, COR_ROUPA0);
     }
 }
+
 void MQRenderPlayer(DATA *data, int quem)
 {
     if(data->game.boolean.personagem[0].andando == true)
@@ -202,7 +205,7 @@ void MQRenderPlayer(DATA *data, int quem)
         }
 
         UpdateModelAnimation(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "player"))], data->file.anim[atoi(abinCoreReturnData("./data/temp/model.temp", "player"))][1], data->game.contador.frames.personagem[quem]);
-
+        MQPlayerUpdateBodyBox( *&data, quem, 1);
         DrawModelEx(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "player"))], data->game.posicao.personagem[quem], (Vector3)
         {
             0.0f, 1.0f, 0.0f
@@ -218,8 +221,8 @@ void MQRenderPlayer(DATA *data, int quem)
             data->game.contador.frames.personagem[quem] = 0;
         data->game.contador.frames.personagem[quem]++;
         MQRenderPlayerItem( *&data, quem, 0);
-
         UpdateModelAnimation(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "player"))], data->file.anim[atoi(abinCoreReturnData("./data/temp/model.temp", abinCoreReturnData("./data/temp/model.temp", ABINCACHE8)))][0], data->game.contador.frames.personagem[quem]);
+        MQPlayerUpdateBodyBox( *&data, quem, 0);
         DrawModelEx(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "player"))], data->game.posicao.personagem[quem], (Vector3)
         {
             0.0f, 1.0f, 0.0f

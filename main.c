@@ -89,7 +89,6 @@ int main(void)
         data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.x, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.y, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.z
     };
     SetExitKey(KEY_END);
-    Vector3 Vec3buff;
     while(!WindowShouldClose() && MQEXIT == false)
     {
         camera.target = (Vector3)
@@ -97,42 +96,32 @@ int main(void)
             data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.x, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.y, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.z
         };
 
-        /* Vec3buff = MQCheckWall(data,"player-cabeca",data.game.rotacao.personagem[0]);
-        if(Vec3buff.x != __INT_MAX__)
-        {
-            if(data.game.posicao.personagem[0].x+0.2 > Vec3buff.x&&data.game.posicao.personagem[0].x-2<Vec3buff.x)
-                data.game.posicao.personagem[0].x = Vec3buff.x;
-        } 
-        if(Vec3buff.z != __INT_MAX__)
-        {
-            if(data.game.posicao.personagem[0].z+0.2 > Vec3buff.z&&data.game.posicao.personagem[0].z-2<Vec3buff.z)
-                data.game.posicao.personagem[0].z = Vec3buff.z;
-        } */
-
-        SetExitKey(KEY_END);
+        /* SetExitKey(KEY_END); */
         if(menu.esc == false)
         {
             UpdateCamera(&camera);
 
-            TECLADO_MAIN(&menu, font, fontTitle, fontSubTitle, logo, &data);
+            
 
-            if(data.game.rotacao.personagem[0] / 360 == 0)
+            if(data.game.rotacao.personagem[0] == 360)
                 data.game.rotacao.personagem[0] = 0;
 
-            if(MQCheckFloorFromHeight(data, data.game.posicao.personagem[0].y - (3 / 60)) == false)
+            if(MQCheckFloorFromHeight(data, data.game.posicao.personagem[0].y - 0.01) == false)
             {
-                if(MQReturnFloorCollisionPoint(data, "player-pernae") == MQFALSE)
+                if(MQReturnFloorCollisionPoint(data, data.game.posicao.personagem[0]) == MQFALSE)
                 {
-                    data.game.posicao.personagem[0].y = MQGravit(data.game.posicao.personagem[0], 1, data.game.ponteiro.personagem[0].tempoGravit);
+                    data.game.posicao.personagem[0].y = MQGravit(data.game.posicao.personagem[0], 1, data.game.contador.gravitFrame.personagem[0]);
                     data.game.ponteiro.personagem[0].lastFloorHeight = data.game.posicao.personagem[0].y;
-                    data.game.ponteiro.personagem[0].tempoGravit++;
+                    data.game.contador.gravitFrame.personagem[0]++;
                 }
-                else if(data.game.ponteiro.personagem[0].lastFloorHeight != data.game.posicao.personagem[0].y)
+                else if(data.game.ponteiro.personagem[0].lastFloorHeight < data.game.posicao.personagem[0].y)
                 {
-                    data.game.posicao.personagem[0].y = MQReturnFloorCollisionPoint(data, "player-pernae");
-                    data.game.ponteiro.personagem[0].tempoGravit = 0;
+                    data.game.posicao.personagem[0].y = MQReturnFloorCollisionPoint(data, data.game.posicao.personagem[0]);
+                    data.game.contador.gravitFrame.personagem[0] = 0;
                 }
             }
+
+            TECLADO_MAIN(&menu, font, fontTitle, fontSubTitle, logo, &data);
 
             for(int i = 0; i < MAXOBJ; i++)
             {
