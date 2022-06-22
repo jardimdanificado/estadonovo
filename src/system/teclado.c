@@ -22,11 +22,6 @@ void TECLADO_MAIN(MENU *menu, Font font, Font fontTitle, Font fontSubTitle, LOGO
     {
 
     }
-    if(IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)||IsKeyPressed(KEY_A)||IsKeyPressed(KEY_LEFT))
-    {
-        data->game.boolean.personagem[0].encontrouParedeX = false;
-        data->game.boolean.personagem[0].encontrouParedeZ = false;
-    }
     if(IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
     {
         if(data->game.rotacao.personagem[0] == 0)
@@ -36,8 +31,8 @@ void TECLADO_MAIN(MENU *menu, Font font, Font fontTitle, Font fontSubTitle, LOGO
     }
     if(IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
     {
-        data->game.boolean.personagem[0].encontrouParedeX = false;
-        data->game.boolean.personagem[0].encontrouParedeZ = false;
+        /* data->game.boolean.personagem[0].encontrouParedeX = false;
+        data->game.boolean.personagem[0].encontrouParedeZ = false; */
         if(data->game.rotacao.personagem[0] == 360)
             data->game.rotacao.personagem[0] = 0;
         //             data.game.posicao.personagem[0].x += 0.03f;
@@ -77,53 +72,25 @@ void TECLADO_MAIN(MENU *menu, Font font, Font fontTitle, Font fontSubTitle, LOGO
     }
     if(IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
     {
-        Vector3 LocalPosi;
-/*         if(data->game.boolean.personagem[0].encontrouParedeX == false)
-        { */
-        LocalPosi = MQPlayerMove(data->game.posicao.personagem[0], data->game.rotacao.personagem[0], data->game.velocidade.personagem[0].velocidade);
-/*         } */
-        if(data->game.boolean.personagem[0].encontrouParedeX == false)
+        Vector3 LocalPosi = MQPlayerMove(data->game.posicao.personagem[0], data->game.rotacao.personagem[0], data->game.velocidade.personagem[0].velocidade);
+
+
+        data->game.posicao.personagem[0].x = LocalPosi.x;
+        Vector3 Vec3buff = MQCheckWall(*data,"player-peitoral",data->game.rotacao.personagem[0]);
+        if(Vec3buff.x != __INT_MAX__)
         {
-            data->game.posicao.personagem[0].x = LocalPosi.x;
-            Vector3 Vec3buff = MQCheckWall(*data,"player-barriga",data->game.rotacao.personagem[0]);
-            if(Vec3buff.x != __INT_MAX__)
-            {
-                if(data->game.posicao.personagem[0].x+0.5 > Vec3buff.x&&data->game.posicao.personagem[0].x-0.5<Vec3buff.x)
-                    data->game.posicao.personagem[0].x = Vec3buff.x;
-                data->game.boolean.personagem[0].encontrouParedeX = true;
-            } 
-        }
-        if(data->game.boolean.personagem[0].encontrouParedeZ == false)
+            /* if(data->game.posicao.personagem[0].x+0.5 > Vec3buff.x&&data->game.posicao.personagem[0].x-0.5<Vec3buff.x) */
+            data->game.posicao.personagem[0].x = Vec3buff.x;
+        } 
+
+        data->game.posicao.personagem[0].z = LocalPosi.z;
+        Vec3buff = MQCheckWall(*data,"player-barriga",data->game.rotacao.personagem[0]);
+        if(Vec3buff.z != __INT_MAX__)
         {
-            data->game.posicao.personagem[0].z = LocalPosi.z;
-            Vector3 Vec3buff = MQCheckWall(*data,"player-barriga",data->game.rotacao.personagem[0]);
-            if(Vec3buff.z != __INT_MAX__&&data->game.boolean.personagem[0].encontrouParedeZ == false)
-            {
-                if(data->game.posicao.personagem[0].z+0.5 > Vec3buff.z&&data->game.posicao.personagem[0].z-0.5<Vec3buff.z)
-                    data->game.posicao.personagem[0].z = Vec3buff.z;
-                data->game.boolean.personagem[0].encontrouParedeZ = true;
-            }
+            /* if(data->game.posicao.personagem[0].z+0.5 > Vec3buff.z&&data->game.posicao.personagem[0].z-0.5<Vec3buff.z) */
+            data->game.posicao.personagem[0].z = Vec3buff.z;
         }
         
-
-
-        if(MQWALLEXCLUDEINDEX != __INT_MAX__)
-        {
-            MQWALLEXCLUDE=true;
-            Vector3 Vec3buff = MQCheckWall(*data,"player-barriga",data->game.rotacao.personagem[0]);
-            if(Vec3buff.x != __INT_MAX__)
-            {
-                if(data->game.posicao.personagem[0].x+0.5 > Vec3buff.x&&data->game.posicao.personagem[0].x-0.5<Vec3buff.x)
-                    data->game.posicao.personagem[0].x = Vec3buff.x;
-                data->game.boolean.personagem[0].encontrouParedeX = true;
-            } 
-            if(Vec3buff.z != __INT_MAX__)
-            {
-                if(data->game.posicao.personagem[0].z+0.5 > Vec3buff.z&&data->game.posicao.personagem[0].z-0.5<Vec3buff.z)
-                    data->game.posicao.personagem[0].z = Vec3buff.z;
-                data->game.boolean.personagem[0].encontrouParedeZ = true;
-            }
-        }
     }
     if(IsKeyDown(KEY_LEFT_SHIFT))
     {

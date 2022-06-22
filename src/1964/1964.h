@@ -348,7 +348,7 @@ typedef struct DATA_PONTEIRO DATA_PONTEIRO;
 
 struct DATA_booleanPERSONAGEM
 {
-    bool pulando, usando, andando, mirando, dropando, andandoPraTras, encontrouParedeX,encontrouParedeZ;
+    bool pulando, usando, andando, mirando, dropando, andandoPraTras;
 };
 typedef struct DATA_booleanPERSONAGEM DATA_booleanPERSONAGEM;
 

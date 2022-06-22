@@ -71,9 +71,6 @@ bool* MQReturnCollisionCube(BoundingBox input, BoundingBox target)
     //26 25 24
 }
 
-bool MQWALLEXCLUDE = false;
-int MQWALLEXCLUDEINDEX=0;
-
 Vector3 MQCheckWall(DATA data, char *hitboxID,float LocalRotation)
 {
     int hitboxIndex = atoi(abinCoreReturnData("./data/temp/hitbox.temp", hitboxID));
@@ -86,78 +83,59 @@ Vector3 MQCheckWall(DATA data, char *hitboxID,float LocalRotation)
             bool *LocalBool;
             LocalBool = malloc(sizeof(bool)*27);
             LocalBool = MQReturnCollisionCube( hitboxLocal, data.file.hitbox[i]);
-            int localint=0;
 
-            for(int i = 0;i<27;i++)
+            if(LocalRotation>=0&&LocalRotation<90&&LocalBool[21]+LocalBool[18]+LocalBool[25]+LocalBool[20]+LocalBool[19]+LocalBool[26]+LocalBool[10]+LocalBool[11]+LocalBool[17]!=0)
             {
-                localint += LocalBool[i];
+                if(hitboxLocal.max.z-0.5 < data.file.hitbox[i].min.z&&hitboxLocal.max.x-0.5 < data.file.hitbox[i].min.x)
+                    return ((Vector3){data.file.hitbox[i].min.x-0.6,__INT_MAX__,data.file.hitbox[i].min.z-0.6});
+                    
+                else if(hitboxLocal.max.z-0.5 < data.file.hitbox[i].min.z)
+                    return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].min.z-0.6});
+
+                else if(hitboxLocal.max.x-0.5 < data.file.hitbox[i].min.x)
+                    return ((Vector3){data.file.hitbox[i].min.x-0.6,__INT_MAX__,__INT_MAX__});
             }
-                
-            if( MQWALLEXCLUDE == true&&MQWALLEXCLUDEINDEX == i)
+
+
+            if(LocalRotation>=90&&LocalRotation<180&&LocalBool[11]+LocalBool[10]+LocalBool[17]+LocalBool[2]+LocalBool[1]+LocalBool[8]+LocalBool[3]+LocalBool[0]+LocalBool[7]!=0)
             {
-                MQWALLEXCLUDE = false;
+                if(hitboxLocal.min.z+0.5 > data.file.hitbox[i].max.z&&hitboxLocal.max.x-0.5 < data.file.hitbox[i].min.x)
+                    return ((Vector3){data.file.hitbox[i].min.x-0.6,__INT_MAX__,data.file.hitbox[i].max.z+0.6});
+                    
+                else if(hitboxLocal.min.z+0.5 > data.file.hitbox[i].max.z)
+                    return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].max.z+0.6});
+
+                else if(hitboxLocal.max.x-0.5 < data.file.hitbox[i].min.x)
+                    return ((Vector3){data.file.hitbox[i].min.x-0.6,__INT_MAX__,__INT_MAX__});
             }
-            else if(localint != 0&&i != hitboxMax)
+
+
+            if(LocalRotation>=180&&LocalRotation<270&&LocalBool[3]+LocalBool[0]+LocalBool[7]+LocalBool[4]+LocalBool[5]+LocalBool[6]+LocalBool[13]+LocalBool[14]+LocalBool[15]!=0)
             {
-                
-                if(LocalRotation>=0&&LocalRotation<90&&LocalBool[21]+LocalBool[18]+LocalBool[25]+LocalBool[20]+LocalBool[19]+LocalBool[26]+LocalBool[10]+LocalBool[11]+LocalBool[17]!=0)
-                {
-                    MQWALLEXCLUDEINDEX=i;
-                    if(hitboxLocal.max.z-0.5 < data.file.hitbox[i].min.z&&hitboxLocal.max.x-0.5 < data.file.hitbox[i].min.x)
-                        return ((Vector3){data.file.hitbox[i].min.x-0.3,__INT_MAX__,data.file.hitbox[i].min.z-0.3});
-                        
-                    else if(hitboxLocal.max.z-0.5 < data.file.hitbox[i].min.z)
-                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].min.z-0.3});
+                if(hitboxLocal.min.z+0.5 > data.file.hitbox[i].max.z&&hitboxLocal.min.x+0.5 > data.file.hitbox[i].max.x)
+                    return ((Vector3){data.file.hitbox[i].min.x-0.6,__INT_MAX__,data.file.hitbox[i].max.z+0.6});
+                    
+                else if(hitboxLocal.min.z+0.5 > data.file.hitbox[i].max.z)
+                    return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].max.z+0.6});
 
-                    else if(hitboxLocal.max.x-0.5 < data.file.hitbox[i].min.x)
-                        return ((Vector3){data.file.hitbox[i].min.x-0.3,__INT_MAX__,__INT_MAX__});
-                }
+                else if(hitboxLocal.min.x+0.5 > data.file.hitbox[i].max.x)
+                    return ((Vector3){data.file.hitbox[i].max.x+0.6,__INT_MAX__,__INT_MAX__});
+            }
 
 
-                if(LocalRotation>=90&&LocalRotation<180&&LocalBool[11]+LocalBool[10]+LocalBool[17]+LocalBool[2]+LocalBool[1]+LocalBool[8]+LocalBool[3]+LocalBool[0]+LocalBool[7]!=0)
-                {
-                    MQWALLEXCLUDEINDEX=i;
-                    if(hitboxLocal.min.z+0.5 > data.file.hitbox[i].max.z&&hitboxLocal.max.x-0.5 < data.file.hitbox[i].min.x)
-                        return ((Vector3){data.file.hitbox[i].min.x-0.3,__INT_MAX__,data.file.hitbox[i].max.z+0.3});
-                        
-                    else if(hitboxLocal.min.z+0.5 > data.file.hitbox[i].max.z)
-                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].max.z+0.3});
+            if(LocalRotation>=270&&LocalRotation<=360&&LocalBool[13]+LocalBool[14]+LocalBool[15]+LocalBool[22]+LocalBool[23]+LocalBool[24]+LocalBool[21]+LocalBool[18]+LocalBool[25]!=0)
+            {
+                if(hitboxLocal.max.z-0.5 < data.file.hitbox[i].min.z&&hitboxLocal.min.x+0.5 > data.file.hitbox[i].max.x)
+                    return ((Vector3){data.file.hitbox[i].min.x-0.6,__INT_MAX__,data.file.hitbox[i].max.z+0.6});
+                    
+                else if(hitboxLocal.max.z-0.5 < data.file.hitbox[i].min.z)
+                    return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].min.z-0.6});
 
-                    else if(hitboxLocal.max.x-0.5 < data.file.hitbox[i].min.x)
-                        return ((Vector3){data.file.hitbox[i].min.x-0.3,__INT_MAX__,__INT_MAX__});
-                }
-
-
-                if(LocalRotation>=180&&LocalRotation<270&&LocalBool[3]+LocalBool[0]+LocalBool[7]+LocalBool[4]+LocalBool[5]+LocalBool[6]+LocalBool[13]+LocalBool[14]+LocalBool[15]!=0)
-                {
-                    MQWALLEXCLUDEINDEX=i;
-                    if(hitboxLocal.min.z+0.5 > data.file.hitbox[i].max.z&&hitboxLocal.min.x+0.5 > data.file.hitbox[i].max.x)
-                        return ((Vector3){data.file.hitbox[i].min.x-0.3,__INT_MAX__,data.file.hitbox[i].max.z+0.3});
-                        
-                    else if(hitboxLocal.min.z+0.5 > data.file.hitbox[i].max.z)
-                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].max.z+0.3});
-
-                    else if(hitboxLocal.min.x+0.5 > data.file.hitbox[i].max.x)
-                        return ((Vector3){data.file.hitbox[i].max.x+0.3,__INT_MAX__,__INT_MAX__});
-                }
-
-
-                if(LocalRotation>=270&&LocalRotation<=360&&LocalBool[13]+LocalBool[14]+LocalBool[15]+LocalBool[22]+LocalBool[23]+LocalBool[24]+LocalBool[21]+LocalBool[18]+LocalBool[25]!=0)
-                {
-                    MQWALLEXCLUDEINDEX=i;
-                    if(hitboxLocal.max.z-0.5 < data.file.hitbox[i].min.z&&hitboxLocal.min.x+0.5 > data.file.hitbox[i].max.x)
-                        return ((Vector3){data.file.hitbox[i].min.x-0.3,__INT_MAX__,data.file.hitbox[i].max.z+0.3});
-                        
-                    else if(hitboxLocal.max.z-0.5 < data.file.hitbox[i].min.z)
-                        return ((Vector3){__INT_MAX__,__INT_MAX__,data.file.hitbox[i].min.z-0.3});
-
-                    else if(hitboxLocal.min.x+0.5 > data.file.hitbox[i].max.x)
-                        return ((Vector3){data.file.hitbox[i].max.x+0.3,__INT_MAX__,__INT_MAX__});
-                }
-            } 
-            MQWALLEXCLUDEINDEX = __INT_MAX__;
+                else if(hitboxLocal.min.x+0.5 > data.file.hitbox[i].max.x)
+                    return ((Vector3){data.file.hitbox[i].max.x+0.6,__INT_MAX__,__INT_MAX__});
+            }
+        
         }
-    MQWALLEXCLUDEINDEX = __INT_MAX__;
     return ((Vector3){__INT_MAX__,__INT_MAX__,__INT_MAX__});
 }
 
@@ -244,8 +222,6 @@ void MQPlayerConfigStart(DATA *data, int quem, Vector3 posi)
     data->game.boolean.personagem[quem].pulando = false;
     data->game.boolean.personagem[quem].usando = false;
     data->game.boolean.personagem[quem].andandoPraTras = false;
-    data->game.boolean.personagem[quem].encontrouParedeX = false;
-    data->game.boolean.personagem[quem].encontrouParedeZ = false;
     data->session.relogio.personagem[quem].relogioNovo = 0;
     data->session.relogio.personagem[quem].relogioVelho = 0;
 }

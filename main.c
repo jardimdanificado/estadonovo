@@ -99,6 +99,7 @@ int main(void)
         /* SetExitKey(KEY_END); */
         if(menu.esc == false)
         {
+            TECLADO_MAIN(&menu, font, fontTitle, fontSubTitle, logo, &data);
             UpdateCamera(&camera);
 
             
@@ -121,7 +122,7 @@ int main(void)
                 }
             }
 
-            TECLADO_MAIN(&menu, font, fontTitle, fontSubTitle, logo, &data);
+            
 
             for(int i = 0; i < MAXOBJ; i++)
             {
