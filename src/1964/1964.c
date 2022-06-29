@@ -1,4 +1,79 @@
 
+BoundingBox MQHitboxUpdateX(BoundingBox hitboxbase, Vector3 targetPosi)
+{
+    hitboxbase.min.x += targetPosi.x;
+    hitboxbase.max.x += targetPosi.x;
+    return hitboxbase;
+}
+
+BoundingBox MQHitboxUpdateY(BoundingBox hitboxbase, Vector3 targetPosi)
+{
+    hitboxbase.min.y += targetPosi.y;
+    hitboxbase.max.y += targetPosi.y;
+    return hitboxbase;
+}
+
+BoundingBox MQHitboxUpdateZ(BoundingBox hitboxbase, Vector3 targetPosi)
+{
+    hitboxbase.min.z += targetPosi.z;
+    hitboxbase.max.z += targetPosi.z;
+    return hitboxbase;
+}
+
+BoundingBox MQHitboxUpdateXYZ(BoundingBox hitboxbase, Vector3 targetPosi)
+{
+    BoundingBox hitbox;
+    hitbox = hitboxbase;
+    hitbox.max = Vector3Add(hitboxbase.max,targetPosi);
+    hitbox.min = Vector3Add(hitboxbase.min, targetPosi);
+    return hitbox;
+}
+
+int MQFindHitboxByName(DATA data, char* name)
+{
+    for(int i = 0; i < MAXOBJ; i++)
+    {
+        if(strcmp(data.session.LoadedNames[i].hitbox,name)==0)
+            return i;
+    }
+    return -1;
+}
+
+
+int MQFindModelByName(DATA data, char* name)
+{
+    for(int i = 0; i < MAXOBJ; i++)
+    {
+        if(strcmp(data.session.LoadedNames[i].model,name)==0)
+            return i;
+    }
+    return -1;
+}
+
+int MQFindRenderModelIndexByID(DATA data, char* id)
+{
+    for(int i = 0;i<MAXOBJ;i++)
+    {
+        if(strcmp(data.session.render.model[i].id, id)==0)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int MQFindRenderTextIndexByID(DATA data, char* id)
+{
+    for(int i = 0;i<MAXOBJ;i++)
+    {
+        if(strcmp(data.session.render.text[i].id, id)==0)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
 float MQDifferenceFloat(float a, float b)
 {
     bool negativo = false;
@@ -103,19 +178,25 @@ void MQWindowInit(const int X, const int Y, const char *title)
 
 void MQWindowStart()
 {
-    char scrytextmem[32], scrxtextmem[32];
-    strcpy(scrxtextmem, abinCoreReturnData("config.text", "SCRX"));
-    strcpy(scrytextmem, abinCoreReturnData("config.text", "SCRY"));
-    screenW = atoi(scrxtextmem);
-    screenH = atoi(scrytextmem);
     char title[255];
     strcpy(title, abinCoreReturnData("config.text", "TITLE"));
-    MQWindowInit(screenW, screenH, title);
+    MQWindowInit(atoi(abinCoreReturnData("config.text", "SCRX")), atoi(abinCoreReturnData("config.text", "SCRY")), title);
 }
 
 //-----------------------------------
-//FONTS
+//FONT&TEXT 
 //-----------------------------------
+
+void MQLoadLangFromFile(DATA* data,char* fileloc)
+{
+    for(int i = 0; i <atoi(abinCoreReturnData(fileloc,"SIZE"));i++)
+    {
+        char buffer[4];
+        snprintf(buffer,4,"%d",i);
+        strcpy(data->file.lang[data->session.LangCount],abinCoreReturnData(fileloc,buffer));
+        data->session.LangCount++;
+    }
+}
 
 Font MQFontStart(char *FontLoc, int FontSize)
 {
@@ -174,7 +255,7 @@ Font MQFontStart(char *FontLoc, int FontSize)
 
 float MQGravit(Vector3 posicao, float gravidade, int tempo)
 {
-    return(posicao.y - (gravidade/60)*(tempo/3));
+    return(posicao.y - gravidade*((tempo*(tempo/5)))/60);
 }
 
 //-----------------------------------
@@ -201,11 +282,74 @@ Camera MQCameraStart(Camera *camera)
     return (*camera);
 }
 
+void MQCameraUpdate(DATA data, Camera *camera)
+{
+    if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.area[0]))
+    {
+        camera->position = (Vector3)
+        {
+            0.4375, 3.5, 11.0625
+        };
+    }
+    else if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.area[1]))
+    {
+        camera->position = (Vector3)
+        {
+            4.473, 3.5, 0.562
+        };
+    }
+    else if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.area[2]))
+    {
+        camera->position = (Vector3)
+        {
+            7.5, 2.5, -4
+        };
+    }
+    else if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.area[3]))
+    {
+        camera->position = (Vector3)
+        {
+            -3.56, 2.5, -4.8375
+            };
+    }
+    else if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.area[4]))
+    {
+        camera->position = (Vector3)
+        {
+            -19, 6, -16.5
+            };
+    }
+    else if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.area[5]))
+    {
+        camera->position = (Vector3)
+        {
+            -6.5, 8.5, -29
+            };
+    }
+
+    if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.area[4]) == false)
+        camera->target = (Vector3)
+    {
+        data.game.posicao.personagem[0].x, data.game.posicao.personagem[0].y + 2, data.game.posicao.personagem[0].z
+    };
+    else
+        camera->target = (Vector3)
+    {
+        0, 4, -16.5
+    };
+}
+
 //-----------------------------------
 //BULLETS
 //-----------------------------------
 
-#include "core/bullet.c"
+//#include "core/bullet.c"
+
+//-----------------------------------
+//MODELS
+//-----------------------------------
+
+#include "core/models.c"
 
 //-----------------------------------
 //DOORS
@@ -218,12 +362,6 @@ Camera MQCameraStart(Camera *camera)
 //-----------------------------------
 
 #include "core/savegame.c"
-
-//-----------------------------------
-//MODELS
-//-----------------------------------
-
-#include "core/models.c"
 
 //-----------------------------------
 //RENDER

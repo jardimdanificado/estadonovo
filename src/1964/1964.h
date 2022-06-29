@@ -23,11 +23,9 @@
 #define MQFALSE __INT_MAX__*(-1)
 #define MQTRUE __INT_MAX__
 
-#define MAXWID 600
-#define MAXHEI 240
 #define MAXOBJ 64
-unsigned int MAXANIM = 1;
 
+unsigned int MAXANIM = 1;
 
 bool MQEXIT = false;
 
@@ -72,8 +70,6 @@ typedef struct MENU MENU;
 
 struct PORTA_UNI
 {
-    //Model modelo;
-    BoundingBox hitbox;
     bool aberta, abrindo, fechando, trancada, existe, invertido;
     int frame;
     Vector3 posicao;
@@ -81,15 +77,8 @@ struct PORTA_UNI
 };
 typedef struct PORTA_UNI PORTA_UNI;
 
-struct PORTA_BASE
-{
-    Model modelo[4], modeloI[3];
-};
-typedef struct PORTA_BASE PORTA_BASE;
-
 struct PORTA
 {
-    PORTA_BASE base;
     PORTA_UNI slots[MAXOBJ];
 };
 typedef struct PORTA PORTA;
@@ -281,14 +270,6 @@ struct DATA_TEXTOITEM
 };
 typedef struct DATA_TEXTOITEM DATA_TEXTOITEM;
 
-struct DATA_TEXTO
-{
-    DATA_TEXTOOPCAO menu;
-    DATA_TEXTOOPCAO act;
-    DATA_TEXTOITEM item;
-};
-typedef struct DATA_TEXTO DATA_TEXTO;
-
 struct DATA_MODELITEM
 {
     Model calca[2], camisa[2], oculos[2], chapeu[2], sapato[2];
@@ -307,12 +288,6 @@ struct DATA_FRAMECOUNT
     int personagem[MAXOBJ + 1];
 };
 typedef struct DATA_FRAMECOUNT DATA_FRAMECOUNT;
-
-struct DATA_COUNTER
-{
-    DATA_FRAMECOUNT frames, gravitFrame;
-};
-typedef struct DATA_COUNTER DATA_COUNTER;
 
 struct DATA_ROTACAO
 {
@@ -335,7 +310,7 @@ typedef struct DATA_PONTEIROitem DATA_PONTEIROitem;
 struct DATA_ponteiroPERSONAGEM
 {
     DATA_PONTEIROitem item;
-    float lastFloorHeight;
+    /* float lastFloorHeight; */
     int tempoGravit;
 };
 typedef struct DATA_ponteiroPERSONAGEM DATA_ponteiroPERSONAGEM;
@@ -405,7 +380,9 @@ struct DATA_FILES
     MAPA mapa;
     Model model[MAXOBJ];
     BoundingBox hitbox[MAXOBJ];
-    DATA_TEXTO text;
+    Font font[MAXOBJ];
+    char text[MAXOBJ][255];
+    char lang[MAXOBJ][255];
     ModelAnimation *anim[MAXOBJ];
     char link[MAXOBJ][255];
     DATA_IMAGEM imagem;
@@ -421,14 +398,55 @@ struct DATA_GAME
     DATA_PONTEIRO ponteiro;
     DATA_POSICAO posicao;
     DATA_ROTACAO rotacao;
-    DATA_COUNTER contador;
 };
 typedef struct DATA_GAME DATA_GAME;
+
+struct DATA_RENDER_MODEL
+{
+    bool visible, playing, reverse;
+    int modelIndex;
+    int currentAnim;
+    int currentFrame;
+    Color color;
+    Vector3 position;
+    float rotation;
+    char *id;
+};
+typedef struct DATA_RENDER_MODEL DATA_RENDER_MODEL;
+
+struct DATA_RENDER_TEXT
+{
+    bool visible;
+    int textIndex;
+    Vector2 position;
+    Color color;
+    char* string;
+    int fontSize;
+    int fontIndex;
+    char *id;
+};
+typedef struct DATA_RENDER_TEXT DATA_RENDER_TEXT;
+
+struct DATA_SESSION_RENDER
+{
+    DATA_RENDER_MODEL model[MAXOBJ];
+    DATA_RENDER_TEXT text[MAXOBJ];
+    Color background;
+};
+typedef struct DATA_SESSION_RENDER DATA_SESSION_RENDER;
+
+struct DATA_SESSION_LOADEDNAMES
+{
+    char model[255],hitbox[255],text[255];
+};
+typedef struct DATA_SESSION_LOADEDNAMES DATA_SESSION_LOADEDNAMES;
 
 struct DATA_SESSION
 {
     DATA_RELOGIO relogio;
-    int ObjCount, AnimCount, HitboxCount;
+    DATA_SESSION_RENDER render;
+    int ModelCount, HitboxCount, TextCount, LangCount,frame;
+    DATA_SESSION_LOADEDNAMES LoadedNames[MAXOBJ];
 };
 typedef struct DATA_SESSION DATA_SESSION;
 
@@ -440,6 +458,6 @@ struct DATA
 };
 typedef struct DATA DATA;
 
-int screenH, screenW;
+
 
 #include "1964.c"

@@ -26,55 +26,39 @@ int main(void)
     InitAudioDevice();
     maintheme = LoadMusicStream("./data/audio/music/main.mp3");
     setlocale(LC_ALL, "Portuguese");
-    int screenH, screenW;
-    char *bufferScrSz, *langstartbuffer;
-    bufferScrSz = malloc(30);
-    strcpy(bufferScrSz, abinCoreReturnData("config.text", "SCRY"));
-    screenH = atoi(bufferScrSz);
-    strcpy(bufferScrSz, abinCoreReturnData("config.text", "SCRX"));
-    screenW = atoi(bufferScrSz);
-    free(bufferScrSz);
-    langstartbuffer = malloc(27);
-    bufferScrSz = malloc(4);
-    strcpy(bufferScrSz, abinCoreReturnData("config.text", "LANG"));
-    snprintf(langstartbuffer, 27, "./data/lang/%s/text.text", bufferScrSz);
-    if(abinCoreFileCheck(langstartbuffer) == false)
-    {
-        abinCoreEditData("config.text", "LANG", "ptbr");
-    }
-    strcpy(bufferScrSz, abinCoreReturnData("config.text", "LANG"));
-    snprintf(langstartbuffer, 27, "./data/lang/%s/text.text", bufferScrSz);
-    abinCoreFileCopy(langstartbuffer, "./data/temp/lang.text");
-    free(bufferScrSz);
-    free(langstartbuffer);
-    DATA data;
 
+    remove("./data/temp/lang");
+    abinCoreFileCopy("./data/lang/ptbr/text.text", "./data/temp/lang");
+    
     if(strcmp(abinCoreReturnData("./config.text", "MSAA"), "true") == 0)
         SetConfigFlags(FLAG_MSAA_4X_HINT);
     if(strcmp(abinCoreReturnData("./config.text", "RESIZE"), "true") == 0)
         SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 
+    DATA data;
+    MQCleanAllRenderSlots(&data);
     MQWindowStart();
-    clock_t *relogio;
-    relogio = malloc(sizeof(clock_t) * 10);
-    Camera camera = MQCameraStart(&camera);
 
-    data.session.ObjCount = 0;
-    data.session.AnimCount = 0;
+    Camera camera = MQCameraStart(&camera);
+    data.session.render.background = (Color){115, 105, 97, 255};
+    data.session.ModelCount = 0;
     data.session.HitboxCount = 0;
-    data.game.contador.frames.personagem[0] = 0;
+    data.session.LangCount = 0;
+    data.session.TextCount = 0;
+    data.session.frame = 0;
     MENU menu;
     menu.estaAberto = true;
     AMBIENTE ambiente;
     ambiente.gravidade = 0.2;
+    MQLoadLangFromFile(&data,"./data/temp/lang");
     MQLoadAllModels(&data);
     MQPlayerConfigStart(&data, 0, (Vector3) {-0.0625, 5, 6.0625});
     MAPA_START(&data);
     msg = malloc(sizeof(char) * 255);
     //msg = " ";
-    Font font = MQFontStart("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16);
-    Font fontTitle = MQFontStart("data/font/Mockery.ttf", 48);
-    Font fontSubTitle = MQFontStart("data/font/Mockery.ttf", 24);
+    data.file.font[0] = MQFontStart("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16);
+    data.file.font[1] = MQFontStart("data/font/Mockery.ttf", 48);
+    data.file.font[2] = MQFontStart("data/font/Mockery.ttf", 24);
     LOGO logo;
     logo.ponteiro = 0;
     logo.relogio = 0;
@@ -82,74 +66,62 @@ int main(void)
     logo.relogiosubDef = 0;
     logo.pisca = false;
     logo.piscaPonteiro = 0;
-    MQEXIT = MQMenu("data/menu/start.menu", true,  &data, font, fontTitle, fontSubTitle, &logo,  screenH);
     SetTargetFPS(60);
+    MQEXIT = MQMenu(&data,0);
+    
     camera.target = (Vector3)
     {
-        data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.x, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.y, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.z
+        data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player0-cabeca"))].min.x, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player0-cabeca"))].min.y, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player0-cabeca"))].min.z
     };
     SetExitKey(KEY_END);
-    while(!WindowShouldClose() && MQEXIT == false)
+    camera.position = (Vector3){0.4375, 3.5, 11.0625};
+    MQRenderAddModelToQueue(&data, "mapa0", atoi(abinCoreReturnData("./data/temp/model.temp", "map0")), WHITE,(Vector3){0.0f, 0.0f, 0.0f}, 0,  0,0,true,false,false);
+    MQRenderAddModelToQueue(&data, "player0", MQFindModelByName(data,"player"), COR_PELE0,data.game.posicao.personagem[0], data.game.rotacao.personagem[0],  0,0,true,true,false);
+    while(!WindowShouldClose() && !MQEXIT)
     {
+        
         camera.target = (Vector3)
         {
-            data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.x, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.y, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player-cabeca"))].min.z
+            data.file.hitbox[MQFindHitboxByName(data, "player0-cabeca")].min.x, data.file.hitbox[MQFindHitboxByName(data, "player0-cabeca")].min.y, data.file.hitbox[MQFindHitboxByName(data, "player0-cabeca")].min.z
         };
+        data.session.frame++;
+        UpdateCamera(&camera);
+        data.session.render.model[MQFindRenderModelIndexByID(data,"player0")].position = data.game.posicao.personagem[0];
+        data.session.render.model[MQFindRenderModelIndexByID(data,"player0")].rotation = data.game.rotacao.personagem[0];
 
-        /* SetExitKey(KEY_END); */
-        if(menu.esc == false)
+        
+        TECLADO_MAIN(&menu, data.file.font[0], data.file.font[1], data.file.font[2], logo, &data);
+        MQPlayerUpdateBodyBox( &data, 0, data.session.render.model[MQFindRenderModelIndexByID(data,"player0")].currentAnim);
+        
+        if(data.game.rotacao.personagem[0] / 360 == 0)
+            data.game.rotacao.personagem[0] = 0;
+
+        if(MQReturnYMaxCollisionPoint(data, data.game.posicao.personagem[0]) == MQFALSE)
         {
-            TECLADO_MAIN(&menu, font, fontTitle, fontSubTitle, logo, &data);
-            UpdateCamera(&camera);
-
-            
-
-            if(data.game.rotacao.personagem[0] == 360)
-                data.game.rotacao.personagem[0] = 0;
-
-            if(MQCheckFloorFromHeight(data, data.game.posicao.personagem[0].y - 0.01) == false)
-            {
-                if(MQReturnFloorCollisionPoint(data, data.game.posicao.personagem[0]) == MQFALSE)
-                {
-                    data.game.posicao.personagem[0].y = MQGravit(data.game.posicao.personagem[0], 1, data.game.contador.gravitFrame.personagem[0]);
-                    data.game.ponteiro.personagem[0].lastFloorHeight = data.game.posicao.personagem[0].y;
-                    data.game.contador.gravitFrame.personagem[0]++;
-                }
-                else if(data.game.ponteiro.personagem[0].lastFloorHeight < data.game.posicao.personagem[0].y)
-                {
-                    data.game.posicao.personagem[0].y = MQReturnFloorCollisionPoint(data, data.game.posicao.personagem[0]);
-                    data.game.contador.gravitFrame.personagem[0] = 0;
-                }
-            }
-
-            
-
-            for(int i = 0; i < MAXOBJ; i++)
-            {
-                if(data.file.mapa.porta.slots[i].abrindo || data.file.mapa.porta.slots[i].fechando)
-                {
-                    if(data.file.mapa.porta.slots[i].existe == true)
-                        MQDoorAnim(&data);
-                }
-            }
-            snprintf(msg,255,"%d",data.game.ponteiro.personagem[0].tempoGravit);
-            MQRender(&data, camera, font, menu);
+            data.game.posicao.personagem[0].y = MQGravit(data.game.posicao.personagem[0], 0.1, data.game.ponteiro.personagem[0].tempoGravit);
+            data.game.ponteiro.personagem[0].tempoGravit++;
         }
-        else if(menu.esc == true)
+        else 
         {
-            data.game.boolean.personagem[0].pulando = false;
-            data.game.boolean.personagem[0].andando = false;
-            MQEXIT = MQMenu("data/menu/esc.menu", false,  &data, font, fontTitle, fontSubTitle, &logo,  screenH);
-            menu.esc = false;
+            data.game.posicao.personagem[0].y = MQReturnYMaxCollisionPoint(data, data.game.posicao.personagem[0]);
+            data.game.ponteiro.personagem[0].tempoGravit = 0;
         }
+        
+        MQUpdateDoor(&data);
+        for(int i = 0; i < MAXOBJ; i++)
+        {
+            if(data.file.mapa.porta.slots[i].abrindo || data.file.mapa.porta.slots[i].fechando)
+            {
+                if(data.file.mapa.porta.slots[i].existe == true)
+                    MQDoorAnim(&data);
+            }
+        }
+        snprintf(msg,255,"%d %f",data.game.ponteiro.personagem[0].tempoGravit,data.game.posicao.personagem[0].y);
+        MQRender(&data, camera, data.file.font[0], menu);
     }
     CloseAudioDevice();
     remove("./data/temp/lang.text");
-    free(relogio);
     free(msg);
-    UnloadFont(font);
-    UnloadFont(fontTitle);
-    UnloadFont(fontSubTitle);
     CloseWindow();              // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 

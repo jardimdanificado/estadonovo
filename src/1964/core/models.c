@@ -1,5 +1,5 @@
 // Update model animated vertex data (positions and normals) for a given frame
-// NOTE: Updated data is uploaded to GPU
+// NOTE: Updated data is returned as mesh
 Mesh MQApplyMeshTransformFromBone(Model model, ModelAnimation anim, int frame)
 {
     if((anim.frameCount > 0) && (anim.bones != NULL) && (anim.framePoses != NULL))
@@ -196,11 +196,11 @@ void MQLoadModel(DATA *data, char *loadedfrom, int ponteiro)
     snprintf(bufferresult[1], 128, "%s", abinCoreReturnData(loadedfrom, bufferlocal[1]));
 
     if(animated == true)
-        snprintf(bufferresult[2], 128, "%d", data->session.AnimCount);
+        snprintf(bufferresult[2], 128, "%d", data->session.ModelCount);
     else
         snprintf(bufferresult[2], 128, "vazio");
 
-    snprintf(ABINCACHE4, 4, "%d", data->session.ObjCount);
+    snprintf(ABINCACHE4, 4, "%d", data->session.ModelCount);
     snprintf(bufferlocal[0], 128, "name%s", ABINCACHE4);
     snprintf(bufferlocal[1], 128, "animated%s", ABINCACHE4);
     snprintf(bufferlocal[2], 128, "anim%s", ABINCACHE4);
@@ -210,13 +210,13 @@ void MQLoadModel(DATA *data, char *loadedfrom, int ponteiro)
     MQSetTempSpecsToFile4("./data/temp/model.temp");
     snprintf(bufferlocal[0], 8, "link%d", ponteiro);
     abinCoreAddNewData("./data/temp/model.temp", bufferlocal[0], abinCoreReturnData(loadedfrom, bufferlocal[0]));
-    data->file.model[data->session.ObjCount] = LoadModel(abinCoreReturnData(loadedfrom, bufferlocal[0]));
-    data->session.ObjCount++;
+    data->file.model[data->session.ModelCount] = LoadModel(abinCoreReturnData(loadedfrom, bufferlocal[0]));
+    strcpy(data->session.LoadedNames[data->session.ModelCount].model ,bufferresult[0]);
     if(animated == true)
     {
-        data->file.anim[data->session.AnimCount] = LoadModelAnimations(abinCoreReturnData(loadedfrom, bufferlocal[0]), &MAXANIM);
-        data->session.AnimCount++;
+        data->file.anim[data->session.ModelCount] = LoadModelAnimations(abinCoreReturnData(loadedfrom, bufferlocal[0]), &MAXANIM);
     }
+    data->session.ModelCount++;
 }
 
 void MQLoadModelsFromText(DATA *data, char *fileloc)
@@ -224,13 +224,13 @@ void MQLoadModelsFromText(DATA *data, char *fileloc)
     for(int i = 0; i < atoi(abinCoreReturnData(fileloc, "SIZE")); i++)
     {
         MQLoadModel( *&data, fileloc, i);
-        snprintf(ABINCACHE4, 4, "%d", data->session.ObjCount);
+        snprintf(ABINCACHE4, 4, "%d", data->session.ModelCount);
         abinCoreEditData("./data/temp/model.temp", "SIZE", ABINCACHE4);
-        snprintf(ABINCACHE16, 16, "anim=%d", data->session.AnimCount);
+        snprintf(ABINCACHE16, 16, "anim=%d", data->session.ModelCount);
     }
 }
 
-void MQLoadHitbox(DATA *data, char *fileloc, int ponteiro)
+void MQLoadHitboxFromModel(DATA *data, char *fileloc, int ponteiro)
 {
     snprintf(ABINCACHE32, 32, "link%d", ponteiro);
     snprintf(ABINCACHE128, 128, "%s", abinCoreReturnData(fileloc, ABINCACHE32));
@@ -245,16 +245,44 @@ void MQLoadHitbox(DATA *data, char *fileloc, int ponteiro)
     MQSetTempSpecsValues2(bufferresult[0], ABINCACHE16);
     MQSetTempSpecsToFile2("./data/temp/hitbox.temp");
     UnloadModel(localModel);
+    strcpy(data->session.LoadedNames[data->session.HitboxCount].hitbox,bufferresult[0]);
+    data->session.HitboxCount++;
+    snprintf(ABINCACHE4, 4, "%d", data->session.HitboxCount);
+    abinCoreEditData("./data/temp/hitbox.temp", "SIZE", ABINCACHE4);
+}
+
+void MQCreateHitbox(DATA *data, char *name, BoundingBox Hitbox)
+{
+    data->file.hitbox[data->session.HitboxCount] = Hitbox;
+    snprintf(ABINCACHE16,16,"name%d",data->session.HitboxCount);
+    snprintf(ABINCACHE8,8,"%d",data->session.HitboxCount);
+    MQSetTempSpecsTypes2(ABINCACHE16, name);
+    MQSetTempSpecsValues2(name, ABINCACHE8);
+    MQSetTempSpecsToFile2("./data/temp/hitbox.temp");
+    strcpy(data->session.LoadedNames[data->session.HitboxCount].hitbox,name);
+    data->session.HitboxCount++;
+    snprintf(ABINCACHE4, 4, "%d", data->session.HitboxCount);
+    abinCoreEditData("./data/temp/hitbox.temp", "SIZE", ABINCACHE4);
+}
+
+void MQCreateEmptyHitbox(DATA *data, char *name)
+{
+    snprintf(ABINCACHE16,16,"name%d",data->session.HitboxCount);
+    snprintf(ABINCACHE8,8,"%d",data->session.HitboxCount);
+    MQSetTempSpecsTypes2(ABINCACHE16, name);
+    MQSetTempSpecsValues2(name, ABINCACHE8);
+    MQSetTempSpecsToFile2("./data/temp/hitbox.temp");
+    strcpy(data->session.LoadedNames[data->session.HitboxCount].hitbox,name);
+    data->session.HitboxCount++;
+    snprintf(ABINCACHE4, 4, "%d", data->session.HitboxCount);
+    abinCoreEditData("./data/temp/hitbox.temp", "SIZE", ABINCACHE4);
 }
 
 void MQLoadHitboxFromText(DATA *data, char *fileloc)
 {
     for(int i = 0; i < atoi(abinCoreReturnData(fileloc, "SIZE")); i++)
     {
-        MQLoadHitbox( *&data, fileloc, i);
-        data->session.HitboxCount++;
-        snprintf(ABINCACHE4, 4, "%d", data->session.HitboxCount);
-        abinCoreEditData("./data/temp/hitbox.temp", "SIZE", ABINCACHE4);
+        MQLoadHitboxFromModel( *&data, fileloc, i);
     }
 }
 
@@ -263,20 +291,17 @@ void MQPlayerUpdateBodyBox(DATA *data, int quem, int qualAnim)
     Mesh LocalMesh;
     Vector3 LocVec3;
     int modelIndex, animIndex, hitboxIndex;
+    snprintf(ABINCACHE16,16,"player%d-cabeca",quem);
+    int hitboxheadfind = MQFindHitboxByName(*data,ABINCACHE16),modelheadfind = MQFindModelByName(*data,ABINCACHE16);
     if(quem >= 0)
     {
         for(int i = 0; i < 14; i++)
         {
-            snprintf(ABINCACHE8, 8, "name%d", i);
-            strcpy(ABINCACHE128, abinCoreReturnData("./data/models/playerhitbox.text", ABINCACHE8));
-            snprintf(ABINCACHE32, 32, "anim%s", abinCoreReturnData("./data/temp/model.temp", ABINCACHE128));
-            modelIndex =  atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE128));
-            animIndex = atoi(abinCoreReturnData("./data/temp/model.temp", ABINCACHE32));
-            hitboxIndex = atoi(abinCoreReturnData("./data/temp/hitbox.temp", ABINCACHE128));
+            modelIndex =  modelheadfind+i;
+            animIndex = modelheadfind+i;
+            hitboxIndex = hitboxheadfind+i;
 
-            UpdateModelAnimation(data->file.model[modelIndex], data->file.anim[animIndex][qualAnim], data->game.contador.frames.personagem[quem]);
-
-            LocalMesh = MQApplyMeshTransformFromBone(data->file.model[modelIndex], data->file.anim[animIndex][qualAnim], data->game.contador.frames.personagem[quem]);
+            LocalMesh = MQApplyMeshTransformFromBone(data->file.model[modelIndex], data->file.anim[animIndex][qualAnim], data->session.render.model[MQFindRenderModelIndexByID(*data,"player0")].currentFrame);
 
             for(int i = 0; i < LocalMesh.vertexCount * 3; i += 3)
             {
@@ -311,7 +336,7 @@ void MQPlayerUpdateBodyBox(DATA *data, int quem, int qualAnim)
             MQSetTempSpecsValues2(ABINCACHE128, ABINCACHE4);
 
             MQSetTempSpecsToFile2("./data/temp/hitbox.temp");
-
+            strcpy(data->session.LoadedNames[data->session.HitboxCount].hitbox,ABINCACHE128);
             data->session.HitboxCount++;
             snprintf(ABINCACHE4, 4, "%d", data->session.HitboxCount);
             abinCoreEditData("./data/temp/hitbox.temp", "SIZE", ABINCACHE4);

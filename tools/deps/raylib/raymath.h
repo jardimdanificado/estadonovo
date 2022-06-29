@@ -1,1 +1,0 @@
-/home/jardel/1964engine/sourcecode/raylib/raymath.h

@@ -13,27 +13,28 @@ void MQDoorCreate(DATA *data, Vector3 posicaoLOCAL, bool invertidoLOCAL, bool tr
             data->file.mapa.porta.slots[i].invertido = invertidoLOCAL;
             data->file.mapa.porta.slots[i].posicao = posicaoLOCAL;
             data->file.mapa.porta.slots[i].trancada = trancadaLOCAL;
+            char bufferlocal[32];
+            snprintf(bufferlocal,32,"porta%d",i);
 
             if(abertaLOCAL == false)
             {
-                data->file.mapa.porta.slots[i].hitbox = GetModelBoundingBox(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "porta0"))]);
+                MQCreateHitbox(*&data,bufferlocal,GetModelBoundingBox(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "porta0"))]));
             }
-            else if(abertaLOCAL == true)
+            else
             {
                 if(invertidoLOCAL == false)
                 {
-                    data->file.mapa.porta.slots[i].hitbox = GetModelBoundingBox(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "porta3"))]);
+                    MQCreateHitbox(*&data,bufferlocal,GetModelBoundingBox(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "porta3"))]));
                 }
-                else if(invertidoLOCAL == true)
+                else 
                 {
-                    data->file.mapa.porta.slots[i].hitbox = GetModelBoundingBox(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "porta-2"))]);;
+                    MQCreateHitbox(*&data,bufferlocal,GetModelBoundingBox(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "porta-2"))]));
                 }
             }
-            data->file.mapa.porta.slots[i].hitbox = MQHitboxUpdateXYZ(data->file.mapa.porta.slots[i].hitbox, data->file.mapa.porta.slots[i].posicao);
-            i = 80;
+            data->file.hitbox[atoi(abinCoreReturnData("./data/temp/model.temp", bufferlocal))] = MQHitboxUpdateXYZ(data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE32))], data->file.mapa.porta.slots[i].posicao);
+            break;
         }
     }
-
 }
 
 void MQUpdateDoor(DATA *data)
@@ -44,59 +45,61 @@ void MQUpdateDoor(DATA *data)
         {
             if(data->file.mapa.porta.slots[i].invertido == false)
             {
+                snprintf(ABINCACHE16,16,"porta%d",i);
                 switch(data->file.mapa.porta.slots[i].frame)
                 {
                     case 0:
                     {
-                        data->file.mapa.porta.slots[i].hitbox = GetModelBoundingBox(data->file.mapa.porta.base.modelo[0]);
-                        data->file.mapa.porta.slots[i].hitbox = MQHitboxUpdateXYZ(data->file.mapa.porta.slots[i].hitbox, data->file.mapa.porta.slots[i].posicao);
+                        data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))] = GetModelBoundingBox(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "porta0"))]);;
+                        data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))] = MQHitboxUpdateXYZ(data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))], data->file.mapa.porta.slots[i].posicao);
                     }
                     break;
                     case 1:
                     {
-                        data->file.mapa.porta.slots[i].hitbox = GetModelBoundingBox(data->file.mapa.porta.base.modelo[1]);
-                        data->file.mapa.porta.slots[i].hitbox = MQHitboxUpdateXYZ(data->file.mapa.porta.slots[i].hitbox, data->file.mapa.porta.slots[i].posicao);
+                        data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))] = GetModelBoundingBox(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "porta1"))]);
+                        data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))] = MQHitboxUpdateXYZ(data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))], data->file.mapa.porta.slots[i].posicao);
                     }
                     break;
                     case 2:
                     {
-                        data->file.mapa.porta.slots[i].hitbox = GetModelBoundingBox(data->file.mapa.porta.base.modelo[2]);
-                        data->file.mapa.porta.slots[i].hitbox = MQHitboxUpdateXYZ(data->file.mapa.porta.slots[i].hitbox, data->file.mapa.porta.slots[i].posicao);
+                        data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))] = GetModelBoundingBox(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "porta2"))]);
+                        data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))] = MQHitboxUpdateXYZ(data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))], data->file.mapa.porta.slots[i].posicao);
                     }
                     break;
                     case 3:
                     {
-                        data->file.mapa.porta.slots[i].hitbox = GetModelBoundingBox(data->file.mapa.porta.base.modelo[3]);
-                        data->file.mapa.porta.slots[i].hitbox = MQHitboxUpdateXYZ(data->file.mapa.porta.slots[i].hitbox, data->file.mapa.porta.slots[i].posicao);
+                        data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))] = GetModelBoundingBox(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "porta3"))]);
+                        data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))] = MQHitboxUpdateXYZ(data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))], data->file.mapa.porta.slots[i].posicao);
                     }
                     break;
                 }
             }
-            else if(data->file.mapa.porta.slots[i].invertido == true)
+            else
             {
                 switch(data->file.mapa.porta.slots[i].frame)
                 {
                     case 0:
                     {
-                        data->file.mapa.porta.slots[i].hitbox = GetModelBoundingBox(data->file.mapa.porta.base.modelo[0]);
-                        data->file.mapa.porta.slots[i].hitbox = MQHitboxUpdateXYZ(data->file.mapa.porta.slots[i].hitbox, data->file.mapa.porta.slots[i].posicao);
+                        data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))] = GetModelBoundingBox(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "porta0"))]);
+                        data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))] = MQHitboxUpdateXYZ(data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))], data->file.mapa.porta.slots[i].posicao);
                     }
                     break;
                     case 1:
                     {
-                        data->file.mapa.porta.slots[i].hitbox = MQHitboxUpdateXYZ(data->file.mapa.porta.slots[i].hitbox, data->file.mapa.porta.slots[i].posicao);
+                        data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))] = GetModelBoundingBox(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "porta-1"))]);
+                        data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))] = MQHitboxUpdateXYZ(data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))], data->file.mapa.porta.slots[i].posicao);
                     }
                     break;
                     case 2:
                     {
-                        data->file.mapa.porta.slots[i].hitbox = GetModelBoundingBox(data->file.mapa.porta.base.modeloI[1]);
-                        data->file.mapa.porta.slots[i].hitbox = MQHitboxUpdateXYZ(data->file.mapa.porta.slots[i].hitbox, data->file.mapa.porta.slots[i].posicao);
+                        data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))] = GetModelBoundingBox(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "porta-2"))]);
+                        data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))] = MQHitboxUpdateXYZ(data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))], data->file.mapa.porta.slots[i].posicao);
                     }
                     break;
                     case 3:
                     {
-                        data->file.mapa.porta.slots[i].hitbox = GetModelBoundingBox(data->file.mapa.porta.base.modeloI[2]);
-                        data->file.mapa.porta.slots[i].hitbox = MQHitboxUpdateXYZ(data->file.mapa.porta.slots[i].hitbox, data->file.mapa.porta.slots[i].posicao);
+                        data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))] = GetModelBoundingBox(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "porta-3"))]);
+                        data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))] = MQHitboxUpdateXYZ(data->file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp",ABINCACHE16))], data->file.mapa.porta.slots[i].posicao);
                     }
                     break;
                 }

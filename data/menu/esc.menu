@@ -1,9 +1,0 @@
-MAX 3
-txt0 %menu4
-txt1 %menu7
-txt2 %menu1
-f0 OFFLOOP
-f1 GO
-to1 ./data/menu/save.menu
-f2 EXIT
-ESC OFFLOOP
