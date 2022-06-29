@@ -1,0 +1,15 @@
+SIZE 6
+
+name0 area0
+name1 area1
+name2 area2
+name3 area3
+name4 area4
+name5 area5
+
+link0 ./data/models/map/level0/area/0.glb
+link1 ./data/models/map/level0/area/1.glb
+link2 ./data/models/map/level0/area/2.glb
+link3 ./data/models/map/level0/area/3.glb
+link4 ./data/models/map/level0/area/4.glb
+link5 ./data/models/map/level0/area/5.glb

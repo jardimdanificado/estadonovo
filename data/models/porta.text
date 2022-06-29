@@ -1,0 +1,26 @@
+SIZE 7
+
+link0 ./data/models/map/porta/0.glb
+link1 ./data/models/map/porta/1.glb
+link2 ./data/models/map/porta/2.glb
+link3 ./data/models/map/porta/3.glb
+link4 ./data/models/map/porta/-1.glb
+link5 ./data/models/map/porta/-2.glb
+link6 ./data/models/map/porta/-3.glb
+
+name0 porta0
+name1 porta1
+name2 porta2
+name3 porta3
+name4 porta-1
+name5 porta-2
+name6 porta-3
+
+animated0 false
+animated1 false
+animated2 false
+animated3 false
+animated4 false
+animated5 false
+animated6 false
+
