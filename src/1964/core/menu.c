@@ -164,7 +164,7 @@ int MQMenuQuestions(DATA *data, int menu, int opcao )
                 case 2:
                 {
                     MQLoadGame(*&data);
-                    return MQTRUE;
+                    return MQFALSE;
                 }
                 break;
             }
@@ -243,7 +243,7 @@ bool MQMenu(DATA *data, int menuIndex)
 {
     PlayMusicStream(maintheme);
     int allmax[] = {2,3,3,0,0};
-    int langIndex[3][3] = {{0,1},{4,7,1},{3,2,4}};
+    int langIndex[3][3] = {{0,1},{4,7,1},{4,2,3}};
 
     int optIndex = 0;
     char quotes[allmax[menuIndex]][255];
