@@ -1,1 +1,0 @@
-gcc tester.c -o test.AppImage -lGL -L../../libs/linux64 -l:libraylib.a -lm -lpthread -ldl -lrt -lX11
