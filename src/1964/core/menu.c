@@ -1,111 +1,17 @@
-void MQRenderLogo(Font fontTitle, Font fontSubTitle, LOGO *logo)
+void MQRenderLogo(DATA data,char* title,char* subtitle,int frame)
 {
-    char bufferLocal[255];
-    strcpy(bufferLocal, abinCoreReturnData("config.text", "TITLE"));
-    DrawTextEx(fontTitle, bufferLocal, (Vector2)
+/*     DrawTextEx(data.file.font[1], title, (Vector2){(GetScreenWidth() / 2) - 157,8}, data.file.font[1].baseSize, 0, COR_LARANJA);*/
+    for(int i = 1; i<(GetScreenHeight()/data.file.font[1].baseSize)-1;i++)
     {
-        (GetScreenWidth() / 2) - 157, 8
-    }, 48, 0, COR_CINZA);
-    DrawTextEx(fontTitle, bufferLocal, (Vector2)
-    {
-        (GetScreenWidth() / 2) - 157, 46
-    }, 48, 0, COR_CINZA);
-    DrawTextEx(fontTitle, bufferLocal, (Vector2)
-    {
-        (GetScreenWidth() / 2) - 157, 84
-    }, 48, 0, COR_CINZA);
-    DrawTextEx(fontTitle, bufferLocal, (Vector2)
-    {
-        (GetScreenWidth() / 2) - 157, 122
-    }, 48, 0, COR_CINZA);
-    DrawTextEx(fontTitle, bufferLocal, (Vector2)
-    {
-        (GetScreenWidth() / 2) - 157, 160
-    }, 48, 0, COR_CINZA);
-    switch(logo->ponteiro)
-    {
-        case 0:
-        {
-            DrawTextEx(fontTitle, bufferLocal, (Vector2)
-            {
-                (GetScreenWidth() / 2) - 157, 8
-            }, 48, 0, COR_LARANJA);
-        }
-        break;
-        case 1:
-        {
-            DrawTextEx(fontTitle, bufferLocal, (Vector2)
-            {
-                (GetScreenWidth() / 2) - 157, 46
-            }, 48, 0, COR_LARANJA);
-        }
-        break;
-        case 2:
-        {
-            DrawTextEx(fontTitle, bufferLocal, (Vector2)
-            {
-                (GetScreenWidth() / 2) - 157, 84
-            }, 48, 0, COR_LARANJA);
-        }
-        break;
-        case 3:
-        {
-            DrawTextEx(fontTitle, bufferLocal, (Vector2)
-            {
-                (GetScreenWidth() / 2) - 157, 122
-            }, 48, 0, COR_LARANJA);
-        }
-        break;
-        case 4:
-        {
-            DrawTextEx(fontTitle, bufferLocal, (Vector2)
-            {
-                (GetScreenWidth() / 2) - 157, 160
-            }, 48, 0, COR_LARANJA);
-        }
-        break;
+        if((frame+(i*i*i))%133>=0&&(frame+(i*i*i))%141<i)
+            DrawTextEx(data.file.font[1], title, (Vector2){(GetScreenWidth() / 2) - 157, (data.file.font[1].baseSize*i)-16}, data.file.font[1].baseSize, 0, COR_LARANJA);
+        else
+            DrawTextEx(data.file.font[1], title, (Vector2){(GetScreenWidth() / 2) - 157, (data.file.font[1].baseSize*i)-16}, data.file.font[1].baseSize, 0, COR_CINZA);
     }
-
-    if(clock() > logo->relogio + CLOCKS_PER_SEC * 1.5)
-    {
-        logo->relogio = clock();
-        if(logo->ponteiro < 4)
-            logo->ponteiro++;
-        else if(logo->ponteiro == 4)
-            logo->ponteiro = 0;
-    }
-
-    logo->relogiosub = clock();
-    strcpy(bufferLocal, abinCoreReturnData("config.text", "SUBTITLE"));
-    DrawTextEx(fontSubTitle, bufferLocal, (Vector2)
-    {
-        (GetScreenWidth() / 2) - 150, 202
-    }, 24, 0, COR_CINZA);
-    if(logo->relogiosub % 19 == 0 && logo->pisca == false)
-    {
-        logo->pisca = true;
-        logo->relogiosubDef = clock();
-    }
-    else if(logo->pisca == true && logo->piscaPonteiro == 0 && clock() > logo->relogiosubDef + (CLOCKS_PER_SEC / 50))
-    {
-        logo->piscaPonteiro++;
-        strcpy(bufferLocal, abinCoreReturnData("config.text", "SUBTITLE"));
-        DrawTextEx(fontSubTitle, bufferLocal, (Vector2)
-        {
-            (GetScreenWidth() / 2) - 150, 202
-        }, 24, 0, COR_LARANJA);
-        logo->relogiosubDef = clock();
-    }
-    else if(logo->pisca == true && logo->piscaPonteiro == 1 && clock() > logo->relogiosubDef + (CLOCKS_PER_SEC / 30))
-    {
-        logo->piscaPonteiro = 0;
-        strcpy(bufferLocal, abinCoreReturnData("config.text", "SUBTITLE"));
-        DrawTextEx(fontSubTitle, bufferLocal, (Vector2)
-        {
-            (GetScreenWidth() / 2) - 150, 202
-        }, 24, 0, COR_LARANJA);
-        logo->pisca = false;
-    }
+    if(frame%84>=0&&frame%120<1)
+        DrawTextEx(data.file.font[2], subtitle, (Vector2){(GetScreenWidth() / 2) - 150 , GetScreenHeight()-(data.file.font[2].baseSize+(data.file.font[2].baseSize/2))}, data.file.font[2].baseSize, 0, COR_LARANJA);
+    else
+        DrawTextEx(data.file.font[2], subtitle, (Vector2){(GetScreenWidth() / 2) - 150 , GetScreenHeight()-(data.file.font[2].baseSize+(data.file.font[2].baseSize/2))}, data.file.font[2].baseSize, 0, COR_CINZA);
 }
 
 int MQMenuQuestions(DATA *data, int menu, int opcao )
@@ -222,18 +128,18 @@ int MQMenuQuestions(DATA *data, int menu, int opcao )
     }
 }
 
-void MQMenuRender(DATA *data, int max, int opt ,char quotes[][255])
+void MQMenuRender(DATA data, int max, int opt ,char quotes[][255])
 {
     BeginDrawing();
     ClearBackground(COR_BRANCO);
-    /* MQRenderLogo(fontTitle, fontSubTitle, *&logo); */
+    /* MQRenderLogo(data.file.font[1], data.file.font[2], *&logo); */
 
     for(int i = max-1; i >=0; i--)
     {
         if(i == opt)
-            DrawTextEx(data->file.font[0], quotes[i], (Vector2){0,(GetScreenHeight() - data->file.font[0].baseSize) - (data->file.font[0].baseSize * i)}, data->file.font[0].baseSize, 0, COR_SELECIONADO);
+            DrawTextEx(data.file.font[0], quotes[i], (Vector2){0,(GetScreenHeight() - data.file.font[0].baseSize) - (data.file.font[0].baseSize * i)}, data.file.font[0].baseSize, 0, COR_SELECIONADO);
         else
-            DrawTextEx(data->file.font[0], quotes[i], (Vector2){0,(GetScreenHeight() - data->file.font[0].baseSize) - (data->file.font[0].baseSize * i)}, data->file.font[0].baseSize, 0, COR_CINZA);
+            DrawTextEx(data.file.font[0], quotes[i], (Vector2){0,(GetScreenHeight() - data.file.font[0].baseSize) - (data.file.font[0].baseSize * i)}, data.file.font[0].baseSize, 0, COR_CINZA);
     }
     EndDrawing();
 }
@@ -247,6 +153,10 @@ bool MQMenu(DATA *data, int menuIndex)
 
     int optIndex = 0;
     char quotes[allmax[menuIndex]][255];
+    char title[2][64];
+    strcpy(title[0],abinCoreReturnData("./config.text","TITLE"));
+    strcpy(title[1],abinCoreReturnData("./config.text","SUBTITLE"));
+    int localframe = 0;
     for(short int i = 0 ;i<allmax[menuIndex];i++)
     {
         strcpy(quotes[i],data->file.lang[langIndex[menuIndex][i]]);
@@ -255,7 +165,8 @@ bool MQMenu(DATA *data, int menuIndex)
     {
         UpdateMusicStream(maintheme);
         //RENDER
-        MQMenuRender(* &data,  allmax[menuIndex], optIndex, quotes );
+        MQRenderLogo(*data,title[0],title[1],localframe);
+        MQMenuRender(*data,  allmax[menuIndex], optIndex, quotes );
         //keyboard
         if(IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
         {
@@ -290,6 +201,7 @@ bool MQMenu(DATA *data, int menuIndex)
                 }
             }
         }
+        localframe++;
     }
     if(menuIndex==MQTRUE)
         return true;

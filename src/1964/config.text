@@ -5,4 +5,4 @@ SCRX 600
 SCRY 240
 LANG ptbr
 MSAA false
-RESIZE false
+RESIZE true

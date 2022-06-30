@@ -127,26 +127,9 @@ void TECLADO_MAIN(MENU *menu, Font font, Font fontTitle, Font fontSubTitle, LOGO
         data->session.render.model[MQFindRenderModelIndexByID(*data,"player0")].reverse = false;
         data->session.render.model[MQFindRenderModelIndexByID(*data,"player0")].currentAnim = 0;
     }
-    if(IsKeyPressed(KEY_SPACE))
-    {
-        if(data->game.boolean.personagem[0].mirando == false)
-        {
-            data->game.velocidade.personagem[0].velocidadePulo = 0.2;
-            data->game.boolean.personagem[0].pulando = true;
-            data->session.relogio.personagem[0].pulo = clock();
-        }
-    }
     if(IsKeyDown(KEY_SPACE))
     {
-        data->game.posicao.personagem[0].y +=0.5;
-    }
-    if(IsKeyReleased(KEY_SPACE))
-    {
-        if(data->game.boolean.personagem[0].mirando == false)
-        {
-            data->game.boolean.personagem[0].pulando = false;
-            data->session.relogio.personagem[0].pulo = clock();
-        }
+        data->game.posicao.personagem[0].y +=0.175;
     }
     if(IsKeyPressed(KEY_E))
     {
