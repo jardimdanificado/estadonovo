@@ -39,61 +39,47 @@ int main(void)
     MQCleanAllRenderSlots(&data);
     MQWindowStart();
 
-    Camera camera = MQCameraStart(&camera);
+    data.session.render.camera = MQCameraStart(&data.session.render.camera);
     data.session.render.background = (Color){115, 105, 97, 255};
     data.session.ModelCount = 0;
     data.session.HitboxCount = 0;
     data.session.LangCount = 0;
     data.session.TextCount = 0;
     data.session.frame = 0;
-    MENU menu;
-    menu.estaAberto = true;
-    AMBIENTE ambiente;
-    ambiente.gravidade = 0.2;
+ 
     MQLoadLangFromFile(&data,"./data/temp/lang");
     MQLoadAllModels(&data);
     MQPlayerConfigStart(&data, 0, (Vector3) {-0.0625, 5, 6.0625});
     MAPA_START(&data);
     msg = malloc(sizeof(char) * 255);
-    //msg = " ";
     data.file.font[0] = MQFontStart("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16);
     data.file.font[1] = MQFontStart("data/font/Mockery.ttf", 48);
     data.file.font[2] = MQFontStart("data/font/Mockery.ttf", 24);
-    LOGO logo;
-    logo.ponteiro = 0;
-    logo.relogio = 0;
-    logo.relogiosub = 0;
-    logo.relogiosubDef = 0;
-    logo.pisca = false;
-    logo.piscaPonteiro = 0;
     SetTargetFPS(60);
     MQEXIT = MQMenu(&data,0);
     
-    camera.target = (Vector3)
+    data.session.render.camera.target = (Vector3)
     {
         data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player0-cabeca"))].min.x, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player0-cabeca"))].min.y, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player0-cabeca"))].min.z
     };
     SetExitKey(KEY_END);
-    camera.position = (Vector3){0.4375, 3.5, 11.0625};
+    data.session.render.camera.position = (Vector3){0.4375, 3.5, 11.0625};
     MQRenderAddModelToQueue(&data, "mapa0", atoi(abinCoreReturnData("./data/temp/model.temp", "map0")), WHITE,(Vector3){0.0f, 0.0f, 0.0f}, 0,  0,0,true,false,false);
     MQRenderAddModelToQueue(&data, "player0", MQFindModelByName(data,"player"), COR_PELE0,data.game.posicao.personagem[0], data.game.rotacao.personagem[0],  0,0,true,true,false);
     while(!WindowShouldClose() && !MQEXIT)
     {
-        
-        camera.target = (Vector3)
+        data.session.render.camera.target = (Vector3)
         {
             data.file.hitbox[MQFindHitboxByName(data, "player0-cabeca")].min.x, data.file.hitbox[MQFindHitboxByName(data, "player0-cabeca")].min.y, data.file.hitbox[MQFindHitboxByName(data, "player0-cabeca")].min.z
         };
         data.session.frame++;
-        UpdateCamera(&camera);
+        UpdateCamera(&data.session.render.camera);
         data.session.render.model[MQFindRenderModelIndexByID(data,"player0")].position = data.game.posicao.personagem[0];
         data.session.render.model[MQFindRenderModelIndexByID(data,"player0")].rotation = data.game.rotacao.personagem[0];
-
-        
-        TECLADO_MAIN(&menu, data.file.font[0], data.file.font[1], data.file.font[2], logo, &data);
+        TECLADO_MAIN(&data);
         MQPlayerUpdateBodyBox( &data, 0, data.session.render.model[MQFindRenderModelIndexByID(data,"player0")].currentAnim);
         
-        if(data.game.rotacao.personagem[0] / 360 == 0)
+        if((int)data.game.rotacao.personagem[0]%360 == 0)
             data.game.rotacao.personagem[0] = 0;
 
         if(MQReturnYMaxCollisionPoint(data, data.game.posicao.personagem[0]) == MQFALSE)
@@ -117,7 +103,7 @@ int main(void)
             }
         }
         snprintf(msg,255,"%d %f",data.game.ponteiro.personagem[0].tempoGravit,data.game.posicao.personagem[0].y);
-        MQRender(&data, camera, data.file.font[0], menu);
+        MQRender(&data);
     }
     CloseAudioDevice();
     remove("./data/temp/lang.text");

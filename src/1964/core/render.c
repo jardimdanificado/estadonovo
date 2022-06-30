@@ -117,11 +117,12 @@ void MQRenderAddTextToQueue(DATA *data,char* id, int textIndex, Color color, Vec
     data->session.render.text[LocalIndex].string = string;
 }
 
-void MQRenderQueue(DATA* data, Camera camera)
+void MQRenderQueue(DATA* data)
 {
+    
     BeginDrawing();
     ClearBackground(data->session.render.background);
-    BeginMode3D(camera);
+    BeginMode3D(data->session.render.camera);
     for(int i=0;i<MAXOBJ;i++)
     {
         DrawBoundingBox(data->file.hitbox[i],BLACK);
@@ -152,8 +153,7 @@ void MQRenderQueue(DATA* data, Camera camera)
     EndDrawing();
 }
 
-void MQRender(DATA *data, Camera camera, Font font,  MENU menu)
+void MQRender(DATA *data)
 {
-    MQRenderQueue(*&data, camera);
-    //RENDER_LVL0( *&data, camera, font, menu);
+    MQRenderQueue(*&data);
 }

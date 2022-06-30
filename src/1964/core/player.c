@@ -186,12 +186,12 @@ void MQPlayerConfigStart(DATA *data, int quem, Vector3 posi)
     //3 - sapatos
     //4 - oculos
     //5 - arma
-    data->game.equip.personagem[quem].chapeu.tipo = 1;
+    /* data->game.equip.personagem[quem].chapeu.tipo = 1;
     data->game.equip.personagem[quem].camisa.tipo = 2;
     data->game.equip.personagem[quem].oculos.tipo = 4;
     data->game.equip.personagem[quem].sapato.tipo = 3;
     data->game.equip.personagem[quem].calca.tipo = 0;
-    data->game.equip.personagem[quem].arma.tipo = 5;
+    data->game.equip.personagem[quem].arma.tipo = 5; */
     data->game.ponteiro.personagem[quem].item.chapeu = 0;
     data->game.ponteiro.personagem[quem].item.camisa = 0;
     data->game.ponteiro.personagem[quem].item.oculos = 0;

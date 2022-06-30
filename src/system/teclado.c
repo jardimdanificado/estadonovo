@@ -1,13 +1,9 @@
 
-void TECLADO_MAIN(MENU *menu, Font font, Font fontTitle, Font fontSubTitle, LOGO logo, DATA *data)
+void TECLADO_MAIN(DATA *data)
 {
     if(IsKeyPressed(KEY_ESCAPE))
     {
         MQEXIT = MQMenu(*&data, 1);
-    }
-    if(IsKeyPressed(KEY_TAB))
-    {
-
     }
     if(IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
     {
@@ -129,7 +125,7 @@ void TECLADO_MAIN(MENU *menu, Font font, Font fontTitle, Font fontSubTitle, LOGO
     }
     if(IsKeyDown(KEY_SPACE))
     {
-        data->game.posicao.personagem[0].y +=0.175;
+        data->game.posicao.personagem[0].y +=0.14;
     }
     if(IsKeyPressed(KEY_E))
     {

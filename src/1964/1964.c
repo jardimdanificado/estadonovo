@@ -282,63 +282,6 @@ Camera MQCameraStart(Camera *camera)
     return (*camera);
 }
 
-void MQCameraUpdate(DATA data, Camera *camera)
-{
-    if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.area[0]))
-    {
-        camera->position = (Vector3)
-        {
-            0.4375, 3.5, 11.0625
-        };
-    }
-    else if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.area[1]))
-    {
-        camera->position = (Vector3)
-        {
-            4.473, 3.5, 0.562
-        };
-    }
-    else if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.area[2]))
-    {
-        camera->position = (Vector3)
-        {
-            7.5, 2.5, -4
-        };
-    }
-    else if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.area[3]))
-    {
-        camera->position = (Vector3)
-        {
-            -3.56, 2.5, -4.8375
-            };
-    }
-    else if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.area[4]))
-    {
-        camera->position = (Vector3)
-        {
-            -19, 6, -16.5
-            };
-    }
-    else if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.area[5]))
-    {
-        camera->position = (Vector3)
-        {
-            -6.5, 8.5, -29
-            };
-    }
-
-    if(CheckCollisionBoxes(data.game.hitbox.personagem[0].frenteAtual, data.file.mapa.area[4]) == false)
-        camera->target = (Vector3)
-    {
-        data.game.posicao.personagem[0].x, data.game.posicao.personagem[0].y + 2, data.game.posicao.personagem[0].z
-    };
-    else
-        camera->target = (Vector3)
-    {
-        0, 4, -16.5
-    };
-}
-
 //-----------------------------------
 //BULLETS
 //-----------------------------------
