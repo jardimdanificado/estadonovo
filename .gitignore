@@ -1,2 +1,7 @@
-./build
-./src/data/
+*.text
+*.sh
+*.appimage
+*.txt
+LICENSE
+*.bat
+*.md
