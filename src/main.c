@@ -74,15 +74,6 @@ int main(void)
             data.game.posicao.personagem[0].y = MQReturnYMaxCollisionPoint(data, data.game.posicao.personagem[0]);
             data.game.ponteiro.personagem[0].tempoGravit = 0;
         }
-        
-/*         for(int i = 0; i < MAXOBJ; i++)
-        {
-            if(data.file.mapa.porta.slots[i].abrindo || data.file.mapa.porta.slots[i].fechando)
-            {
-                if(data.file.mapa.porta.slots[i].existe == true)
-                    MQDoorAnim(&data);
-            }
-        } */
         MQRender(&data);
     }
     CloseAudioDevice();
