@@ -35,7 +35,7 @@ int main(void)
     MQLoadLangFromFile(&data,"./data/temp/lang");
     MQLoadAllModels(&data);
     MQPlayerConfigStart(&data, 0, (Vector3) {-0.0625, 5, 6.0625});
-    LEVEL0(&data);
+    //LEVEL0(&data);
     data.file.font[0] = MQFontStart("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16);
     data.file.font[1] = MQFontStart("data/font/Mockery.ttf", 48);
     data.file.font[2] = MQFontStart("data/font/Mockery.ttf", 24);
@@ -77,15 +77,14 @@ int main(void)
             data.game.ponteiro.personagem[0].tempoGravit = 0;
         }
         
-        MQUpdateDoor(&data);
-        for(int i = 0; i < MAXOBJ; i++)
+/*         for(int i = 0; i < MAXOBJ; i++)
         {
             if(data.file.mapa.porta.slots[i].abrindo || data.file.mapa.porta.slots[i].fechando)
             {
                 if(data.file.mapa.porta.slots[i].existe == true)
                     MQDoorAnim(&data);
             }
-        }
+        } */
         MQRender(&data);
     }
     CloseAudioDevice();

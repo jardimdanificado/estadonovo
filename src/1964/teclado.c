@@ -129,11 +129,8 @@ void TECLADO_MAIN(DATA *data)
     }
     if(IsKeyPressed(KEY_E))
     {
-
         data->game.boolean.personagem[0].usando = true;
 
-        data->session.relogio.personagem[0].relogioNovo = 0;
-        data->session.relogio.personagem[0].relogioVelho = 0;
         /* MQPlayerUse( *&data, 0); */
         data->game.boolean.personagem[0].usando = false;
     }

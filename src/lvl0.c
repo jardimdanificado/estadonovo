@@ -1,8 +1,8 @@
-
+/* 
 void LEVEL0(DATA *data)
 {
-    data->file.mapa.mapaAtual = 0;
-
+     data->file.mapa.mapaAtual = 0;
+ 
     MQCreateHitbox(*&data,"props0", GetModelBoundingBox(data->file.model[atoi(abinCoreReturnData("./data/temp/model.temp", "props0"))]));
     //tipos
     //0 - calca
@@ -35,3 +35,4 @@ void LEVEL0(DATA *data)
         -0.06, 0, 2.125
         }, false, false, false);
 }
+ */

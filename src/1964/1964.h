@@ -46,14 +46,6 @@ Music maintheme;
 bool MQEXIT = false;
 
 //-----------------------------------
-//ENVIROMENT
-//-----------------------------------
-
-//-----------------------------------
-//MENU
-//-----------------------------------
-
-//-----------------------------------
 //DOORS
 //-----------------------------------
 
@@ -129,23 +121,6 @@ struct BALAS_GLOBALVAR
 };
 typedef struct BALAS_GLOBALVAR BALAS_GLOBALVAR;
 
-struct MAPA
-{
-    Model modelo[MAXOBJ];
-    BoundingBox hitboxHorizontal[MAXOBJ], hitboxVertical[MAXOBJ];
-    Model dummy;
-    MAPA_PROPS props[MAXOBJ];
-    int mapaAtual;
-    BoundingBox area[MAXOBJ];
-    MAPA_ITEM item[MAXOBJ];
-    PORTA porta;
-    MAPA_DROPS drops[MAXOBJ];
-    MAPA_DROPS dropDUMMY;
-    BALAS_MAPA balas[255];
-    BALAS_GLOBALVAR balasGLOBAL;
-};
-typedef struct MAPA MAPA;
-
 //-----------------------------------
 //DATA
 //-----------------------------------
@@ -206,12 +181,6 @@ struct DATA_RELOGIOplayer
 };
 typedef struct DATA_RELOGIOplayer DATA_RELOGIOplayer;
 
-struct DATA_RELOGIO
-{
-    DATA_RELOGIOplayer personagem[MAXOBJ + 1];
-};
-typedef struct DATA_RELOGIO DATA_RELOGIO;
-
 struct DATA_VELOCIDADEPLAYER
 {
     float velocidade, velocidadePulo;
@@ -232,14 +201,13 @@ typedef struct DATA_IMAGEM DATA_IMAGEM;
 
 struct DATA_FILES
 {
-    MAPA mapa;
     Model model[MAXOBJ];
     BoundingBox hitbox[MAXOBJ];
+    BoundingBox eventbox[MAXOBJ];
     Font font[MAXOBJ];
     char text[MAXOBJ][255];
     char lang[MAXOBJ][255];
     ModelAnimation *anim[MAXOBJ];
-    char link[MAXOBJ][255];
     DATA_IMAGEM imagem;
 };
 typedef struct DATA_FILES DATA_FILES;
@@ -291,16 +259,16 @@ typedef struct DATA_SESSION_RENDER DATA_SESSION_RENDER;
 
 struct DATA_SESSION_LOADEDNAMES
 {
-    char model[255],hitbox[255],text[255];
+    char model[255],hitbox[255],text[255],event[255];
 };
 typedef struct DATA_SESSION_LOADEDNAMES DATA_SESSION_LOADEDNAMES;
 
 struct DATA_SESSION
 {
-    DATA_RELOGIO relogio;
     DATA_SESSION_RENDER render;
-    int ModelCount, HitboxCount, TextCount, LangCount,frame;
+    int ModelCount, HitboxCount, TextCount, LangCount;
     DATA_SESSION_LOADEDNAMES LoadedNames[MAXOBJ];
+    long int frame;
 };
 typedef struct DATA_SESSION DATA_SESSION;
 

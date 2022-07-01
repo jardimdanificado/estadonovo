@@ -207,8 +207,8 @@ void MQPlayerConfigStart(DATA *data, int quem, Vector3 posi)
     data->game.boolean.personagem[quem].pulando = false;
     data->game.boolean.personagem[quem].usando = false;
     data->game.boolean.personagem[quem].andandoPraTras = false;
-    data->session.relogio.personagem[quem].relogioNovo = 0;
-    data->session.relogio.personagem[quem].relogioVelho = 0;
+    /* data->session.relogio.personagem[quem].relogioNovo = 0;
+    data->session.relogio.personagem[quem].relogioVelho = 0; */
 }
 
 Vector3 MQPlayerMove(Vector3 posicao, float rotacao, float velocidade)

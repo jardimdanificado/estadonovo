@@ -298,7 +298,7 @@ Camera MQCameraStart(Camera *camera)
 //DOORS
 //-----------------------------------
 
-#include "door.c"
+/* #include "door.c" */
 
 //-----------------------------------
 //SAVE
