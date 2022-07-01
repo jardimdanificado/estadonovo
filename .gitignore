@@ -1,5 +1,5 @@
-./*.text
-./build/*.sh
-./build/*.bat
+./**.text
+./build/**.sh
+./build/**.bat
 ./LICENSE
 ./README.md
