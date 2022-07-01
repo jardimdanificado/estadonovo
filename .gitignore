@@ -1,7 +1,5 @@
-*.text
-*.sh
-*.appimage
-*.txt
-LICENSE
-*.bat
-*.md
+./*.text
+./build/*.sh
+./build/*.bat
+./LICENSE
+./README.md
