@@ -171,29 +171,33 @@ Vector2 MQUpdateDirection(Vector2 posicao, float rotacao)
 //WINDOW
 //-----------------------------------
 
-void MQWindowInit(const int X, const int Y, const char *title)
-{
-    InitWindow(X, Y, title);
-}
-
 void MQWindowStart()
 {
-    char title[255];
-    strcpy(title, abinCoreReturnData("config.text", "TITLE"));
-    MQWindowInit(atoi(abinCoreReturnData("config.text", "SCRX")), atoi(abinCoreReturnData("config.text", "SCRY")), title);
+    if(strcmp(abinCoreReturnData("./config.text", "MSAA"), "true") == 0)
+        SetConfigFlags(FLAG_MSAA_4X_HINT);
+    if(strcmp(abinCoreReturnData("./config.text", "RESIZE"), "true") == 0)
+        SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    char buffer[255];
+    snprintf(buffer,255,"%s",abinCoreReturnData("config.text", "TITLE"));
+    InitAudioDevice();
+    InitWindow(atoi(abinCoreReturnData("config.text", "SCRX")), atoi(abinCoreReturnData("config.text", "SCRY")), buffer);
+    
 }
 
 //-----------------------------------
 //FONT&TEXT 
 //-----------------------------------
 
-void MQLoadLangFromFile(DATA* data,char* fileloc)
+void MQLoadLang(DATA* data, char lang[4])
 {
-    for(int i = 0; i <atoi(abinCoreReturnData(fileloc,"SIZE"));i++)
+    remove("./data/temp/lang");
+    char buffer[27];
+    snprintf(buffer,27,"./data/lang/%s/text.text",lang);
+    abinCoreFileCopy(buffer, "./data/temp/lang");
+    for(int i = 0; i <atoi(abinCoreReturnData("./data/temp/lang","SIZE"));i++)
     {
-        char buffer[4];
         snprintf(buffer,4,"%d",i);
-        strcpy(data->file.lang[data->session.LangCount],abinCoreReturnData(fileloc,buffer));
+        strcpy(data->file.lang[data->session.LangCount],abinCoreReturnData("./data/temp/lang",buffer));
         data->session.LangCount++;
     }
 }

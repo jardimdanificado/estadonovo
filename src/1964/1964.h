@@ -41,157 +41,11 @@
 
 unsigned int MAXANIM = 1;
 
-Music maintheme;
-
 bool MQEXIT = false;
-
-//-----------------------------------
-//DOORS
-//-----------------------------------
-
-struct PORTA_UNI
-{
-    bool aberta, abrindo, fechando, trancada, existe, invertido;
-    int frame;
-    Vector3 posicao;
-    clock_t relogioVelho, relogioNovo;
-};
-typedef struct PORTA_UNI PORTA_UNI;
-
-struct PORTA
-{
-    PORTA_UNI slots[MAXOBJ];
-};
-typedef struct PORTA PORTA;
-
-//-----------------------------------
-//MAP & BULLETS
-//-----------------------------------
-
-struct MAPA_ITEM
-{
-    Model modelo;
-    BoundingBox hitbox;
-    bool pegou;
-    int tipo;
-    int municao, municaoMax;
-    //tipos
-    //0 - calca
-    //1 - chapeu
-    //2 - camisa
-    //3 - sapatos
-    //4 - oculos
-    //5 - arma
-    int ponteiro;
-};
-typedef struct MAPA_ITEM MAPA_ITEM;
-
-struct MAPA_PROPS
-{
-    Model modelo;
-    BoundingBox hitbox;
-};
-typedef struct MAPA_PROPS MAPA_PROPS;
-
-struct MAPA_DROPS
-{
-    Model modelo;
-    bool ocupado;
-    Vector3 posicao;
-    BoundingBox hitbox;
-    int tipo, ponteiro;
-};
-typedef struct MAPA_DROPS MAPA_DROPS;
-
-struct BALAS_MAPA
-{
-    Vector3 posicao;
-    int rotacao;
-    bool existe, parou;
-    float velocidade;
-    BoundingBox hitbox;
-    clock_t relogio, relogioCriado;
-};
-typedef struct BALAS_MAPA BALAS_MAPA;
-
-struct BALAS_GLOBALVAR
-{
-    Model modelo;
-    bool todasBalasUsadas;
-};
-typedef struct BALAS_GLOBALVAR BALAS_GLOBALVAR;
 
 //-----------------------------------
 //DATA
 //-----------------------------------
-
-struct DATA_FRAMECOUNT
-{
-    int personagem[MAXOBJ + 1];
-};
-typedef struct DATA_FRAMECOUNT DATA_FRAMECOUNT;
-
-struct DATA_ROTACAO
-{
-    float personagem[MAXOBJ + 1];
-};
-typedef struct DATA_ROTACAO DATA_ROTACAO;
-
-struct DATA_POSICAO
-{
-    Vector3 personagem[MAXOBJ + 1];
-};
-typedef struct DATA_POSICAO DATA_POSICAO;
-
-struct DATA_PONTEIROitem
-{
-    int calca, camisa, chapeu, sapato, arma, oculos;
-};
-typedef struct DATA_PONTEIROitem DATA_PONTEIROitem;
-
-struct DATA_ponteiroPERSONAGEM
-{
-    DATA_PONTEIROitem item;
-    /* float lastFloorHeight; */
-    int tempoGravit;
-};
-typedef struct DATA_ponteiroPERSONAGEM DATA_ponteiroPERSONAGEM;
-
-struct DATA_PONTEIRO
-{
-    DATA_ponteiroPERSONAGEM personagem[MAXOBJ + 1];
-};
-typedef struct DATA_PONTEIRO DATA_PONTEIRO;
-
-struct DATA_booleanPERSONAGEM
-{
-    bool pulando, usando, andando, mirando, dropando, andandoPraTras;
-};
-typedef struct DATA_booleanPERSONAGEM DATA_booleanPERSONAGEM;
-
-struct DATA_BOOLEAN
-{
-    DATA_booleanPERSONAGEM personagem[MAXOBJ + 1];
-};
-typedef struct DATA_BOOLEAN DATA_BOOLEAN;
-
-struct DATA_RELOGIOplayer
-{
-    clock_t relogioVelho, relogioNovo, pulo, relogioLogs;
-};
-typedef struct DATA_RELOGIOplayer DATA_RELOGIOplayer;
-
-struct DATA_VELOCIDADEPLAYER
-{
-    float velocidade, velocidadePulo;
-};
-typedef struct DATA_VELOCIDADEPLAYER DATA_VELOCIDADEPLAYER;
-
-struct DATA_VELOCIDADE
-{
-    DATA_VELOCIDADEPLAYER personagem[MAXOBJ + 1];
-};
-typedef struct DATA_VELOCIDADE DATA_VELOCIDADE;
 
 struct DATA_IMAGEM
 {
@@ -199,28 +53,23 @@ struct DATA_IMAGEM
 };
 typedef struct DATA_IMAGEM DATA_IMAGEM;
 
-struct DATA_FILES
+struct DATA_MAPA
 {
-    Model model[MAXOBJ];
-    BoundingBox hitbox[MAXOBJ];
-    BoundingBox eventbox[MAXOBJ];
-    Font font[MAXOBJ];
-    char text[MAXOBJ][255];
-    char lang[MAXOBJ][255];
-    ModelAnimation *anim[MAXOBJ];
-    DATA_IMAGEM imagem;
+    float velocidade;
+    int tempoGravit;
+    Vector3 posicao;
+    float rotacao;
 };
-typedef struct DATA_FILES DATA_FILES;
+typedef struct DATA_MAPA DATA_MAPA;
 
-struct DATA_GAME
+struct DATA_PLAYER
 {
-    DATA_VELOCIDADE velocidade;
-    DATA_BOOLEAN boolean;
-    DATA_PONTEIRO ponteiro;
-    DATA_POSICAO posicao;
-    DATA_ROTACAO rotacao;
+    float velocidade;
+    int tempoGravit;
+    Vector3 posicao;
+    float rotacao;
 };
-typedef struct DATA_GAME DATA_GAME;
+typedef struct DATA_PLAYER DATA_PLAYER;
 
 struct DATA_RENDER_MODEL
 {
@@ -262,6 +111,25 @@ struct DATA_SESSION_LOADEDNAMES
     char model[255],hitbox[255],text[255],event[255];
 };
 typedef struct DATA_SESSION_LOADEDNAMES DATA_SESSION_LOADEDNAMES;
+
+struct DATA_GAME
+{
+    DATA_PLAYER personagem[MAXOBJ];
+};
+typedef struct DATA_GAME DATA_GAME;
+
+struct DATA_FILES
+{
+    Model model[MAXOBJ];
+    BoundingBox hitbox[MAXOBJ];
+    BoundingBox eventbox[MAXOBJ];
+    Font font[MAXOBJ];
+    char text[MAXOBJ][255];
+    char lang[MAXOBJ][255];
+    ModelAnimation *anim[MAXOBJ];
+    Music audio[MAXOBJ];
+};
+typedef struct DATA_FILES DATA_FILES;
 
 struct DATA_SESSION
 {
