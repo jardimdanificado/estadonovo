@@ -1,25 +1,10 @@
 //LIB C
 #include <time.h>
 #include <locale.h>
-#include "src/abin/abindependencies.h"
-char *msg, msg_simples[512];
-
-//RAYLIB
-#include "src/raylib/raylib.h"
-#include "src/raylib/raymath.h"
-
-//ABIN Files
-#include "src/abin/abin.h"
-
-Music maintheme;
 
 //ENGINE
-#include "src/1964/1964.h"
-
-//PROJECT SPECIFIC
-#include "src/map/map.c"
-#include "src/system/teclado.c"
-
+#include "./1964/1964.h"
+#include "./lvl0.c"
 
 int main(void)
 {
@@ -50,8 +35,7 @@ int main(void)
     MQLoadLangFromFile(&data,"./data/temp/lang");
     MQLoadAllModels(&data);
     MQPlayerConfigStart(&data, 0, (Vector3) {-0.0625, 5, 6.0625});
-    MAPA_START(&data);
-    msg = malloc(sizeof(char) * 255);
+    LEVEL0(&data);
     data.file.font[0] = MQFontStart("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16);
     data.file.font[1] = MQFontStart("data/font/Mockery.ttf", 48);
     data.file.font[2] = MQFontStart("data/font/Mockery.ttf", 24);
@@ -102,13 +86,12 @@ int main(void)
                     MQDoorAnim(&data);
             }
         }
-        snprintf(msg,255,"%d %f",data.game.ponteiro.personagem[0].tempoGravit,data.game.posicao.personagem[0].y);
         MQRender(&data);
     }
     CloseAudioDevice();
     remove("./data/temp/lang.text");
-    free(msg);
-    CloseWindow();              // Close window and OpenGL context
+    CloseWindow();          
+    // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 
     return 0;

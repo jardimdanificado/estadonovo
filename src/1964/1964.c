@@ -241,7 +241,7 @@ Font MQFontStart(char *FontLoc, int FontSize)
 //PLAYER
 //-----------------------------------
 
-#include "core/player.c"
+#include "player.c"
 
 //-----------------------------------
 //AI
@@ -292,32 +292,34 @@ Camera MQCameraStart(Camera *camera)
 //MODELS
 //-----------------------------------
 
-#include "core/models.c"
+#include "models.c"
 
 //-----------------------------------
 //DOORS
 //-----------------------------------
 
-#include "core/door.c"
+#include "door.c"
 
 //-----------------------------------
 //SAVE
 //-----------------------------------
 
-#include "core/savegame.c"
+#include "savegame.c"
 
 //-----------------------------------
 //RENDER
 //-----------------------------------
 
-#include "core/render.c"
-
-//-----------------------------------
-//TEXTS
-//-----------------------------------
+#include "render.c"
 
 //-----------------------------------
 //MENU
 //-----------------------------------
 
-#include "core/menu.c"
+#include "menu.c"
+
+//-----------------------------------
+//KEYBOARD
+//-----------------------------------
+
+#include "teclado.c"

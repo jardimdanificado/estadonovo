@@ -7,6 +7,20 @@
 #define GLSL_VERSION            100
 #endif
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include <assert.h>
+#include <math.h>
+
+//RAYLIB
+#include "./raylib/raylib.h"
+#include "./raylib/raymath.h"
+
+//ABIN Files
+#include "./abin.h"
+
 #define COR_VERMELHO CLITERAL(Color){235, 64, 52,255}
 #define COR_SELECIONADO   CLITERAL(Color){202,137,109,255}
 #define COR_SELECIONADO2 CLITERAL(Color){145, 39, 32,255}
@@ -26,6 +40,8 @@
 #define MAXOBJ 64
 
 unsigned int MAXANIM = 1;
+
+Music maintheme;
 
 bool MQEXIT = false;
 
