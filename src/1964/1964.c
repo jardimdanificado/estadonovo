@@ -1,3 +1,94 @@
+//-----------------------------------
+//TEMP
+//-----------------------------------
+
+void MQSetTempSpecsTypes2(char *type0, char *type1)
+{
+    strcpy(ABINCACHE32, "./data/temp/dummyt.specs");
+    remove(ABINCACHE32);
+    abinCoreFileCreate(ABINCACHE32);
+    abinCoreAddNewData(ABINCACHE32, "type0", type0);
+    abinCoreAddNewData(ABINCACHE32, "type1", type1);
+}
+
+void MQSetTempSpecsValues2(char *value0, char *value1)
+{
+    strcpy(ABINCACHE32, "./data/temp/dummyv.specs");
+    remove(ABINCACHE32);
+    abinCoreFileCreate(ABINCACHE32);
+    abinCoreAddNewData(ABINCACHE32, "value0", value0);
+    abinCoreAddNewData(ABINCACHE32, "value1", value1);
+}
+
+void MQSetTempSpecsToFile2(char *fileloc)
+{
+    char bufferlocal[2][64];
+    char buffervalues[2][128];
+    char buffertypes[2][128];
+    strcpy(bufferlocal[0], "./data/temp/dummyv.specs");
+    strcpy(bufferlocal[1], "./data/temp/dummyt.specs");
+    strcpy(buffervalues[0], abinCoreReturnData(bufferlocal[0], "value0"));
+    strcpy(buffervalues[1], abinCoreReturnData(bufferlocal[0], "value1"));
+    strcpy(buffertypes[0], abinCoreReturnData(bufferlocal[1], "type0"));
+    strcpy(buffertypes[1], abinCoreReturnData(bufferlocal[1], "type1"));
+    for(int i = 0; i < 2; i++)
+    {
+        abinCoreAddNewData(fileloc, buffertypes[i], buffervalues[i]);
+    }
+    snprintf(ABINCACHE16, 16, "%d", atoi(abinCoreReturnData(fileloc, "SIZE")));
+    abinCoreEditData(fileloc, "SIZE", ABINCACHE16);
+}
+
+void MQSetTempSpecsTypes4(char *type0, char *type1, char *type2, char *type3)
+{
+    strcpy(ABINCACHE32, "./data/temp/dummyt.specs");
+    remove(ABINCACHE32);
+    abinCoreFileCreate(ABINCACHE32);
+    abinCoreAddNewData(ABINCACHE32, "type0", type0);
+    abinCoreAddNewData(ABINCACHE32, "type1", type1);
+    abinCoreAddNewData(ABINCACHE32, "type2", type2);
+    abinCoreAddNewData(ABINCACHE32, "type3", type3);
+}
+
+void MQSetTempSpecsValues4(char *value0, char *value1, char *value2, char *value3)
+{
+    strcpy(ABINCACHE32, "./data/temp/dummyv.specs");
+    remove(ABINCACHE32);
+    abinCoreFileCreate(ABINCACHE32);
+    abinCoreAddNewData(ABINCACHE32, "value0", value0);
+    abinCoreAddNewData(ABINCACHE32, "value1", value1);
+    abinCoreAddNewData(ABINCACHE32, "value2", value2);
+    abinCoreAddNewData(ABINCACHE32, "value3", value3);
+}
+
+void MQSetTempSpecsToFile4(char *fileloc)
+{
+    char bufferlocal[4][64];
+    char buffervalues[4][128];
+    char buffertypes[4][128];
+    strcpy(bufferlocal[0], "./data/temp/dummyv.specs");
+    strcpy(bufferlocal[1], "./data/temp/dummyt.specs");
+    strcpy(bufferlocal[2], "vazio");
+    strcpy(bufferlocal[3], "vazio");
+    strcpy(buffervalues[0], abinCoreReturnData(bufferlocal[0], "value0"));
+    strcpy(buffervalues[1], abinCoreReturnData(bufferlocal[0], "value1"));
+    strcpy(buffervalues[2], abinCoreReturnData(bufferlocal[0], "value2"));
+    strcpy(buffervalues[3], abinCoreReturnData(bufferlocal[0], "value3"));
+    strcpy(buffertypes[0], abinCoreReturnData(bufferlocal[1], "type0"));
+    strcpy(buffertypes[1], abinCoreReturnData(bufferlocal[1], "type1"));
+    strcpy(buffertypes[2], abinCoreReturnData(bufferlocal[1], "type2"));
+    strcpy(buffertypes[3], abinCoreReturnData(bufferlocal[1], "type3"));
+    for(int i = 0; i < 4; i++)
+    {
+        abinCoreAddNewData(fileloc, buffertypes[i], buffervalues[i]);
+    }
+    snprintf(ABINCACHE16, 16, "%d", atoi(abinCoreReturnData(fileloc, "SIZE")));
+    abinCoreEditData(fileloc, "SIZE", ABINCACHE16);
+}
+
+//-----------------------------------
+//HTIBOX
+//-----------------------------------
 
 BoundingBox MQHitboxUpdateX(BoundingBox hitboxbase, Vector3 targetPosi)
 {
@@ -28,6 +119,10 @@ BoundingBox MQHitboxUpdateXYZ(BoundingBox hitboxbase, Vector3 targetPosi)
     hitbox.min = Vector3Add(hitboxbase.min, targetPosi);
     return hitbox;
 }
+
+//-----------------------------------
+//FIND
+//-----------------------------------
 
 int MQFindHitboxByName(DATA data, char* name)
 {
@@ -74,6 +169,10 @@ int MQFindRenderTextIndexByID(DATA data, char* id)
     return -1;
 }
 
+//-----------------------------------
+//CALCULATE
+//-----------------------------------
+
 float MQDifferenceFloat(float a, float b)
 {
     bool negativo = false;
@@ -108,6 +207,15 @@ float MQDifferenceFloat(float a, float b)
     return resultado;
 }
 
+Vector3 MQDifferenceVec3(Vector3 vec1, Vector3 vec2)
+{
+    return((Vector3) {MQDifferenceFloat(vec1.x, vec2.x), MQDifferenceFloat(vec1.y, vec2.y), MQDifferenceFloat(vec1.z, vec2.z)});
+}
+
+//-----------------------------------
+//VERTICES
+//-----------------------------------
+
 Vector3 MQRotateVerticeSelf(float angle, Vector3 vertice)
 {
     Vector3 NewVertice;
@@ -124,47 +232,6 @@ Vector3 MQRotateVertice(Vector3 pivot, float angle, Vector3 vertice)
     NewVertice.x = ((vertice.x - pivot.x) * cos(angle)) - ((vertice.z - pivot.z) * sin(angle)) + pivot.x;
     NewVertice.z = ((vertice.x - pivot.x) * sin(angle)) + ((vertice.z - pivot.z) * cos(angle)) + pivot.z;
     return NewVertice;
-}
-
-Vector3 MQDifferenceVec3(Vector3 vec1, Vector3 vec2)
-{
-    return((Vector3) {MQDifferenceFloat(vec1.x, vec2.x), MQDifferenceFloat(vec1.y, vec2.y), MQDifferenceFloat(vec1.z, vec2.z)});
-}
-
-Vector2 MQUpdateDirection(Vector2 posicao, float rotacao)
-{
-    //z+ frente
-    //x+ esquerda
-    int giro = rotacao / 90;
-    Vector2 Resultado;
-    switch(giro)
-    {
-        case 0:
-        {
-            Resultado.y = posicao.y;
-            Resultado.x = posicao.x;
-        }
-        break;
-        case 1:
-        {
-            Resultado.x = posicao.y * (-1);
-            Resultado.y = posicao.x;
-        }
-        break;
-        case 2:
-        {
-            Resultado.y = posicao.y * (-1);
-            Resultado.x = posicao.x * (-1);
-        }
-        break;
-        case 3:
-        {
-            Resultado.y = posicao.x;
-            Resultado.x = posicao.y * (-1);
-        }
-        break;
-    }
-    return Resultado;
 }
 
 //-----------------------------------
