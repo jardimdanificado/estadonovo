@@ -29,11 +29,11 @@ int main(void)
     
     data.session.render.camera.target = (Vector3)
     {
-        data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player0-cabeca"))].min.x, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player0-cabeca"))].min.y, data.file.hitbox[atoi(abinCoreReturnData("./data/temp/hitbox.temp", "player0-cabeca"))].min.z
+        data.file.hitbox[MQFindHitboxByName(data, "player0-cabeca")].min.x, data.file.hitbox[MQFindHitboxByName(data, "player0-cabeca")].min.y, data.file.hitbox[MQFindHitboxByName(data, "player0-cabeca")].min.z
     };
     SetExitKey(KEY_END);
     data.session.render.camera.position = (Vector3){0.4375, 3.5, 11.0625};
-    MQRenderAddModelToQueue(&data, "mapa0", atoi(abinCoreReturnData("./data/temp/model.temp", "map0")), WHITE,(Vector3){0.0f, 0.0f, 0.0f}, 0,  0,0,true,false,false);
+    MQRenderAddModelToQueue(&data, "mapa0", MQFindModelByName(data,"map0"), WHITE,(Vector3){0.0f, 0.0f, 0.0f}, 0,  0,0,true,false,false);
     MQRenderAddModelToQueue(&data, "player0", MQFindModelByName(data,"player"), COR_PELE0,data.game.personagem[0].posicao, data.game.personagem[0].rotacao,  0,0,true,true,false);
     while(!WindowShouldClose() && !MQEXIT)
     {
