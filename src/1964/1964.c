@@ -33,6 +33,82 @@ BoundingBox MQHitboxUpdateXYZ(BoundingBox hitboxbase, Vector3 targetPosi)
 }
 
 //-----------------------------------
+//FONT&STRING
+//-----------------------------------
+
+char *MQStrAddInt(char* string, int value)
+{
+    char buffer[sizeof(string)];
+    strcpy(buffer,string);
+    string = malloc(sizeof(string)+8);
+    snprintf(string,sizeof(string)+8,"%s%d",buffer,value);
+    return string;
+}
+
+char *MQStrAddStr(char* string1, char* string2)
+{
+    char buffer[sizeof(string1)];
+    strcpy(buffer,string1);
+    string1 = malloc(sizeof(buffer)+sizeof(string2));
+    snprintf(string1,sizeof(buffer)+sizeof(string2),"%s%s",buffer,string2);
+    return string1;
+}
+
+void MQLoadLang(DATA* data, char lang[4])
+{
+    remove("./data/temp/lang");
+    char buffer[27];
+    snprintf(buffer,27,"./data/lang/%s/text.text",lang);
+    abinCoreFileCopy(buffer, "./data/temp/lang");
+    for(int i = 0; i <atoi(abinCoreReturnData("./data/temp/lang","SIZE"));i++)
+    {
+        snprintf(buffer,4,"%d",i);
+        strcpy(data->file.lang[data->session.LangCount],abinCoreReturnData("./data/temp/lang",buffer));
+        data->session.LangCount++;
+    }
+}
+
+Font MQFontStart(char *FontLoc, int FontSize)
+{
+    unsigned int fileSize = 0;
+    unsigned char *fileData = LoadFileData(FontLoc, &fileSize);
+    // Default font generation from TTF font
+    Font fontDefault = { 0 };
+    fontDefault.baseSize = FontSize;
+    fontDefault.glyphCount = 95;
+
+    // Loading font data from memory data
+    // Parameters > font size: FontSize, no glyphs array provided (0), glyphs count: 95 (autogenerate chars array)
+    fontDefault.glyphs = LoadFontData(fileData, fileSize, FontSize, 0, 95, FONT_DEFAULT);
+
+    fontDefault.glyphs = LoadFontData(fileData, fileSize, FontSize, 0, 95, FONT_DEFAULT);
+    // Parameters > glyphs count: 95, font size: FontSize, glyphs padding in image: 4 px, pack method: 0 (default)
+    Image atlas = GenImageFontAtlas(fontDefault.glyphs, &fontDefault.recs, 95, FontSize, 14, 0);
+    fontDefault.texture = LoadTextureFromImage(atlas);
+    UnloadImage(atlas);
+
+    // SDF font generation from TTF font
+    Font fontSDF = { 0 };
+    fontSDF.baseSize = FontSize;
+    fontSDF.glyphCount = 95;
+    // Parameters > font size: FontSize, no glyphs array provided (0), glyphs count: 0 (defaults to 95)
+    fontSDF.glyphs = LoadFontData(fileData, fileSize, FontSize, 0, 0, FONT_SDF);
+    // Parameters > glyphs count: 95, font size: FontSize, glyphs padding in image: 0 px, pack method: 1 (Skyline algorythm)
+    atlas = GenImageFontAtlas(fontSDF.glyphs, &fontSDF.recs, 95, FontSize, 0, 1);
+    fontSDF.texture = LoadTextureFromImage(atlas);
+    UnloadImage(atlas);
+
+    UnloadFileData(fileData);      // Free memory from loaded file
+
+    // Load SDF required shader (we use default vertex shader)
+    //Shader shader = LoadShader(0, TextFormat("data/shaders/sdf.fs", 330));
+    SetTextureFilter(fontSDF.texture, TEXTURE_FILTER_POINT);    // Required for SDF font
+
+    return (fontDefault);
+}
+
+
+//-----------------------------------
 //FIND
 //-----------------------------------
 
@@ -160,73 +236,6 @@ void MQWindowStart()
     snprintf(buffer,255,"%s",abinCoreReturnData("config.text", "TITLE"));
     InitAudioDevice();
     InitWindow(atoi(abinCoreReturnData("config.text", "SCRX")), atoi(abinCoreReturnData("config.text", "SCRY")), buffer);
-    
-}
-
-//-----------------------------------
-//FONT&STRING
-//-----------------------------------
-
-char *MQStrAddInt(char* string, int value)
-{
-    char buffer[sizeof(string)];
-    strcpy(buffer,string);
-    string = malloc(sizeof(string)+8);
-    snprintf(string,sizeof(string)+8,"%s%d",buffer,value);
-    return string;
-}
-
-void MQLoadLang(DATA* data, char lang[4])
-{
-    remove("./data/temp/lang");
-    char buffer[27];
-    snprintf(buffer,27,"./data/lang/%s/text.text",lang);
-    abinCoreFileCopy(buffer, "./data/temp/lang");
-    for(int i = 0; i <atoi(abinCoreReturnData("./data/temp/lang","SIZE"));i++)
-    {
-        snprintf(buffer,4,"%d",i);
-        strcpy(data->file.lang[data->session.LangCount],abinCoreReturnData("./data/temp/lang",buffer));
-        data->session.LangCount++;
-    }
-}
-
-Font MQFontStart(char *FontLoc, int FontSize)
-{
-    unsigned int fileSize = 0;
-    unsigned char *fileData = LoadFileData(FontLoc, &fileSize);
-    // Default font generation from TTF font
-    Font fontDefault = { 0 };
-    fontDefault.baseSize = FontSize;
-    fontDefault.glyphCount = 95;
-
-    // Loading font data from memory data
-    // Parameters > font size: FontSize, no glyphs array provided (0), glyphs count: 95 (autogenerate chars array)
-    fontDefault.glyphs = LoadFontData(fileData, fileSize, FontSize, 0, 95, FONT_DEFAULT);
-
-    fontDefault.glyphs = LoadFontData(fileData, fileSize, FontSize, 0, 95, FONT_DEFAULT);
-    // Parameters > glyphs count: 95, font size: FontSize, glyphs padding in image: 4 px, pack method: 0 (default)
-    Image atlas = GenImageFontAtlas(fontDefault.glyphs, &fontDefault.recs, 95, FontSize, 14, 0);
-    fontDefault.texture = LoadTextureFromImage(atlas);
-    UnloadImage(atlas);
-
-    // SDF font generation from TTF font
-    Font fontSDF = { 0 };
-    fontSDF.baseSize = FontSize;
-    fontSDF.glyphCount = 95;
-    // Parameters > font size: FontSize, no glyphs array provided (0), glyphs count: 0 (defaults to 95)
-    fontSDF.glyphs = LoadFontData(fileData, fileSize, FontSize, 0, 0, FONT_SDF);
-    // Parameters > glyphs count: 95, font size: FontSize, glyphs padding in image: 0 px, pack method: 1 (Skyline algorythm)
-    atlas = GenImageFontAtlas(fontSDF.glyphs, &fontSDF.recs, 95, FontSize, 0, 1);
-    fontSDF.texture = LoadTextureFromImage(atlas);
-    UnloadImage(atlas);
-
-    UnloadFileData(fileData);      // Free memory from loaded file
-
-    // Load SDF required shader (we use default vertex shader)
-    //Shader shader = LoadShader(0, TextFormat("data/shaders/sdf.fs", 330));
-    SetTextureFilter(fontSDF.texture, TEXTURE_FILTER_POINT);    // Required for SDF font
-
-    return (fontDefault);
 }
 
 //-----------------------------------
@@ -242,12 +251,26 @@ Font MQFontStart(char *FontLoc, int FontSize)
 //#include "ai.c"
 
 //-----------------------------------
-//GRAVITY
+//COLISION
 //-----------------------------------
 
-float MQGravit(Vector3 posicao, float gravidade, int tempo)
+float MQGravity(Vector3 posicao, float gravidade, int tempo)
 {
     return(posicao.y - gravidade*((tempo*(tempo/5)))/60);
+}
+
+void MQGravit(DATA data,Vector3 *posicao, int *counter)
+{
+    if(MQReturnYMaxCollisionPoint(data, *posicao) == MQFALSE)
+    {
+        posicao->y = MQGravity(*posicao, 0.1, *counter);
+        *counter++;
+    }
+    else 
+    {
+        posicao->y = MQReturnYMaxCollisionPoint(data, *posicao);
+        *counter = 0;
+    }
 }
 
 //-----------------------------------

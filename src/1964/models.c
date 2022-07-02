@@ -140,55 +140,55 @@ void MQCreateEmptyHitbox(DATA *data, char *name)
     data->session.HitboxCount++;
 }
 
-
+void MQPlayerCreateBodyBox(DATA *data, int quem)
+{
+    //abinCoreReturnData("./data/models/playerhitbox.text", MQStrAddInt("name",0));
+    for(int i = 0; i < 14; i++)
+    {
+        snprintf(ABINCACHE128,128,"%s%d",abinCoreReturnData("./data/models/playerhitbox.text", MQStrAddInt("name",i)),quem);
+        data->file.hitbox[data->session.HitboxCount] = GetModelBoundingBox(data->file.model[MQFindModelByName(*data,ABINCACHE128)]);
+        strcpy(data->session.LoadedNames[data->session.HitboxCount].hitbox,ABINCACHE128);
+        data->session.HitboxCount++;
+    } 
+}
 
 void MQPlayerUpdateBodyBox(DATA *data, int quem, int qualAnim)
 {
     Mesh LocalMesh;
     Vector3 LocVec3;
-    int modelIndex, animIndex, hitboxIndex;
-    snprintf(ABINCACHE16,16,"player%d-cabeca",quem);
-    int hitboxheadfind = MQFindHitboxByName(*data,ABINCACHE16),modelheadfind = MQFindModelByName(*data,ABINCACHE16);
-    if(quem >= 0)
+    int modelIndex, hitboxIndex;
+    char buffer2[32];
+    snprintf(buffer2,32,"player-cabeca%d",quem);
+    char buffer[32];
+    snprintf(buffer,32,"player%d",quem);
+    int abc = MQFindRenderModelIndexByID(*data,buffer);
+    
+    int hitboxheadfind = MQFindHitboxByName(*data,buffer2),modelheadfind = MQFindModelByName(*data,buffer2);
+    for(int i = 0; i < 14; i++)
     {
-        for(int i = 0; i < 14; i++)
+        modelIndex =  modelheadfind+i;
+        hitboxIndex = hitboxheadfind+i;
+
+        LocalMesh = MQApplyMeshTransformFromBone(data->file.model[modelIndex], data->file.anim[modelIndex][qualAnim], data->session.render.model[abc].currentFrame);
+        
+
+        for(int i = 0; i < LocalMesh.vertexCount * 3; i += 3)
         {
-            modelIndex =  modelheadfind+i;
-            animIndex = modelheadfind+i;
-            hitboxIndex = hitboxheadfind+i;
+            LocVec3 = MQRotateVerticeSelf(270 - ((PI / 180) * (data->game.personagem[quem].rotacao)), (Vector3) {LocalMesh.vertices[i], LocalMesh.vertices[i + 1], LocalMesh.vertices[i + 2]});
 
-            LocalMesh = MQApplyMeshTransformFromBone(data->file.model[modelIndex], data->file.anim[animIndex][qualAnim], data->session.render.model[MQFindRenderModelIndexByID(*data,"player0")].currentFrame);
-
-            for(int i = 0; i < LocalMesh.vertexCount * 3; i += 3)
-            {
-                LocVec3 = MQRotateVerticeSelf(270 - ((PI / 180) * (data->game.personagem[quem].rotacao)), (Vector3) {LocalMesh.vertices[i], LocalMesh.vertices[i + 1], LocalMesh.vertices[i + 2]});
-
-                LocalMesh.vertices[i] = LocVec3.x;
-                LocalMesh.vertices[i + 1] = LocVec3.y;
-                LocalMesh.vertices[i + 2] = LocVec3.z;
-            }
-            data->file.hitbox[hitboxIndex] = GetMeshBoundingBox(LocalMesh);
-
-            data->file.hitbox[hitboxIndex].min = Vector3Add(data->file.hitbox[hitboxIndex].min, (Vector3) {0.06, 0.06, 0.06});
-            data->file.hitbox[hitboxIndex].max = Vector3Subtract(data->file.hitbox[hitboxIndex].max, (Vector3) {0.06, 0.06, 0.06});
-
-            data->file.hitbox[hitboxIndex].min = Vector3Add(data->file.hitbox[hitboxIndex].min, data->game.personagem[quem].posicao);
-            data->file.hitbox[hitboxIndex].max = Vector3Add(data->file.hitbox[hitboxIndex].max, data->game.personagem[quem].posicao);
+            LocalMesh.vertices[i] = LocVec3.x;
+            LocalMesh.vertices[i + 1] = LocVec3.y;
+            LocalMesh.vertices[i + 2] = LocVec3.z;
         }
-    }
-    else
-    {
-        for(int i = 0; i < 14; i++)
-        {
-            snprintf(ABINCACHE8, 8, "name%d", i);
-            strcpy(ABINCACHE128, abinCoreReturnData("./data/models/playerhitbox.text", ABINCACHE8));
+        data->file.hitbox[hitboxIndex] = GetMeshBoundingBox(LocalMesh);
 
-            data->file.hitbox[data->session.HitboxCount] = GetModelBoundingBox(data->file.model[MQFindModelByName(*data,ABINCACHE128)]);
+        data->file.hitbox[hitboxIndex].min = Vector3Add(data->file.hitbox[hitboxIndex].min, (Vector3) {0.06, 0.06, 0.06});
+        data->file.hitbox[hitboxIndex].max = Vector3Subtract(data->file.hitbox[hitboxIndex].max, (Vector3) {0.06, 0.06, 0.06});
 
-            strcpy(data->session.LoadedNames[data->session.HitboxCount].hitbox,ABINCACHE128);
-            data->session.HitboxCount++;
-        }
+        data->file.hitbox[hitboxIndex].min = Vector3Add(data->file.hitbox[hitboxIndex].min, data->game.personagem[quem].posicao);
+        data->file.hitbox[hitboxIndex].max = Vector3Add(data->file.hitbox[hitboxIndex].max, data->game.personagem[quem].posicao);
     }
+
 }
 
 void MQLoadAllModels(DATA *data)
@@ -198,5 +198,5 @@ void MQLoadAllModels(DATA *data)
     MQLoadModelsFromText( *&data, "./data/models/porta.text");
     MQLoadModelsFromText( *&data, "./data/models/map/level0/lvl0.text");
     MQLoadHitboxFromText( *&data, "./data/models/map/level0/hitbox.text");
-    MQPlayerUpdateBodyBox( *&data, -1, 0);
+    MQPlayerCreateBodyBox( *&data, 0);
 }

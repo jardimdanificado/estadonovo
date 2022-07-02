@@ -35,7 +35,7 @@ void TECLADO_MAIN(DATA *data)
         else
             reverseRotation = data->game.personagem[0].rotacao-180;
         
-        Vector3 Vec3buff = MQCheckWall(*data,"player0-barriga",reverseRotation);
+        Vector3 Vec3buff = MQCheckWall(*data,"player-barriga0",reverseRotation);
         if(Vec3buff.x != __INT_MAX__)
         {
             if(data->game.personagem[0].posicao.x+0.5 > Vec3buff.x&&data->game.personagem[0].posicao.x-0.5<Vec3buff.x)
@@ -51,7 +51,7 @@ void TECLADO_MAIN(DATA *data)
         if(MQWALLEXCLUDEINDEX != __INT_MAX__)
         {
             MQWALLEXCLUDE=true;
-            Vec3buff = MQCheckWall(*data,"player0-barriga",reverseRotation);
+            Vec3buff = MQCheckWall(*data,"player-barriga0",reverseRotation);
             if(Vec3buff.x != __INT_MAX__)
             {
                 if(data->game.personagem[0].posicao.x+0.5 > Vec3buff.x&&data->game.personagem[0].posicao.x-0.5<Vec3buff.x)
@@ -71,7 +71,7 @@ void TECLADO_MAIN(DATA *data)
     if(IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
     {
         data->game.personagem[0].posicao = MQPlayerMove(data->game.personagem[0].posicao, data->game.personagem[0].rotacao, data->game.personagem[0].velocidade);
-        Vector3 Vec3buff = MQCheckWall(*data,"player0-barriga",data->game.personagem[0].rotacao);
+        Vector3 Vec3buff = MQCheckWall(*data,"player-barriga0",data->game.personagem[0].rotacao);
         if(Vec3buff.x != __INT_MAX__)
         {
             if(data->game.personagem[0].posicao.x+0.5 > Vec3buff.x&&data->game.personagem[0].posicao.x-0.5<Vec3buff.x)
@@ -87,7 +87,7 @@ void TECLADO_MAIN(DATA *data)
         if(MQWALLEXCLUDEINDEX != __INT_MAX__)
         {
             MQWALLEXCLUDE=true;
-            Vec3buff = MQCheckWall(*data,"player0-barriga",data->game.personagem[0].rotacao);
+            Vec3buff = MQCheckWall(*data,"player-barriga0",data->game.personagem[0].rotacao);
             if(Vec3buff.x != __INT_MAX__)
             {
                 if(data->game.personagem[0].posicao.x+0.5 > Vec3buff.x&&data->game.personagem[0].posicao.x-0.5<Vec3buff.x)

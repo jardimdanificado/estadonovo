@@ -15,20 +15,20 @@ link11 ./data/models/personagem/body/coxaesquerda.iqm
 link12 ./data/models/personagem/body/pernadireita.iqm
 link13 ./data/models/personagem/body/pernaesquerda.iqm
 
-name0 player0-cabeca
-name1 player0-pescoco
-name2 player0-peitoral
-name3 player0-barriga
-name4 player0-maod
-name5 player0-maoe
-name6 player0-bracod
-name7 player0-bracoe
-name8 player0-ombrod
-name9 player0-ombroe
-name10 player0-coxad
-name11 player0-coxae
-name12 player0-pernad
-name13 player0-pernae
+name0 player-cabeca
+name1 player-pescoco
+name2 player-peitoral
+name3 player-barriga
+name4 player-maod
+name5 player-maoe
+name6 player-bracod
+name7 player-bracoe
+name8 player-ombrod
+name9 player-ombroe
+name10 player-coxad
+name11 player-coxae
+name12 player-pernad
+name13 player-pernae
 
 animated0 true
 animated1 true

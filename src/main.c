@@ -29,7 +29,7 @@ int main(void)
     
     data.session.render.camera.target = (Vector3)
     {
-        data.file.hitbox[MQFindHitboxByName(data, "player0-cabeca")].min.x, data.file.hitbox[MQFindHitboxByName(data, "player0-cabeca")].min.y, data.file.hitbox[MQFindHitboxByName(data, "player0-cabeca")].min.z
+        data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.x, data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.y, data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.z
     };
     SetExitKey(KEY_END);
     data.session.render.camera.position = (Vector3){0.4375, 3.5, 11.0625};
@@ -39,7 +39,7 @@ int main(void)
     {
         data.session.render.camera.target = (Vector3)
         {
-            data.file.hitbox[MQFindHitboxByName(data, "player0-cabeca")].min.x, data.file.hitbox[MQFindHitboxByName(data, "player0-cabeca")].min.y, data.file.hitbox[MQFindHitboxByName(data, "player0-cabeca")].min.z
+            data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.x, data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.y, data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.z
         };
         data.session.frame++;
         UpdateCamera(&data.session.render.camera);
@@ -51,20 +51,11 @@ int main(void)
         if((int)data.game.personagem[0].rotacao%360 == 0)
             data.game.personagem[0].rotacao = 0;
 
-        if(MQReturnYMaxCollisionPoint(data, data.game.personagem[0].posicao) == MQFALSE)
-        {
-            data.game.personagem[0].posicao.y = MQGravit(data.game.personagem[0].posicao, 0.1, data.game.personagem[0].tempoGravit);
-            data.game.personagem[0].tempoGravit++;
-        }
-        else 
-        {
-            data.game.personagem[0].posicao.y = MQReturnYMaxCollisionPoint(data, data.game.personagem[0].posicao);
-            data.game.personagem[0].tempoGravit = 0;
-        }
+        MQGravit(data, &data.game.personagem[0].posicao, &data.game.personagem[0].tempoGravit);
         MQRenderQueue(&data);
     }
     CloseAudioDevice();
-    remove("./data/temp/lang.text");
+    remove("./data/temp/lang");
     CloseWindow();          
     // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
