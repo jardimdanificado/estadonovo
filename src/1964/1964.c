@@ -1,92 +1,4 @@
 //-----------------------------------
-//TEMP
-//-----------------------------------
-
-void MQSetTempSpecsTypes2(char *type0, char *type1)
-{
-    strcpy(ABINCACHE32, "./data/temp/dummyt.specs");
-    remove(ABINCACHE32);
-    abinCoreFileCreate(ABINCACHE32);
-    abinCoreAddNewData(ABINCACHE32, "type0", type0);
-    abinCoreAddNewData(ABINCACHE32, "type1", type1);
-}
-
-void MQSetTempSpecsValues2(char *value0, char *value1)
-{
-    strcpy(ABINCACHE32, "./data/temp/dummyv.specs");
-    remove(ABINCACHE32);
-    abinCoreFileCreate(ABINCACHE32);
-    abinCoreAddNewData(ABINCACHE32, "value0", value0);
-    abinCoreAddNewData(ABINCACHE32, "value1", value1);
-}
-
-void MQSetTempSpecsToFile2(char *fileloc)
-{
-    char bufferlocal[2][64];
-    char buffervalues[2][128];
-    char buffertypes[2][128];
-    strcpy(bufferlocal[0], "./data/temp/dummyv.specs");
-    strcpy(bufferlocal[1], "./data/temp/dummyt.specs");
-    strcpy(buffervalues[0], abinCoreReturnData(bufferlocal[0], "value0"));
-    strcpy(buffervalues[1], abinCoreReturnData(bufferlocal[0], "value1"));
-    strcpy(buffertypes[0], abinCoreReturnData(bufferlocal[1], "type0"));
-    strcpy(buffertypes[1], abinCoreReturnData(bufferlocal[1], "type1"));
-    for(int i = 0; i < 2; i++)
-    {
-        abinCoreAddNewData(fileloc, buffertypes[i], buffervalues[i]);
-    }
-    snprintf(ABINCACHE16, 16, "%d", atoi(abinCoreReturnData(fileloc, "SIZE")));
-    abinCoreEditData(fileloc, "SIZE", ABINCACHE16);
-}
-
-void MQSetTempSpecsTypes4(char *type0, char *type1, char *type2, char *type3)
-{
-    strcpy(ABINCACHE32, "./data/temp/dummyt.specs");
-    remove(ABINCACHE32);
-    abinCoreFileCreate(ABINCACHE32);
-    abinCoreAddNewData(ABINCACHE32, "type0", type0);
-    abinCoreAddNewData(ABINCACHE32, "type1", type1);
-    abinCoreAddNewData(ABINCACHE32, "type2", type2);
-    abinCoreAddNewData(ABINCACHE32, "type3", type3);
-}
-
-void MQSetTempSpecsValues4(char *value0, char *value1, char *value2, char *value3)
-{
-    strcpy(ABINCACHE32, "./data/temp/dummyv.specs");
-    remove(ABINCACHE32);
-    abinCoreFileCreate(ABINCACHE32);
-    abinCoreAddNewData(ABINCACHE32, "value0", value0);
-    abinCoreAddNewData(ABINCACHE32, "value1", value1);
-    abinCoreAddNewData(ABINCACHE32, "value2", value2);
-    abinCoreAddNewData(ABINCACHE32, "value3", value3);
-}
-
-void MQSetTempSpecsToFile4(char *fileloc)
-{
-    char bufferlocal[4][64];
-    char buffervalues[4][128];
-    char buffertypes[4][128];
-    strcpy(bufferlocal[0], "./data/temp/dummyv.specs");
-    strcpy(bufferlocal[1], "./data/temp/dummyt.specs");
-    strcpy(bufferlocal[2], "vazio");
-    strcpy(bufferlocal[3], "vazio");
-    strcpy(buffervalues[0], abinCoreReturnData(bufferlocal[0], "value0"));
-    strcpy(buffervalues[1], abinCoreReturnData(bufferlocal[0], "value1"));
-    strcpy(buffervalues[2], abinCoreReturnData(bufferlocal[0], "value2"));
-    strcpy(buffervalues[3], abinCoreReturnData(bufferlocal[0], "value3"));
-    strcpy(buffertypes[0], abinCoreReturnData(bufferlocal[1], "type0"));
-    strcpy(buffertypes[1], abinCoreReturnData(bufferlocal[1], "type1"));
-    strcpy(buffertypes[2], abinCoreReturnData(bufferlocal[1], "type2"));
-    strcpy(buffertypes[3], abinCoreReturnData(bufferlocal[1], "type3"));
-    for(int i = 0; i < 4; i++)
-    {
-        abinCoreAddNewData(fileloc, buffertypes[i], buffervalues[i]);
-    }
-    snprintf(ABINCACHE16, 16, "%d", atoi(abinCoreReturnData(fileloc, "SIZE")));
-    abinCoreEditData(fileloc, "SIZE", ABINCACHE16);
-}
-
-//-----------------------------------
 //HTIBOX
 //-----------------------------------
 
@@ -252,8 +164,17 @@ void MQWindowStart()
 }
 
 //-----------------------------------
-//FONT&TEXT 
+//FONT&STRING
 //-----------------------------------
+
+char *MQStrAddInt(char* string, int value)
+{
+    char buffer[sizeof(string)];
+    strcpy(buffer,string);
+    string = malloc(sizeof(string)+8);
+    snprintf(string,sizeof(string)+8,"%s%d",buffer,value);
+    return string;
+}
 
 void MQLoadLang(DATA* data, char lang[4])
 {

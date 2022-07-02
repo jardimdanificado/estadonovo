@@ -100,46 +100,31 @@ Mesh MQApplyMeshTransformFromBone(Model model, ModelAnimation anim, int frame)
     }
 }
 
-void MQLoadModel(DATA *data, char *loadedfrom, int ponteiro)
-{
-    char bufferlocal[2][128], bufferresult[2][128];
-    snprintf(bufferlocal[0], 128, "name%d", ponteiro);
-    snprintf(bufferlocal[1], 128, "animated%d", ponteiro);
-    bool animated;
-    snprintf(bufferresult[0], 128, "%s", abinCoreReturnData(loadedfrom, bufferlocal[0]));
-    if(strcmp(abinCoreReturnData(loadedfrom, bufferlocal[1]), "true") == 0)
-        animated = true;
-    snprintf(bufferresult[1], 128, "%s", abinCoreReturnData(loadedfrom, bufferlocal[1]));
-
-    snprintf(bufferlocal[0], 8, "link%d", ponteiro);
-    data->file.model[data->session.ModelCount] = LoadModel(abinCoreReturnData(loadedfrom, bufferlocal[0]));
-    strcpy(data->session.LoadedNames[data->session.ModelCount].model ,bufferresult[0]);
-    if(animated == true)
-    {
-        data->file.anim[data->session.ModelCount] = LoadModelAnimations(abinCoreReturnData(loadedfrom, bufferlocal[0]), &MAXANIM);
-    }
-    data->session.ModelCount++;
-}
-
 void MQLoadModelsFromText(DATA *data, char *fileloc)
 {
     for(int i = 0; i < atoi(abinCoreReturnData(fileloc, "SIZE")); i++)
     {
-        MQLoadModel( *&data, fileloc, i);
+        data->file.model[data->session.ModelCount] = LoadModel(abinCoreReturnData(fileloc, MQStrAddInt("link",i)));
+        strcpy(data->session.LoadedNames[data->session.ModelCount].model ,abinCoreReturnData(fileloc, MQStrAddInt("name",i)));
+        if(strcmp(abinCoreReturnData(fileloc, MQStrAddInt("animated",i)), "true") == 0)
+        {
+            data->file.anim[data->session.ModelCount] = LoadModelAnimations(abinCoreReturnData(fileloc, MQStrAddInt("link",i)), &MAXANIM);
+        }
+        data->session.ModelCount++;
     }
 }
 
-void MQLoadHitboxFromModel(DATA *data, char *fileloc, int ponteiro)
+void MQLoadHitboxFromText(DATA *data, char *fileloc)
 {
-    snprintf(ABINCACHE32, 32, "link%d", ponteiro);
-    snprintf(ABINCACHE128, 128, "%s", abinCoreReturnData(fileloc, ABINCACHE32));
-    Model localModel = LoadModel(ABINCACHE128);
-    char bufferresult[128];
-    snprintf(bufferresult, 128, "%s", abinCoreReturnData(fileloc, ABINCACHE32));
-    data->file.hitbox[data->session.HitboxCount] = GetModelBoundingBox(localModel);
-    UnloadModel(localModel);
-    strcpy(data->session.LoadedNames[data->session.HitboxCount].hitbox,bufferresult);
-    data->session.HitboxCount++;
+    Model localModel;
+    for(int i = 0; i < atoi(abinCoreReturnData(fileloc, "SIZE")); i++)
+    {
+        localModel = LoadModel(abinCoreReturnData(fileloc, MQStrAddInt("link",i)));
+        data->file.hitbox[data->session.HitboxCount] = GetModelBoundingBox(localModel);
+        UnloadModel(localModel);
+        strcpy(data->session.LoadedNames[data->session.HitboxCount].hitbox,abinCoreReturnData(fileloc, MQStrAddInt("name",i)));
+        data->session.HitboxCount++;
+    }
 }
 
 void MQCreateHitbox(DATA *data, char *name, BoundingBox Hitbox)
@@ -155,13 +140,7 @@ void MQCreateEmptyHitbox(DATA *data, char *name)
     data->session.HitboxCount++;
 }
 
-void MQLoadHitboxFromText(DATA *data, char *fileloc)
-{
-    for(int i = 0; i < atoi(abinCoreReturnData(fileloc, "SIZE")); i++)
-    {
-        MQLoadHitboxFromModel( *&data, fileloc, i);
-    }
-}
+
 
 void MQPlayerUpdateBodyBox(DATA *data, int quem, int qualAnim)
 {

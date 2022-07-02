@@ -153,7 +153,3 @@ void MQRenderQueue(DATA* data)
     EndDrawing();
 }
 
-void MQRender(DATA *data)
-{
-    MQRenderQueue(*&data);
-}

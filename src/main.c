@@ -61,7 +61,7 @@ int main(void)
             data.game.personagem[0].posicao.y = MQReturnYMaxCollisionPoint(data, data.game.personagem[0].posicao);
             data.game.personagem[0].tempoGravit = 0;
         }
-        MQRender(&data);
+        MQRenderQueue(&data);
     }
     CloseAudioDevice();
     remove("./data/temp/lang.text");
