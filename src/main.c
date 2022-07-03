@@ -51,7 +51,7 @@ int main(void)
         if((int)data.game.personagem[0].rotacao%360 == 0)
             data.game.personagem[0].rotacao = 0;
 
-        MQGravit(data, &data.game.personagem[0].posicao, &data.game.personagem[0].tempoGravit);
+        MQGravit(&data, 0);
         MQRenderQueue(&data);
     }
     CloseAudioDevice();

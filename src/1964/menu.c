@@ -132,8 +132,6 @@ void MQMenuRender(DATA data, int max, int opt ,char quotes[][255])
 {
     BeginDrawing();
     ClearBackground(COR_BRANCO);
-    /* MQRenderLogo(data.file.font[1], data.file.font[2], *&logo); */
-
     for(int i = max-1; i >=0; i--)
     {
         if(i == opt)

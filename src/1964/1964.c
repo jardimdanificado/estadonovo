@@ -259,17 +259,17 @@ float MQGravity(Vector3 posicao, float gravidade, int tempo)
     return(posicao.y - gravidade*((tempo*(tempo/5)))/60);
 }
 
-void MQGravit(DATA data,Vector3 *posicao, int *counter)
+void MQGravit(DATA* data, int quem)
 {
-    if(MQReturnYMaxCollisionPoint(data, *posicao) == MQFALSE)
+    if(MQReturnYMaxCollisionPoint(*data, data->game.personagem[quem].posicao) == MQFALSE)
     {
-        posicao->y = MQGravity(*posicao, 0.1, *counter);
-        *counter++;
+        data->game.personagem[quem].posicao.y = MQGravity(data->game.personagem[quem].posicao, 0.1, data->game.personagem[quem].tempoGravit);
+        data->game.personagem[quem].tempoGravit++;
     }
     else 
     {
-        posicao->y = MQReturnYMaxCollisionPoint(data, *posicao);
-        *counter = 0;
+        data->game.personagem[quem].posicao.y = MQReturnYMaxCollisionPoint(*data, data->game.personagem[quem].posicao);
+        data->game.personagem[quem].tempoGravit = 0;
     }
 }
 
