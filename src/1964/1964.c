@@ -36,6 +36,8 @@ BoundingBox MQHitboxUpdateXYZ(BoundingBox hitboxbase, Vector3 targetPosi)
 //FONT&STRING
 //-----------------------------------
 
+//Use into a strcmp() or strcpy()
+//DONT use it direcly
 char *MQStrAddInt(char* string, int value)
 {
     char buffer[sizeof(string)];
@@ -43,15 +45,6 @@ char *MQStrAddInt(char* string, int value)
     string = malloc(sizeof(string)+8);
     snprintf(string,sizeof(string)+8,"%s%d",buffer,value);
     return string;
-}
-
-char *MQStrAddStr(char* string1, char* string2)
-{
-    char buffer[sizeof(string1)];
-    strcpy(buffer,string1);
-    string1 = malloc(sizeof(buffer)+sizeof(string2));
-    snprintf(string1,sizeof(buffer)+sizeof(string2),"%s%s",buffer,string2);
-    return string1;
 }
 
 void MQLoadLang(DATA* data, char lang[4])
