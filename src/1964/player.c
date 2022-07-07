@@ -77,7 +77,7 @@ int MQWALLEXCLUDEINDEX=0;
 Vector3 MQCheckWall(DATA data, char *hitboxID,float LocalRotation)
 {
     int hitboxIndex = MQFindHitboxByName(data, hitboxID);
-    int hitboxMax = data.session.HitboxCount;
+    int hitboxMax = data.session.counter.hitbox;
     BoundingBox hitboxLocal = data.file.hitbox[hitboxIndex];
     
     for(int i = 0; i < hitboxMax; i++)
@@ -163,7 +163,7 @@ Vector3 MQCheckWall(DATA data, char *hitboxID,float LocalRotation)
 
 float MQReturnYMaxCollisionPoint(DATA data, Vector3 posi)
 {
-    int hitboxMax = data.session.HitboxCount;
+    int hitboxMax = data.session.counter.hitbox;
     BoundingBox hitboxLocal;
     hitboxLocal.max = (Vector3){posi.x+0.005,posi.y-0.05,posi.z+0.005};
     hitboxLocal.min = (Vector3){posi.x-0.005,posi.y-0.1,posi.z-0.005};

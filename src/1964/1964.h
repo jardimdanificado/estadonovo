@@ -40,6 +40,8 @@ unsigned int MAXANIM = 1;
 
 bool MQEXIT = false;
 
+//events
+
 //-----------------------------------
 //DATA
 //-----------------------------------
@@ -68,47 +70,6 @@ struct DATA_PLAYER
 };
 typedef struct DATA_PLAYER DATA_PLAYER;
 
-struct DATA_RENDER_MODEL
-{
-    bool visible, playing, reverse;
-    int modelIndex;
-    int currentAnim;
-    int currentFrame;
-    Color color;
-    Vector3 position;
-    float rotation;
-    char *id;
-};
-typedef struct DATA_RENDER_MODEL DATA_RENDER_MODEL;
-
-struct DATA_RENDER_TEXT
-{
-    bool visible;
-    int textIndex;
-    Vector2 position;
-    Color color;
-    char* string;
-    int fontSize;
-    int fontIndex;
-    char *id;
-};
-typedef struct DATA_RENDER_TEXT DATA_RENDER_TEXT;
-
-struct DATA_SESSION_RENDER
-{
-    DATA_RENDER_MODEL model[MAXOBJ];
-    DATA_RENDER_TEXT text[MAXOBJ];
-    Color background;
-    Camera camera;
-};
-typedef struct DATA_SESSION_RENDER DATA_SESSION_RENDER;
-
-struct DATA_SESSION_LOADEDNAMES
-{
-    char model[255],hitbox[255],text[255],event[255];
-};
-typedef struct DATA_SESSION_LOADEDNAMES DATA_SESSION_LOADEDNAMES;
-
 struct DATA_GAME
 {
     DATA_PLAYER personagem[MAXOBJ];
@@ -128,11 +89,70 @@ struct DATA_FILES
 };
 typedef struct DATA_FILES DATA_FILES;
 
+struct DATA_RENDER_MODEL
+{
+    bool visible, playing, reverse;
+    int modelIndex;
+    int currentAnim;
+    int currentFrame;
+    Color color;
+    Vector3 position;
+    float rotation;
+    char *name;
+};
+typedef struct DATA_RENDER_MODEL DATA_RENDER_MODEL;
+
+struct DATA_RENDER_TEXT
+{
+    bool visible;
+    int textIndex;
+    Vector2 position;
+    Color color;
+    char* string;
+    int fontSize;
+    int fontIndex;
+    char *name;
+};
+typedef struct DATA_RENDER_TEXT DATA_RENDER_TEXT;
+
+struct DATA_SESSION_RENDER
+{
+    DATA_RENDER_MODEL model[MAXOBJ];
+    DATA_RENDER_TEXT text[MAXOBJ];
+    Color background;
+    Camera camera;
+};
+typedef struct DATA_SESSION_RENDER DATA_SESSION_RENDER;
+
+struct DATA_SESSION_LOADEDNAMES
+{
+    char model[MAXOBJ][255],hitbox[MAXOBJ][255],text[MAXOBJ][255],eventbox[MAXOBJ][255];
+};
+typedef struct DATA_SESSION_LOADEDNAMES DATA_SESSION_LOADEDNAMES;
+
+struct DATA_SESSION_COUNTERS
+{
+     int model, hitbox, text, lang, eventbox;
+};
+typedef struct DATA_SESSION_COUNTERS DATA_SESSION_COUNTERS;
+
+struct DATA_SESSION_EVENT
+{
+    bool active;
+    int eventboxIndex;
+    int eventFuncionIndex;
+    Vector3 position;
+    float rotation;
+    char *name;
+};
+typedef struct DATA_SESSION_EVENT DATA_SESSION_EVENT;
+
 struct DATA_SESSION
 {
     DATA_SESSION_RENDER render;
-    int ModelCount, HitboxCount, TextCount, LangCount;
-    DATA_SESSION_LOADEDNAMES LoadedNames[MAXOBJ];
+    DATA_SESSION_COUNTERS counter;
+    DATA_SESSION_LOADEDNAMES LoadedNames;
+    DATA_SESSION_EVENT event[MAXOBJ];
     long int frame;
 };
 typedef struct DATA_SESSION DATA_SESSION;
@@ -145,6 +165,5 @@ struct DATA
 };
 typedef struct DATA DATA;
 
-
-
 #include "1964.c"
+#include "../event.c"

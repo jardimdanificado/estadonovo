@@ -56,8 +56,8 @@ void MQLoadLang(DATA* data, char lang[4])
     for(int i = 0; i <atoi(abinCoreReturnData("./data/temp/lang","SIZE"));i++)
     {
         snprintf(buffer,4,"%d",i);
-        strcpy(data->file.lang[data->session.LangCount],abinCoreReturnData("./data/temp/lang",buffer));
-        data->session.LangCount++;
+        strcpy(data->file.lang[data->session.counter.lang],abinCoreReturnData("./data/temp/lang",buffer));
+        data->session.counter.lang++;
     }
 }
 
@@ -100,7 +100,6 @@ Font MQFontStart(char *FontLoc, int FontSize)
     return (fontDefault);
 }
 
-
 //-----------------------------------
 //FIND
 //-----------------------------------
@@ -109,28 +108,27 @@ int MQFindHitboxByName(DATA data, char* name)
 {
     for(int i = 0; i < MAXOBJ; i++)
     {
-        if(strcmp(data.session.LoadedNames[i].hitbox,name)==0)
+        if(strcmp(data.session.LoadedNames.hitbox[i],name)==0)
             return i;
     }
     return -1;
 }
-
 
 int MQFindModelByName(DATA data, char* name)
 {
     for(int i = 0; i < MAXOBJ; i++)
     {
-        if(strcmp(data.session.LoadedNames[i].model,name)==0)
+        if(strcmp(data.session.LoadedNames.model[i],name)==0)
             return i;
     }
     return -1;
 }
 
-int MQFindRenderModelIndexByID(DATA data, char* id)
+int MQFindRenderModelIndexByName(DATA data, char* name)
 {
     for(int i = 0;i<MAXOBJ;i++)
     {
-        if(strcmp(data.session.render.model[i].id, id)==0)
+        if(strcmp(data.session.render.model[i].name, name)==0)
         {
             return i;
         }
@@ -138,11 +136,11 @@ int MQFindRenderModelIndexByID(DATA data, char* id)
     return -1;
 }
 
-int MQFindRenderTextIndexByID(DATA data, char* id)
+int MQFindRenderTextIndexByName(DATA data, char* name)
 {
     for(int i = 0;i<MAXOBJ;i++)
     {
-        if(strcmp(data.session.render.text[i].id, id)==0)
+        if(strcmp(data.session.render.text[i].name, name)==0)
         {
             return i;
         }

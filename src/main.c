@@ -8,12 +8,14 @@ int main(void)
     DATA data;
     MQWindowStart(abinCoreReturnData("config.text", "TITLE"));
     MQCleanAllRenderSlots(&data);
+    MQCleanAllEventSlots(&data);
     data.session.render.camera = MQCameraStart(&data.session.render.camera);
     data.session.render.background = (Color){115, 105, 97, 255};
-    data.session.ModelCount = 0;
-    data.session.HitboxCount = 0;
-    data.session.LangCount = 0;
-    data.session.TextCount = 0;
+    data.session.counter.model = 0;
+    data.session.counter.hitbox = 0;
+    data.session.counter.lang = 0;
+    data.session.counter.text = 0;
+    data.session.counter.eventbox = 0;
     data.session.frame = 0;
     MQLoadLang(&data,"ptbr");
     MQLoadAllModels(&data);
@@ -35,6 +37,11 @@ int main(void)
     data.session.render.camera.position = (Vector3){0.4375, 3.5, 11.0625};
     MQRenderAddModelToQueue(&data, "mapa0", MQFindModelByName(data,"map0"), WHITE,(Vector3){0.0f, 0.0f, 0.0f}, 0,  0,0,true,false,false);
     MQRenderAddModelToQueue(&data, "player0", MQFindModelByName(data,"player"), COR_PELE0,data.game.personagem[0].posicao, data.game.personagem[0].rotacao,  0,0,true,true,false);
+    
+    data.file.eventbox[data.session.counter.eventbox].min = (Vector3){-0.5,0,-0.5};
+    data.file.eventbox[data.session.counter.eventbox].max = (Vector3){0.5,2,1};
+    MQCreateEventbox(&data, "playeruse0",data.file.eventbox[data.session.counter.eventbox]);
+    MQAddEventToQueue(&data,"playeruse0",MQTRUE,MQFindEventboxIndexByName(data,"playeruse0"),(Vector3){0,0,0},0,true);
     while(!WindowShouldClose() && !MQEXIT)
     {
         data.session.render.camera.target = (Vector3)
@@ -43,10 +50,14 @@ int main(void)
         };
         data.session.frame++;
         UpdateCamera(&data.session.render.camera);
-        data.session.render.model[MQFindRenderModelIndexByID(data,"player0")].position = data.game.personagem[0].posicao;
-        data.session.render.model[MQFindRenderModelIndexByID(data,"player0")].rotation = data.game.personagem[0].rotacao;
+
+
+        data.session.render.model[MQFindRenderModelIndexByName(data,"player0")].position = data.game.personagem[0].posicao;
+        data.session.render.model[MQFindRenderModelIndexByName(data,"player0")].rotation = data.game.personagem[0].rotacao;
+        
+
         TECLADO_MAIN(&data);
-        MQPlayerUpdateBodyBox( &data, 0, data.session.render.model[MQFindRenderModelIndexByID(data,"player0")].currentAnim);
+        MQPlayerUpdateBodyBox( &data, 0, data.session.render.model[MQFindRenderModelIndexByName(data,"player0")].currentAnim);
         
         if((int)data.game.personagem[0].rotacao%360 == 0)
             data.game.personagem[0].rotacao = 0;

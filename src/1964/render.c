@@ -12,7 +12,7 @@ void MQCleanAllRenderSlots(DATA *data)
         data->session.render.model[i].visible = false;
         data->session.render.model[i].playing = false;
         data->session.render.model[i].reverse = false;
-        data->session.render.model[i].id = " ";
+        data->session.render.model[i].name = " ";
         data->session.render.model[i].currentAnim = 0;
         data->session.render.model[i].currentFrame = 0;
         data->session.render.text[i].color.r = 0;
@@ -25,7 +25,7 @@ void MQCleanAllRenderSlots(DATA *data)
         data->session.render.text[i].fontSize = __INT_MAX__;
         data->session.render.text[i].fontIndex = __INT_MAX__;
         data->session.render.text[i].string = " ";
-        data->session.render.text[i].id = " ";
+        data->session.render.text[i].name = " ";
     }
 }
 
@@ -43,7 +43,7 @@ void MQCleanAllRenderModelSlots(DATA *data)
         data->session.render.model[i].visible = false;
         data->session.render.model[i].playing = false;
         data->session.render.model[i].reverse = false;
-        data->session.render.model[i].id = " ";
+        data->session.render.model[i].name = " ";
         data->session.render.model[i].currentAnim = 0;
         data->session.render.model[i].currentFrame = 0;
     }
@@ -63,11 +63,11 @@ void MQCleanAllRenderTextSlots(DATA *data)
         data->session.render.text[i].fontSize = __INT_MAX__;
         data->session.render.text[i].fontIndex = __INT_MAX__;
         data->session.render.text[i].string = " ";
-        data->session.render.text[i].id = " ";
+        data->session.render.text[i].name = " ";
     }
 }
 
-void MQRenderAddModelToQueue(DATA *data, char* id, int modelIndex, Color color, Vector3 position, float rotation, int currentAnim, int currentFrame, bool visible, bool playing, bool reverse)
+void MQRenderAddModelToQueue(DATA *data, char* name, int modelIndex, Color color, Vector3 position, float rotation, int currentAnim, int currentFrame, bool visible, bool playing, bool reverse)
 {
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
@@ -78,7 +78,7 @@ void MQRenderAddModelToQueue(DATA *data, char* id, int modelIndex, Color color, 
             break;
         }
     }
-    data->session.render.model[LocalIndex].id = id;
+    data->session.render.model[LocalIndex].name = name;
     data->session.render.model[LocalIndex].currentAnim = currentAnim;
     data->session.render.model[LocalIndex].currentFrame = currentFrame;
     data->session.render.model[LocalIndex].color.r = color.r;
@@ -93,7 +93,7 @@ void MQRenderAddModelToQueue(DATA *data, char* id, int modelIndex, Color color, 
     data->session.render.model[LocalIndex].reverse = reverse;
 }
 
-void MQRenderAddTextToQueue(DATA *data,char* id, int textIndex, Color color, Vector2 position, int fontIndex, int fontSize, char* string, bool visible)
+void MQRenderAddTextToQueue(DATA *data,char* name, int textIndex, Color color, Vector2 position, int fontIndex, int fontSize, char* string, bool visible)
 {
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
@@ -104,7 +104,7 @@ void MQRenderAddTextToQueue(DATA *data,char* id, int textIndex, Color color, Vec
             break;
         }
     }
-    data->session.render.text[LocalIndex].id = id;
+    data->session.render.text[LocalIndex].name = name;
     data->session.render.text[LocalIndex].color.r = color.r;
     data->session.render.text[LocalIndex].color.g = color.g;
     data->session.render.text[LocalIndex].color.b = color.b;

@@ -106,13 +106,13 @@ void MQLoadModelsFromText(DATA *data, char *fileloc)
     for(int i = 0; i < atoi(abinCoreReturnData(fileloc, "SIZE")); i++)
     {
         strcpy(buffer,abinCoreReturnData(fileloc, MQStrAddInt("link",i)));
-        data->file.model[data->session.ModelCount] = LoadModel(buffer);
-        strcpy(data->session.LoadedNames[data->session.ModelCount].model ,abinCoreReturnData(fileloc, MQStrAddInt("name",i)));
+        data->file.model[data->session.counter.model] = LoadModel(buffer);
+        strcpy(data->session.LoadedNames.model[data->session.counter.model] ,abinCoreReturnData(fileloc, MQStrAddInt("name",i)));
         if(strcmp(abinCoreReturnData(fileloc, MQStrAddInt("animated",i)), "true") == 0)
         {
-            data->file.anim[data->session.ModelCount] = LoadModelAnimations(buffer, &MAXANIM);
+            data->file.anim[data->session.counter.model] = LoadModelAnimations(buffer, &MAXANIM);
         }
-        data->session.ModelCount++;
+        data->session.counter.model++;
     }
 }
 
@@ -122,24 +122,24 @@ void MQLoadHitboxFromText(DATA *data, char *fileloc)
     for(int i = 0; i < atoi(abinCoreReturnData(fileloc, "SIZE")); i++)
     {
         localModel = LoadModel(abinCoreReturnData(fileloc, MQStrAddInt("link",i)));
-        data->file.hitbox[data->session.HitboxCount] = GetModelBoundingBox(localModel);
+        data->file.hitbox[data->session.counter.hitbox] = GetModelBoundingBox(localModel);
         UnloadModel(localModel);
-        strcpy(data->session.LoadedNames[data->session.HitboxCount].hitbox,abinCoreReturnData(fileloc, MQStrAddInt("name",i)));
-        data->session.HitboxCount++;
+        strcpy(data->session.LoadedNames.hitbox[data->session.counter.hitbox],abinCoreReturnData(fileloc, MQStrAddInt("name",i)));
+        data->session.counter.hitbox++;
     }
 }
 
 void MQCreateHitbox(DATA *data, char *name, BoundingBox Hitbox)
 {
-    data->file.hitbox[data->session.HitboxCount] = Hitbox;
-    strcpy(data->session.LoadedNames[data->session.HitboxCount].hitbox,name);
-    data->session.HitboxCount++;
+    data->file.hitbox[data->session.counter.hitbox] = Hitbox;
+    strcpy(data->session.LoadedNames.hitbox[data->session.counter.hitbox],name);
+    data->session.counter.hitbox++;
 }
 
 void MQCreateEmptyHitbox(DATA *data, char *name)
 {
-    strcpy(data->session.LoadedNames[data->session.HitboxCount].hitbox,name);
-    data->session.HitboxCount++;
+    strcpy(data->session.LoadedNames.hitbox[data->session.counter.hitbox],name);
+    data->session.counter.hitbox++;
 }
 
 void MQPlayerCreateBodyBox(DATA *data, int quem)
@@ -150,9 +150,9 @@ void MQPlayerCreateBodyBox(DATA *data, int quem)
     {
         snprintf(buffer,128,"%s%d",abinCoreReturnData("./data/models/playerhitbox.text", MQStrAddInt("name",i)),quem);
         snprintf(buffer0,128,"%s",abinCoreReturnData("./data/models/playerhitbox.text", MQStrAddInt("name",i)));
-        data->file.hitbox[data->session.HitboxCount] = GetModelBoundingBox(data->file.model[MQFindModelByName(*data,buffer0)]);
-        strcpy(data->session.LoadedNames[data->session.HitboxCount].hitbox,buffer);
-        data->session.HitboxCount++;
+        data->file.hitbox[data->session.counter.hitbox] = GetModelBoundingBox(data->file.model[MQFindModelByName(*data,buffer0)]);
+        strcpy(data->session.LoadedNames.hitbox[data->session.counter.hitbox],buffer);
+        data->session.counter.hitbox++;
     } 
     
 }
@@ -176,7 +176,7 @@ void MQPlayerUpdateBodyBox(DATA *data, int quem, int qualAnim)
         snprintf(buffer,128,"player%d",quem);
         snprintf(ABINCACHE16,16,"hitbox%d",hitboxheadfind);
         snprintf(ABINCACHE16,16,"model%d",modelheadfind);
-        LocalMesh = MQApplyMeshTransformFromBone(data->file.model[modelIndex], data->file.anim[modelIndex][qualAnim], data->session.render.model[MQFindRenderModelIndexByID(*data,buffer)].currentFrame);
+        LocalMesh = MQApplyMeshTransformFromBone(data->file.model[modelIndex], data->file.anim[modelIndex][qualAnim], data->session.render.model[MQFindRenderModelIndexByName(*data,buffer)].currentFrame);
         
 
         for(int i = 0; i < LocalMesh.vertexCount * 3; i += 3)
