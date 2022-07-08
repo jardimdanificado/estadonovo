@@ -48,15 +48,15 @@ void MQCleanAllEventSlots(DATA *data)
     for(int i = 0;i<MAXOBJ;i++)
     { 
         data->session.event[i].name = " ";
-        data->session.event[i].eventboxIndex = MQTRUE;
+        data->session.event[i].originEventbox = (BoundingBox){(Vector3){0,0,0},(Vector3){0,0,0}};
         data->session.event[i].eventFuncionIndex = MQTRUE;
-        data->session.event[i].position = (Vector3){MQTRUE,MQTRUE,MQTRUE};
-        data->session.event[i].rotation = MQTRUE;
+        data->session.event[i].position = (Vector3){0,0,0};
+        data->session.event[i].rotation = 0;
         data->session.event[i].active = false;
     }
 }
 
-void MQAddEventToQueue(DATA *data, char*name, int functionIndex, int eventboxIndex, Vector3 position, float rotation, bool active)
+void MQAddEventToQueue(DATA *data, char*name, int functionIndex, BoundingBox originEventbox, Vector3 position, float rotation, bool active)
 {
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
@@ -68,7 +68,7 @@ void MQAddEventToQueue(DATA *data, char*name, int functionIndex, int eventboxInd
         }
     }
     data->session.event[LocalIndex].name = name;
-    data->session.event[LocalIndex].eventboxIndex = eventboxIndex;
+    data->session.event[LocalIndex].originEventbox = originEventbox;
     data->session.event[LocalIndex].eventFuncionIndex = functionIndex;
     data->session.event[LocalIndex].position = position;
     data->session.event[LocalIndex].rotation = rotation;
@@ -79,7 +79,7 @@ int MQFindEventIndexByName(DATA data, char* name)
 {
     for(int i = 0;i<MAXOBJ;i++)
     {
-        if(strcmp(MQEventNames[i] , name)==0)
+        if(strcmp(data.session.event[i].name , name)==0)
         {
             return i;
         }

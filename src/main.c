@@ -40,21 +40,19 @@ int main(void)
     
     data.file.eventbox[data.session.counter.eventbox].min = (Vector3){-0.5,0,-0.5};
     data.file.eventbox[data.session.counter.eventbox].max = (Vector3){0.5,2,1};
-    MQCreateEventbox(&data, "playeruse0",data.file.eventbox[data.session.counter.eventbox]);
-    MQAddEventToQueue(&data,"playeruse0",MQTRUE,MQFindEventboxIndexByName(data,"playeruse0"),(Vector3){0,0,0},0,true);
+    MQCreateEventbox(&data, "playeruse",data.file.eventbox[data.session.counter.eventbox]);
+    MQAddEventToQueue(&data,"playeruse0",MQTRUE,data.file.eventbox[MQFindEventboxIndexByName(data,"playeruse")],(Vector3){0,0,0},0,true);
+
     while(!WindowShouldClose() && !MQEXIT)
     {
-        data.session.render.camera.target = (Vector3)
-        {
-            data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.x, data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.y, data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.z
-        };
+        data.session.render.camera.target = (Vector3){data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.x, data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.y, data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.z};
         data.session.frame++;
         UpdateCamera(&data.session.render.camera);
 
 
         data.session.render.model[MQFindRenderModelIndexByName(data,"player0")].position = data.game.personagem[0].posicao;
         data.session.render.model[MQFindRenderModelIndexByName(data,"player0")].rotation = data.game.personagem[0].rotacao;
-        
+        data.session.event[MQFindEventIndexByName(data,"playeruse0")].position = data.game.personagem[0].posicao;
 
         TECLADO_MAIN(&data);
         MQPlayerUpdateBodyBox( &data, 0, data.session.render.model[MQFindRenderModelIndexByName(data,"player0")].currentAnim);

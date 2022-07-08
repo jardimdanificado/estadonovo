@@ -139,8 +139,8 @@ typedef struct DATA_SESSION_COUNTERS DATA_SESSION_COUNTERS;
 struct DATA_SESSION_EVENT
 {
     bool active;
-    int eventboxIndex;
     int eventFuncionIndex;
+    BoundingBox originEventbox;
     Vector3 position;
     float rotation;
     char *name;

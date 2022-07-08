@@ -126,6 +126,7 @@ void MQRenderQueue(DATA* data)
     for(int i=0;i<MAXOBJ;i++)
     {
         DrawBoundingBox(data->file.hitbox[i],BLACK);
+        DrawBoundingBox(MQHitboxUpdateXYZ(data->session.event[i].originEventbox, data->session.event[i].position),BLACK);
         if(data->session.render.model[i].modelIndex != __INT_MAX__)
         {
             if(data->session.render.model[i].playing == true)
