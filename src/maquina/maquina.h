@@ -221,4 +221,3 @@ struct MQDATA
 typedef struct MQDATA MQDATA;
 
 #include "maquina.c"
-#include "../event.c"

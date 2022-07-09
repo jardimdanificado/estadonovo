@@ -1,19 +1,3 @@
-void MQRenderLogo(MQDATA data,char* title,char* subtitle,int frame)
-{
-/*     DrawTextEx(data.files.fonts[1], title, (Vector2){(GetScreenWidth() / 2) - 157,8}, data.files.fonts[1].font.baseSize, 0, COR_LARANJA);*/
-    for(int i = 1; i<(GetScreenHeight()/data.files.fonts[1].font.baseSize)-1;i++)
-    {
-        if((frame+(i*i*i))%133>=0&&(frame+(i*i*i))%141<i)
-            DrawTextEx(data.files.fonts[1].font, title, (Vector2){(GetScreenWidth() / 2) - 157, (data.files.fonts[1].font.baseSize*i)-16}, data.files.fonts[1].font.baseSize, 0, COR_LARANJA);
-        else
-            DrawTextEx(data.files.fonts[1].font, title, (Vector2){(GetScreenWidth() / 2) - 157, (data.files.fonts[1].font.baseSize*i)-16}, data.files.fonts[1].font.baseSize, 0, COR_CINZA);
-    }
-    if(frame%84>=0&&frame%120<1)
-        DrawTextEx(data.files.fonts[2].font, subtitle, (Vector2){(GetScreenWidth() / 2) - 150 , GetScreenHeight()-(data.files.fonts[2].font.baseSize+(data.files.fonts[2].font.baseSize/2))}, data.files.fonts[2].font.baseSize, 0, COR_LARANJA);
-    else
-        DrawTextEx(data.files.fonts[2].font, subtitle, (Vector2){(GetScreenWidth() / 2) - 150 , GetScreenHeight()-(data.files.fonts[2].font.baseSize+(data.files.fonts[2].font.baseSize/2))}, data.files.fonts[2].font.baseSize, 0, COR_CINZA);
-}
-
 int MQMenuQuestions(MQDATA *data, int menu, int opcao )
 {
     switch (menu)
@@ -75,57 +59,22 @@ int MQMenuQuestions(MQDATA *data, int menu, int opcao )
                 break;
             }
         break;
-/*         case 3:
-            switch (opcao)
-            {
-                case 0:
-                {
-                    
-                }
-                break;
-                case 1:
-                {
-                    
-                }
-                break;
-                case 2:
-                {
-                    
-                }
-                break;
-                case 3:
-                {
-                    
-                }
-                break;
-            }
-        break; */
-        default:
-            switch (opcao)
-            {
-                case 0:
-                {
-                    
-                }
-                break;
-                case 1:
-                {
-                    
-                }
-                break;
-                case 2:
-                {
-                    
-                }
-                break;
-                case 3:
-                {
-                    
-                }
-                break;
-            }
-        break;
     }
+}
+
+void MQRenderLogo(MQDATA data,char* title,char* subtitle,int frame)
+{
+    for(int i = 1; i<(GetScreenHeight()/data.files.fonts[1].font.baseSize)-1;i++)
+    {
+        if((frame+(i*i*i))%133>=0&&(frame+(i*i*i))%141<i)
+            DrawTextEx(data.files.fonts[1].font, title, (Vector2){(GetScreenWidth() / 2) - 157, (data.files.fonts[1].font.baseSize*i)-16}, data.files.fonts[1].font.baseSize, 0, COR_LARANJA);
+        else
+            DrawTextEx(data.files.fonts[1].font, title, (Vector2){(GetScreenWidth() / 2) - 157, (data.files.fonts[1].font.baseSize*i)-16}, data.files.fonts[1].font.baseSize, 0, COR_CINZA);
+    }
+    if(frame%84>=0&&frame%120<1)
+        DrawTextEx(data.files.fonts[2].font, subtitle, (Vector2){(GetScreenWidth() / 2) - 150 , GetScreenHeight()-(data.files.fonts[2].font.baseSize+(data.files.fonts[2].font.baseSize/2))}, data.files.fonts[2].font.baseSize, 0, COR_LARANJA);
+    else
+        DrawTextEx(data.files.fonts[2].font, subtitle, (Vector2){(GetScreenWidth() / 2) - 150 , GetScreenHeight()-(data.files.fonts[2].font.baseSize+(data.files.fonts[2].font.baseSize/2))}, data.files.fonts[2].font.baseSize, 0, COR_CINZA);
 }
 
 void MQMenuRender(MQDATA data, int max, int opt ,char quotes[][255])

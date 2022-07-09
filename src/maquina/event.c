@@ -15,12 +15,8 @@ float event2(MQDATA* data, float b)
     return 0;
 }
 
-EVENTFUNC MQEventFuntions[3] = {&event0,&event1,&event2};
+EVENTFUNC MQEventFunctions[3] = {&event0,&event1,&event2};
 char *MQEventNames[3] = {"evento0","evento1","evento2"};
-
-//-----------------------------------------------------
-//EVENTS MANIPULATION
-//-----------------------------------------------------
 
 void MQCreateEventbox(MQDATA *data, char *name, BoundingBox Hitbox)
 {
@@ -115,6 +111,3 @@ int MQFindEventIndexByName(MQDATA data, char* name)
     return -1;
 }
 
-/* typedef float (*event)(MQDATA*, float); */                 //declare typdef
-
-/* event func[3] = {&event0, &event1, &event2}; */
