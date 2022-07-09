@@ -187,15 +187,19 @@ struct MQDATA_EVENTBOX_SLOT
 };
 typedef struct MQDATA_EVENTBOX_SLOT MQDATA_EVENTBOX_SLOT;
 
+struct MQDATA_QUEUE_ITEM
+{
+    char name[128];
+    char type[16];
+    int index;
+    float content;
+    bool active;
+};
+typedef struct MQDATA_QUEUE_ITEM MQDATA_QUEUE_ITEM;
+
 struct MQDATA_QUEUE_MAP
 {
-    bool active;
-    bool persistent;
-    int function;
-    BoundingBox hitbox;
-    Vector3 position;
-    float rotation;
-    char *name;
+    MQDATA_QUEUE_ITEM item[MAXOBJ];
 };
 typedef struct MQDATA_QUEUE_MAP MQDATA_QUEUE_MAP;
 

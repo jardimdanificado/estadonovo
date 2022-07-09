@@ -246,7 +246,7 @@ void MQPlayerUpdateBodyBox(MQDATA *data, int quem, int qualAnim)
     char buffer[128];
     snprintf(buffer,128,"player-cabeca%d",quem);
     int hitboxheadfind,modelheadfind; 
-    hitboxheadfind = MQFindHitboxByName(*data,buffer);
+    hitboxheadfind = MQFindHitbox(*data,buffer);
     modelheadfind = MQFindModelByName(*data,"player-cabeca");
     for(int i = 0; i < 14; i++)
     {
@@ -255,7 +255,7 @@ void MQPlayerUpdateBodyBox(MQDATA *data, int quem, int qualAnim)
         snprintf(buffer,128,"player%d",quem);
         /* abinDEBUGint("debug.txt",modelIndex); */
         /* abinDEBUGint("debug.txt",hitboxIndex); */
-        LocalMesh = MQApplyMeshTransformFromBone(data->files.models[modelIndex].model, data->files.models[modelIndex].anim[qualAnim], data->queue.render.model[MQFindRenderModelIndexByName(*data,buffer)].currentFrame);
+        LocalMesh = MQApplyMeshTransformFromBone(data->files.models[modelIndex].model, data->files.models[modelIndex].anim[qualAnim], data->queue.render.model[MQFindRenderModel(*data,buffer)].currentFrame);
         
 
         for(int i = 0; i < LocalMesh.vertexCount * 3; i += 3)

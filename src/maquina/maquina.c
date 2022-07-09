@@ -158,7 +158,7 @@ void MQResetAllFileSlots(MQDATA* data)
 //FIND
 //-----------------------------------
 
-int MQFindHitboxByName(MQDATA data, char* name)
+int MQFindHitbox(MQDATA data, char* name)
 {
     for(int i = 0; i < MAXOBJ; i++)
     {
@@ -179,7 +179,7 @@ int MQFindModelByName(MQDATA data, char* name)
     return -1;
 }
 
-int MQFindRenderModelIndexByName(MQDATA data, char* name)
+int MQFindRenderModel(MQDATA data, char* name)
 {
     for(int i = 0;i<MAXOBJ;i++)
     {
@@ -238,10 +238,55 @@ Vector3 MQRotateVertice(Vector3 pivot, float angle, Vector3 vertice)
 #include "player.c"
 
 //-----------------------------------
-//AI
+//ITEM
 //-----------------------------------
 
-//#include "ai.c"
+void MQCleanAllItemSlots(MQDATA_QUEUE_ITEM* itemTree[])
+{
+    for (short int i = 0; i < MAXOBJ; i++)
+    {
+        strcpy(itemTree[i]->name," ");
+        strcpy(itemTree[i]->type," ");
+        itemTree[i]->index = MQTRUE;
+        itemTree[i]->content = MQTRUE;
+        itemTree[i]->active = false;
+    }
+}
+
+void MQAddItemToQueue(MQDATA_QUEUE_ITEM* itemTree[], char*name, char*type, int index, float content, bool active)
+{
+    int LocalIndex;
+    for(int i = 0;i<MAXOBJ;i++)
+    {
+        if(strcmp(itemTree[i]->name," ")==0)
+        {
+            LocalIndex = i;
+            break;
+        }
+    }
+    strcpy(itemTree[LocalIndex]->name,name);
+    strcpy(itemTree[LocalIndex]->type,type);
+    itemTree[LocalIndex]->index = index;
+    itemTree[LocalIndex]->content = content;
+}
+
+int MQFindItem(MQDATA_QUEUE_ITEM itemTree[], char* name)
+{
+    for(int i = 0;i<MAXOBJ;i++)
+    {
+        if(strcmp(itemTree[i].name , name)==0)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void MQDeleteEvent(MQDATA_QUEUE_ITEM* item)
+{
+    strcpy(item->name," ");
+    item->active = false;
+}
 
 //-----------------------------------
 //COLISION

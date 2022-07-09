@@ -49,7 +49,7 @@ void MQCreateEmptyEventbox(MQDATA *data, char *name)
     LocalIndex++;
 }
 
-int MQFindEventboxIndexByName(MQDATA data, char* name)
+int MQFindEventbox(MQDATA data, char* name)
 {
     for(int i = 0;i<MAXOBJ;i++)
     {
@@ -71,10 +71,11 @@ void MQCleanAllEventSlots(MQDATA *data)
         data->queue.event[i].position = (Vector3){0,0,0};
         data->queue.event[i].rotation = 0;
         data->queue.event[i].active = false;
+        data->queue.event[i].persistent = false;
     }
 }
 
-void MQAddEventToQueue(MQDATA *data, char*name, int functionIndex, BoundingBox hitbox, Vector3 position, float rotation, bool active)
+void MQAddEventToQueue(MQDATA *data, char*name, int functionIndex, BoundingBox hitbox, Vector3 position, float rotation, bool active, bool persistent)
 {
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
@@ -91,15 +92,17 @@ void MQAddEventToQueue(MQDATA *data, char*name, int functionIndex, BoundingBox h
     data->queue.event[LocalIndex].position = position;
     data->queue.event[LocalIndex].rotation = rotation;
     data->queue.event[LocalIndex].active = active;
+    data->queue.event[LocalIndex].persistent = persistent;
 }
 
 void MQDeleteEvent(MQDATA* data, int index)
 {
     data->queue.event[index].name = " ";
     data->queue.event[index].active = false;
+    data->queue.event[index].persistent = false;
 }
 
-int MQFindEventIndexByName(MQDATA data, char* name)
+int MQFindEvent(MQDATA data, char* name)
 {
     for(int i = 0;i<MAXOBJ;i++)
     {

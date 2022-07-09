@@ -85,7 +85,7 @@ Vector3 MQCheckWall(MQDATA data, char *hitboxID,float LocalRotation)
             break;
         }
     }
-    int hitboxIndex = MQFindHitboxByName(data, hitboxID);
+    int hitboxIndex = MQFindHitbox(data, hitboxID);
     BoundingBox hitboxLocal = data.files.hitboxes[hitboxIndex].hitbox;
     
     for(int i = 0; i < hitboxMax; i++)
