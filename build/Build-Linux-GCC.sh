@@ -4,7 +4,7 @@ current_time=$(date "+%Y-%m-%d-%H:%M:%S")
 
 mkdir ../../BUILD/EstadoNovo_$current_time/
 
-gcc ../src/main.c -o ../../BUILD/EstadoNovo_$current_time/1964.AppImage -lGL -L./libs/linux64/ -l:libraylib.a -lm -lpthread -ldl -lrt -lX11&&chmod +x ../../BUILD/EstadoNovo_$current_time/1964.AppImage
+gcc ../src/main.c -o ../../BUILD/EstadoNovo_$current_time/estadonovo -lGL -L./libs/linux64/ -l:libraylib.a -lm -lpthread -ldl -lrt -lX11&&chmod +x ../../BUILD/EstadoNovo_$current_time/estadonovo
 
 cp -r ../src/data/ ../../BUILD/EstadoNovo_$current_time/
 

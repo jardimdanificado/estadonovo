@@ -1,12 +1,5 @@
+cp -r ../src/data/ ./EstadoNovo
 
-#!/bin/bash
-current_time=$(date "+%Y-%m-%d-%H:%M:%S")
+cp ../credits.text ./EstadoNovo
 
-mkdir ./EstadoNovo/
-
-cp -r ../data/ ./EstadoNovo/
-
-cp ../credits.text ./EstadoNovo/
-
-cp ../1964/config.text ./EstadoNovo/
-
+cp ../src/config.text ./EstadoNovo

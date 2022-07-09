@@ -1,4 +1,4 @@
 #!/bin/bash
 
 
-xfce4-terminal -e "gdb -ex run ./1964.AppImage"
+xfce4-terminal -e "gdb -ex run ./estadonovo"
