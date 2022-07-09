@@ -1,4 +1,4 @@
-void MQCleanAllRenderSlots(DATA *data)
+void MQCleanAllRenderSlots(MQDATA *data)
 {
     for(int i = 0;i<MAXOBJ;i++)
     { 
@@ -29,7 +29,7 @@ void MQCleanAllRenderSlots(DATA *data)
     }
 }
 
-void MQCleanAllRenderModelSlots(DATA *data)
+void MQCleanAllRenderModelSlots(MQDATA *data)
 {
     for(int i = 0;i<MAXOBJ;i++)
     { 
@@ -49,7 +49,7 @@ void MQCleanAllRenderModelSlots(DATA *data)
     }
 }
 
-void MQCleanAllRenderTextSlots(DATA *data)
+void MQCleanAllRenderTextSlots(MQDATA *data)
 {
     for(int i = 0;i<MAXOBJ;i++)
     { 
@@ -67,7 +67,7 @@ void MQCleanAllRenderTextSlots(DATA *data)
     }
 }
 
-void MQRenderAddModelToQueue(DATA *data, char* name, int modelIndex, Color color, Vector3 position, float rotation, int currentAnim, int currentFrame, bool visible, bool playing, bool reverse)
+void MQRenderAddModelToQueue(MQDATA *data, char* name, int modelIndex, Color color, Vector3 position, float rotation, int currentAnim, int currentFrame, bool visible, bool playing, bool reverse)
 {
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
@@ -93,7 +93,7 @@ void MQRenderAddModelToQueue(DATA *data, char* name, int modelIndex, Color color
     data->queue.render.model[LocalIndex].reverse = reverse;
 }
 
-void MQRenderAddTextToQueue(DATA *data,char* name, int textIndex, Color color, Vector2 position, int fontIndex, int fontSize, char* string, bool visible)
+void MQRenderAddTextToQueue(MQDATA *data,char* name, int textIndex, Color color, Vector2 position, int fontIndex, int fontSize, char* string, bool visible)
 {
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
@@ -117,7 +117,7 @@ void MQRenderAddTextToQueue(DATA *data,char* name, int textIndex, Color color, V
     data->queue.render.text[LocalIndex].string = string;
 }
 
-void MQRenderQueue(DATA* data)
+void MQRenderQueue(MQDATA* data)
 {
     
     BeginDrawing();
@@ -125,14 +125,14 @@ void MQRenderQueue(DATA* data)
     BeginMode3D(data->queue.render.camera);
     for(int i=0;i<MAXOBJ;i++)
     {
-        DrawBoundingBox(data->file.hitbox[i],BLACK);
-        DrawBoundingBox(MQHitboxUpdateXYZ(data->queue.event[i].originEventbox, data->queue.event[i].position),GREEN);
+        DrawBoundingBox(data->files.hitboxes[i].hitbox,BLACK);
+        DrawBoundingBox(MQHitboxUpdateXYZ(data->queue.event[i].hitbox, data->queue.event[i].position),GREEN);
         if(data->queue.render.model[i].modelIndex != __INT_MAX__)
         {
             if(data->queue.render.model[i].playing == true)
             {
                 if(data->queue.render.model[i].reverse == false)
-                    if(data->queue.render.model[i].currentFrame < data->file.anim[data->queue.render.model[i].modelIndex][data->queue.render.model[i].currentAnim].frameCount)
+                    if(data->queue.render.model[i].currentFrame < data->files.models[data->queue.render.model[i].modelIndex].anim[data->queue.render.model[i].currentAnim].frameCount)
                         data->queue.render.model[i].currentFrame++;
                     else
                         data->queue.render.model[i].currentFrame = 0;
@@ -140,14 +140,14 @@ void MQRenderQueue(DATA* data)
                     if(data->queue.render.model[i].currentFrame > 0)
                         data->queue.render.model[i].currentFrame--;
                     else
-                        data->queue.render.model[i].currentFrame = data->file.anim[data->queue.render.model[i].modelIndex][data->queue.render.model[i].currentAnim].frameCount;
-                UpdateModelAnimation(data->file.model[data->queue.render.model[i].modelIndex], data->file.anim[data->queue.render.model[i].modelIndex][data->queue.render.model[i].currentAnim], data->queue.render.model[i].currentFrame);
+                        data->queue.render.model[i].currentFrame = data->files.models[data->queue.render.model[i].modelIndex].anim[data->queue.render.model[i].currentAnim].frameCount;
+                UpdateModelAnimation(data->files.models[data->queue.render.model[i].modelIndex].model, data->files.models[data->queue.render.model[i].modelIndex].anim[data->queue.render.model[i].currentAnim], data->queue.render.model[i].currentFrame);
             }
-            DrawModelEx(data->file.model[data->queue.render.model[i].modelIndex], data->queue.render.model[i].position, (Vector3){0.0f, 1.0f, 0.0f}, data->queue.render.model[i].rotation , (Vector3){1.0f, 1.0f, 1.0f}, data->queue.render.model[i].color);
+            DrawModelEx(data->files.models[data->queue.render.model[i].modelIndex].model, data->queue.render.model[i].position, (Vector3){0.0f, 1.0f, 0.0f}, data->queue.render.model[i].rotation , (Vector3){1.0f, 1.0f, 1.0f}, data->queue.render.model[i].color);
         }
         if(data->queue.render.text[i].textIndex != __INT_MAX__)
         {
-            DrawTextEx(data->file.font[data->queue.render.text[i].fontIndex], data->queue.render.text[i].string,data->queue.render.text[i].position , data->queue.render.text[i].fontSize, 0, data->queue.render.text[i].color);
+            DrawTextEx(data->files.fonts[data->queue.render.text[i].fontIndex].font, data->queue.render.text[i].string,data->queue.render.text[i].position , data->queue.render.text[i].fontSize, 0, data->queue.render.text[i].color);
         }
     }
     EndMode3D();

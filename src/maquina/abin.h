@@ -1,6 +1,5 @@
 bool AbinGlobalIsDebug = false;
 
-//ABINary DATA
 char ABINCACHE4[4];
 char ABINCACHE8[8];
 char ABINCACHE16[16];

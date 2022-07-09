@@ -47,76 +47,96 @@ bool MQEXIT = false;
 //DATA_GAME
 //-----------------------------------
 
-struct DATA_MAPA
+struct MQDATA_PLAYER
 {
     float velocidade;
     int tempoGravit;
     Vector3 posicao;
     float rotacao;
 };
-typedef struct DATA_MAPA DATA_MAPA;
+typedef struct MQDATA_PLAYER MQDATA_PLAYER;
 
-struct DATA_PLAYER
+struct MQDATA_GAME
 {
-    float velocidade;
-    int tempoGravit;
-    Vector3 posicao;
-    float rotacao;
+    MQDATA_PLAYER personagem[MAXOBJ];
 };
-typedef struct DATA_PLAYER DATA_PLAYER;
-
-struct DATA_GAME
-{
-    DATA_PLAYER personagem[MAXOBJ];
-};
-typedef struct DATA_GAME DATA_GAME;
+typedef struct MQDATA_GAME MQDATA_GAME;
 
 //-----------------------------------
 //DATA_FILE
 //-----------------------------------
 
-struct DATA_FILES
+struct MQDATA_FILE_MODEL
 {
-    Model model[MAXOBJ];
-    BoundingBox hitbox[MAXOBJ];
-    BoundingBox eventbox[MAXOBJ];
-    Font font[MAXOBJ];
-    char text[MAXOBJ][255];
-    char lang[MAXOBJ][255];
-    ModelAnimation *anim[MAXOBJ];
-    Music audio[MAXOBJ];
+    Model model;
+    ModelAnimation *anim;
+    char name[255];
 };
-typedef struct DATA_FILES DATA_FILES;
+typedef struct MQDATA_FILE_MODEL MQDATA_FILE_MODEL;
+
+struct MQDATA_FILE_HITBOX
+{
+    BoundingBox hitbox;
+    char name[255];
+};
+typedef struct MQDATA_FILE_HITBOX MQDATA_FILE_HITBOX;
+
+struct MQDATA_FILE_FONT
+{
+    Font font;
+    char name[255];
+};
+typedef struct MQDATA_FILE_FONT MQDATA_FILE_FONT;
+
+struct MQDATA_FILE_TEXT
+{
+    char text[255];
+    char name[255];
+};
+typedef struct MQDATA_FILE_TEXT MQDATA_FILE_TEXT;
+
+struct MQDATA_FILE_MUSIC
+{
+    Music music;
+    char name[255];
+};
+typedef struct MQDATA_FILE_MUSIC MQDATA_FILE_MUSIC;
+
+struct MQDATA_FILE_SOUND
+{
+    Sound sound;
+    char name[255];
+};
+typedef struct MQDATA_FILE_SOUND MQDATA_FILE_SOUND;
+
+struct MQDATA_FILES
+{
+    MQDATA_FILE_MODEL models[MAXOBJ];
+    MQDATA_FILE_HITBOX hitboxes[MAXOBJ];
+    MQDATA_FILE_HITBOX eventboxes[MAXOBJ];
+    MQDATA_FILE_FONT fonts[MAXOBJ];
+    MQDATA_FILE_TEXT texts[MAXOBJ];
+    MQDATA_FILE_TEXT langs[MAXOBJ];
+    MQDATA_FILE_MUSIC musics[MAXOBJ];
+    MQDATA_FILE_SOUND sounds[MAXOBJ];
+};
+typedef struct MQDATA_FILES MQDATA_FILES;
 
 //-----------------------------------
 //DATA_SESSION
 //-----------------------------------
 
-struct DATA_SESSION_LOADEDFILENAMES
-{
-    char model[MAXOBJ][255],hitbox[MAXOBJ][255],text[MAXOBJ][255],eventbox[MAXOBJ][255];
-};
-typedef struct DATA_SESSION_LOADEDFILENAMES DATA_SESSION_LOADEDFILENAMES;
-
-struct DATA_SESSION_COUNTERS
-{
-     int model, hitbox, text, lang, eventbox;
-};
-typedef struct DATA_SESSION_COUNTERS DATA_SESSION_COUNTERS;
-
-struct DATA_SESSION
+struct MQDATA_SESSION
 {
     long int frame;
-    DATA_SESSION_COUNTERS counter;
-    DATA_SESSION_LOADEDFILENAMES LoadedFilenames;
 };
-typedef struct DATA_SESSION DATA_SESSION;
+typedef struct MQDATA_SESSION MQDATA_SESSION;
 
 //-----------------------------------
 //DATA_QUEUE_RENDER
 //-----------------------------------
 
-struct DATA_RENDER_MODEL
+struct MQDATA_RENDER_MODEL
 {
     bool visible, playing, reverse;
     int modelIndex;
@@ -127,9 +147,9 @@ struct DATA_RENDER_MODEL
     float rotation;
     char *name;
 };
-typedef struct DATA_RENDER_MODEL DATA_RENDER_MODEL;
+typedef struct MQDATA_RENDER_MODEL MQDATA_RENDER_MODEL;
 
-struct DATA_RENDER_TEXT
+struct MQDATA_RENDER_TEXT
 {
     bool visible;
     int textIndex;
@@ -140,52 +160,65 @@ struct DATA_RENDER_TEXT
     int fontIndex;
     char *name;
 };
-typedef struct DATA_RENDER_TEXT DATA_RENDER_TEXT;
+typedef struct MQDATA_RENDER_TEXT MQDATA_RENDER_TEXT;
 
 //-----------------------------------
 //DATA_QUEUE
 //-----------------------------------
 
-struct DATA_QUEUE_RENDER
+struct MQDATA_QUEUE_RENDER
 {
-    DATA_RENDER_MODEL model[MAXOBJ];
-    DATA_RENDER_TEXT text[MAXOBJ];
+    MQDATA_RENDER_MODEL model[MAXOBJ];
+    MQDATA_RENDER_TEXT text[MAXOBJ];
     Color background;
     Camera camera;
 };
-typedef struct DATA_QUEUE_RENDER DATA_QUEUE_RENDER;
+typedef struct MQDATA_QUEUE_RENDER MQDATA_QUEUE_RENDER;
 
-struct DATA_QUEUE_EVENT
+struct MQDATA_EVENTBOX_SLOT
 {
     bool active;
     bool persistent;
-    int eventFuncionIndex;
-    BoundingBox originEventbox;
+    int function;
+    BoundingBox hitbox;
     Vector3 position;
     float rotation;
     char *name;
 };
-typedef struct DATA_QUEUE_EVENT DATA_QUEUE_EVENT;
+typedef struct MQDATA_EVENTBOX_SLOT MQDATA_EVENTBOX_SLOT;
 
-struct DATA_QUEUE
+struct MQDATA_QUEUE_MAP
 {
-    DATA_QUEUE_RENDER render;
-    DATA_QUEUE_EVENT event[MAXOBJ];
+    bool active;
+    bool persistent;
+    int function;
+    BoundingBox hitbox;
+    Vector3 position;
+    float rotation;
+    char *name;
 };
-typedef struct DATA_QUEUE DATA_QUEUE;
+typedef struct MQDATA_QUEUE_MAP MQDATA_QUEUE_MAP;
+
+struct MQDATA_QUEUE
+{
+    MQDATA_QUEUE_RENDER render;
+    MQDATA_EVENTBOX_SLOT event[MAXOBJ];
+    MQDATA_QUEUE_MAP map;
+};
+typedef struct MQDATA_QUEUE MQDATA_QUEUE;
 
 //-----------------------------------
 //DATA
 //-----------------------------------
 
-struct DATA
+struct MQDATA
 {
-    DATA_GAME game;
-    DATA_FILES file;
-    DATA_SESSION session;
-    DATA_QUEUE queue;
+    MQDATA_GAME game;
+    MQDATA_FILES files;
+    MQDATA_SESSION session;
+    MQDATA_QUEUE queue;
 };
-typedef struct DATA DATA;
+typedef struct MQDATA MQDATA;
 
 #include "maquina.c"
 #include "../event.c"

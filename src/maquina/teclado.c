@@ -1,5 +1,5 @@
 
-void TECLADO_MAIN(DATA *data)
+void TECLADO_MAIN(MQDATA *data)
 {
     if(IsKeyPressed(KEY_ESCAPE))
     {

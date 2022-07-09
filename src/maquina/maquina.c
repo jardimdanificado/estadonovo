@@ -72,8 +72,17 @@ char *MQStrAddInt(char* string, int value)
     return string;
 }
 
-void MQLoadLang(DATA* data, char lang[4])
+void MQLoadLang(MQDATA* data, char lang[4])
 {
+    int LocalIndex;
+    for(int i = 0;i<MAXOBJ;i++)
+    {
+        if(strcmp(data->files.langs[i].name," ")==0)
+        {
+            LocalIndex = i;
+            break;
+        }
+    }
     remove("./data/temp/lang");
     char buffer[27];
     snprintf(buffer,27,"./data/lang/%s/text.text",lang);
@@ -81,8 +90,9 @@ void MQLoadLang(DATA* data, char lang[4])
     for(int i = 0; i <atoi(abinCoreReturnData("./data/temp/lang","SIZE"));i++)
     {
         snprintf(buffer,4,"%d",i);
-        strcpy(data->file.lang[data->session.counter.lang],abinCoreReturnData("./data/temp/lang",buffer));
-        data->session.counter.lang++;
+        strcpy(data->files.langs[LocalIndex].text,abinCoreReturnData("./data/temp/lang",buffer));
+        strcpy(data->files.langs[LocalIndex].name,"sem-nome");
+        LocalIndex++;
     }
 }
 
@@ -126,30 +136,50 @@ Font MQFontStart(char *FontLoc, int FontSize)
 }
 
 //-----------------------------------
+//FILES
+//-----------------------------------
+
+void MQResetAllFileSlots(MQDATA* data)
+{
+    for(int i = 0; i < MAXOBJ; i++)
+    {
+        strcpy(data->files.eventboxes[i].name," ");
+        strcpy(data->files.fonts[i].name," ");
+        strcpy(data->files.hitboxes[i].name," ");
+        strcpy(data->files.langs[i].name," ");
+        strcpy(data->files.models[i].name," ");
+        strcpy(data->files.musics[i].name," ");
+        strcpy(data->files.sounds[i].name," ");
+        strcpy(data->files.texts[i].name," ");
+    }
+}
+
+//-----------------------------------
 //FIND
 //-----------------------------------
 
-int MQFindHitboxByName(DATA data, char* name)
+int MQFindHitboxByName(MQDATA data, char* name)
 {
     for(int i = 0; i < MAXOBJ; i++)
     {
-        if(strcmp(data.session.LoadedFilenames.hitbox[i],name)==0)
+        if(strcmp(data.files.hitboxes[i].name,name)==0)
             return i;
     }
     return -1;
 }
 
-int MQFindModelByName(DATA data, char* name)
+int MQFindModelByName(MQDATA data, char* name)
 {
     for(int i = 0; i < MAXOBJ; i++)
     {
-        if(strcmp(data.session.LoadedFilenames.model[i],name)==0)
+        /* abinDEBUGtext("debug.txt",data.files.models[i].name); */
+        if(strcmp(data.files.models[i].name,name)==0)
             return i;
     }
     return -1;
 }
 
-int MQFindRenderModelIndexByName(DATA data, char* name)
+int MQFindRenderModelIndexByName(MQDATA data, char* name)
 {
     for(int i = 0;i<MAXOBJ;i++)
     {
@@ -161,7 +191,7 @@ int MQFindRenderModelIndexByName(DATA data, char* name)
     return -1;
 }
 
-int MQFindRenderTextIndexByName(DATA data, char* name)
+int MQFindRenderTextIndexByName(MQDATA data, char* name)
 {
     for(int i = 0;i<MAXOBJ;i++)
     {
@@ -222,7 +252,7 @@ float MQGravity(Vector3 posicao, float gravidade, int tempo)
     return(posicao.y - gravidade*((tempo*(tempo/5)))/60);
 }
 
-void MQGravit(DATA* data, int quem)
+void MQGravit(MQDATA* data, int quem)
 {
     if(MQReturnYMaxCollisionPoint(*data, data->game.personagem[quem].posicao) == MQFALSE)
     {
@@ -261,28 +291,22 @@ Camera MQCameraStart(Camera *camera)
 }
 
 //-----------------------------------
-//DOORS
-//-----------------------------------
-
-/* #include "door.c" */
-
-//-----------------------------------
 //SAVE
 //-----------------------------------
 
-void MQLoadGame(DATA *data)
+void MQLoadGame(MQDATA *data)
 {
     FILE *file;
     file = fopen("data/save/savegame", "r+b");
-    fread(&data->game, sizeof(struct DATA_GAME), 1, file);
+    fread(&data->game, sizeof(struct MQDATA_GAME), 1, file);
     fclose(file);
 }
 
-void MQSaveGame(DATA data)
+void MQSaveGame(MQDATA data)
 {
     remove("data/save/savegame");
     FILE *file = fopen("data/save/savegame", "w+b");
-    fwrite(&data.game, sizeof(struct DATA_GAME), 1, file);
+    fwrite(&data.game, sizeof(struct MQDATA_GAME), 1, file);
     fclose(file);
 }
 

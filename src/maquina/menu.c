@@ -1,20 +1,20 @@
-void MQRenderLogo(DATA data,char* title,char* subtitle,int frame)
+void MQRenderLogo(MQDATA data,char* title,char* subtitle,int frame)
 {
-/*     DrawTextEx(data.file.font[1], title, (Vector2){(GetScreenWidth() / 2) - 157,8}, data.file.font[1].baseSize, 0, COR_LARANJA);*/
-    for(int i = 1; i<(GetScreenHeight()/data.file.font[1].baseSize)-1;i++)
+/*     DrawTextEx(data.files.fonts[1], title, (Vector2){(GetScreenWidth() / 2) - 157,8}, data.files.fonts[1].font.baseSize, 0, COR_LARANJA);*/
+    for(int i = 1; i<(GetScreenHeight()/data.files.fonts[1].font.baseSize)-1;i++)
     {
         if((frame+(i*i*i))%133>=0&&(frame+(i*i*i))%141<i)
-            DrawTextEx(data.file.font[1], title, (Vector2){(GetScreenWidth() / 2) - 157, (data.file.font[1].baseSize*i)-16}, data.file.font[1].baseSize, 0, COR_LARANJA);
+            DrawTextEx(data.files.fonts[1].font, title, (Vector2){(GetScreenWidth() / 2) - 157, (data.files.fonts[1].font.baseSize*i)-16}, data.files.fonts[1].font.baseSize, 0, COR_LARANJA);
         else
-            DrawTextEx(data.file.font[1], title, (Vector2){(GetScreenWidth() / 2) - 157, (data.file.font[1].baseSize*i)-16}, data.file.font[1].baseSize, 0, COR_CINZA);
+            DrawTextEx(data.files.fonts[1].font, title, (Vector2){(GetScreenWidth() / 2) - 157, (data.files.fonts[1].font.baseSize*i)-16}, data.files.fonts[1].font.baseSize, 0, COR_CINZA);
     }
     if(frame%84>=0&&frame%120<1)
-        DrawTextEx(data.file.font[2], subtitle, (Vector2){(GetScreenWidth() / 2) - 150 , GetScreenHeight()-(data.file.font[2].baseSize+(data.file.font[2].baseSize/2))}, data.file.font[2].baseSize, 0, COR_LARANJA);
+        DrawTextEx(data.files.fonts[2].font, subtitle, (Vector2){(GetScreenWidth() / 2) - 150 , GetScreenHeight()-(data.files.fonts[2].font.baseSize+(data.files.fonts[2].font.baseSize/2))}, data.files.fonts[2].font.baseSize, 0, COR_LARANJA);
     else
-        DrawTextEx(data.file.font[2], subtitle, (Vector2){(GetScreenWidth() / 2) - 150 , GetScreenHeight()-(data.file.font[2].baseSize+(data.file.font[2].baseSize/2))}, data.file.font[2].baseSize, 0, COR_CINZA);
+        DrawTextEx(data.files.fonts[2].font, subtitle, (Vector2){(GetScreenWidth() / 2) - 150 , GetScreenHeight()-(data.files.fonts[2].font.baseSize+(data.files.fonts[2].font.baseSize/2))}, data.files.fonts[2].font.baseSize, 0, COR_CINZA);
 }
 
-int MQMenuQuestions(DATA *data, int menu, int opcao )
+int MQMenuQuestions(MQDATA *data, int menu, int opcao )
 {
     switch (menu)
     {
@@ -128,24 +128,24 @@ int MQMenuQuestions(DATA *data, int menu, int opcao )
     }
 }
 
-void MQMenuRender(DATA data, int max, int opt ,char quotes[][255])
+void MQMenuRender(MQDATA data, int max, int opt ,char quotes[][255])
 {
     BeginDrawing();
     ClearBackground(COR_BRANCO);
     for(int i = max-1; i >=0; i--)
     {
         if(i == opt)
-            DrawTextEx(data.file.font[0], quotes[i], (Vector2){0,(GetScreenHeight() - data.file.font[0].baseSize) - (data.file.font[0].baseSize * i)}, data.file.font[0].baseSize, 0, COR_SELECIONADO);
+            DrawTextEx(data.files.fonts[0].font, quotes[i], (Vector2){0,(GetScreenHeight() - data.files.fonts[0].font.baseSize) - (data.files.fonts[0].font.baseSize * i)}, data.files.fonts[0].font.baseSize, 0, COR_SELECIONADO);
         else
-            DrawTextEx(data.file.font[0], quotes[i], (Vector2){0,(GetScreenHeight() - data.file.font[0].baseSize) - (data.file.font[0].baseSize * i)}, data.file.font[0].baseSize, 0, COR_CINZA);
+            DrawTextEx(data.files.fonts[0].font, quotes[i], (Vector2){0,(GetScreenHeight() - data.files.fonts[0].font.baseSize) - (data.files.fonts[0].font.baseSize * i)}, data.files.fonts[0].font.baseSize, 0, COR_CINZA);
     }
     EndDrawing();
 }
 
 
-bool MQMenu(DATA *data, int menuIndex)
+bool MQMenu(MQDATA *data, int menuIndex)
 {
-    PlayMusicStream(data->file.audio[0]);
+    PlayMusicStream(data->files.musics[0].music);
     int allmax[] = {2,3,3,0,0};
     int langIndex[3][3] = {{0,1},{4,7,1},{4,2,3}};
 
@@ -157,11 +157,11 @@ bool MQMenu(DATA *data, int menuIndex)
     int localframe = 0;
     for(short int i = 0 ;i<allmax[menuIndex];i++)
     {
-        strcpy(quotes[i],data->file.lang[langIndex[menuIndex][i]]);
+        strcpy(quotes[i],data->files.langs[langIndex[menuIndex][i]].text);
     }
     while(menuIndex < MQTRUE&& menuIndex > MQFALSE)
     {
-        UpdateMusicStream(data->file.audio[0]);
+        UpdateMusicStream(data->files.musics[0].music);
         //RENDER
         MQRenderLogo(*data,title[0],title[1],localframe);
         MQMenuRender(*data,  allmax[menuIndex], optIndex, quotes );
@@ -195,7 +195,7 @@ bool MQMenu(DATA *data, int menuIndex)
             {
                 for(short int i = 0 ;i<allmax[menuIndex];i++)
                 {
-                    strcpy(quotes[i],data->file.lang[langIndex[menuIndex][i]]);
+                    strcpy(quotes[i],data->files.langs[langIndex[menuIndex][i]].text);
                 }
             }
         }

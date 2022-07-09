@@ -104,19 +104,28 @@ Mesh MQApplyMeshTransformFromBone(Model model, ModelAnimation anim, int frame)
     }
 }
 
-void MQLoadModelsFromText(DATA *data, char *fileloc)
+void MQLoadModelsFromText(MQDATA *data, char *fileloc)
 {
+    int LocalIndex;
+    for(int i = 0;i<MAXOBJ;i++)
+    {
+        if(strcmp(data->files.models[i].name," ")==0)
+        {
+            LocalIndex = i;
+            break;
+        }
+    }
     char buffer[128];
     for(int i = 0; i < atoi(abinCoreReturnData(fileloc, "SIZE")); i++)
     {
         strcpy(buffer,abinCoreReturnData(fileloc, MQStrAddInt("link",i)));
-        data->file.model[data->session.counter.model] = LoadModel(buffer);
-        strcpy(data->session.LoadedFilenames.model[data->session.counter.model] ,abinCoreReturnData(fileloc, MQStrAddInt("name",i)));
+        data->files.models[LocalIndex].model= LoadModel(buffer);
+        strcpy(data->files.models[LocalIndex].name ,abinCoreReturnData(fileloc, MQStrAddInt("name",i)));
         if(strcmp(abinCoreReturnData(fileloc, MQStrAddInt("animated",i)), "true") == 0)
         {
-            data->file.anim[data->session.counter.model] = LoadModelAnimations(buffer, &MAXANIM);
+            data->files.models[LocalIndex].anim= LoadModelAnimations(buffer, &MAXANIM);
         }
-        data->session.counter.model++;
+        LocalIndex++;
     }
 }
 
@@ -154,46 +163,82 @@ BoundingBox MQHitboxUpdateXYZ(BoundingBox hitboxbase, Vector3 targetPosi)
     return hitbox;
 }
 
-void MQLoadHitboxFromText(DATA *data, char *fileloc)
+void MQLoadHitboxFromText(MQDATA *data, char *fileloc)
 {
+    int LocalIndex;
+    for(int i = 0;i<MAXOBJ;i++)
+    {
+        if(strcmp(data->files.hitboxes[i].name," ")==0)
+        {
+            LocalIndex = i;
+            break;
+        }
+    }
     Model localModel;
     for(int i = 0; i < atoi(abinCoreReturnData(fileloc, "SIZE")); i++)
     {
         localModel = LoadModel(abinCoreReturnData(fileloc, MQStrAddInt("link",i)));
-        data->file.hitbox[data->session.counter.hitbox] = GetModelBoundingBox(localModel);
+        data->files.hitboxes[LocalIndex].hitbox= GetModelBoundingBox(localModel);
         UnloadModel(localModel);
-        strcpy(data->session.LoadedFilenames.hitbox[data->session.counter.hitbox],abinCoreReturnData(fileloc, MQStrAddInt("name",i)));
-        data->session.counter.hitbox++;
+        strcpy(data->files.hitboxes[LocalIndex].name,abinCoreReturnData(fileloc, MQStrAddInt("name",i)));
+        LocalIndex++;
     }
 }
 
-void MQCreateHitbox(DATA *data, char *name, BoundingBox Hitbox)
+void MQCreateHitbox(MQDATA *data, char *name, BoundingBox Hitbox)
 {
-    data->file.hitbox[data->session.counter.hitbox] = Hitbox;
-    strcpy(data->session.LoadedFilenames.hitbox[data->session.counter.hitbox],name);
-    data->session.counter.hitbox++;
+    int LocalIndex;
+    for(int i = 0;i<MAXOBJ;i++)
+    {
+        if(strcmp(data->files.hitboxes[i].name," ")==0)
+        {
+            LocalIndex = i;
+            break;
+        }
+    }
+    data->files.hitboxes[LocalIndex].hitbox= Hitbox;
+    strcpy(data->files.hitboxes[LocalIndex].name,name);
+    LocalIndex++;
 }
 
-void MQCreateEmptyHitbox(DATA *data, char *name)
+void MQCreateEmptyHitbox(MQDATA *data, char *name)
 {
-    strcpy(data->session.LoadedFilenames.hitbox[data->session.counter.hitbox],name);
-    data->session.counter.hitbox++;
+    int LocalIndex;
+    for(int i = 0;i<MAXOBJ;i++)
+    {
+        if(strcmp(data->files.hitboxes[i].name," ")==0)
+        {
+            LocalIndex = i;
+            break;
+        }
+    }
+    strcpy(data->files.hitboxes[LocalIndex].name,name);
+    LocalIndex++;
 }
 
-void MQPlayerCreateBodyBox(DATA *data, int quem)
+void MQPlayerCreateBodyBox(MQDATA *data, int quem)
 {
+    int LocalIndex;
+    for(int i = 0;i<MAXOBJ;i++)
+    {
+        if(strcmp(data->files.hitboxes[i].name," ")==0)
+        {
+            LocalIndex = i;
+            break;
+        }
+    }
     char buffer[128],buffer0[128];
     for(int i = 0; i < 14; i++)
     {
         snprintf(buffer,128,"%s%d",abinCoreReturnData("./data/models/playerhitbox.text", MQStrAddInt("name",i)),quem);
         snprintf(buffer0,128,"%s",abinCoreReturnData("./data/models/playerhitbox.text", MQStrAddInt("name",i)));
-        data->file.hitbox[data->session.counter.hitbox] = GetModelBoundingBox(data->file.model[MQFindModelByName(*data,buffer0)]);
-        strcpy(data->session.LoadedFilenames.hitbox[data->session.counter.hitbox],buffer);
-        data->session.counter.hitbox++;
+        data->files.hitboxes[LocalIndex].hitbox= GetModelBoundingBox(data->files.models[MQFindModelByName(*data,buffer0)].model);
+        strcpy(data->files.hitboxes[LocalIndex].name,buffer);
+        LocalIndex++;
     } 
 }
 
-void MQPlayerUpdateBodyBox(DATA *data, int quem, int qualAnim)
+void MQPlayerUpdateBodyBox(MQDATA *data, int quem, int qualAnim)
 {
     Mesh LocalMesh;
     Vector3 LocVec3;
@@ -202,17 +247,15 @@ void MQPlayerUpdateBodyBox(DATA *data, int quem, int qualAnim)
     snprintf(buffer,128,"player-cabeca%d",quem);
     int hitboxheadfind,modelheadfind; 
     hitboxheadfind = MQFindHitboxByName(*data,buffer);
-    snprintf(ABINCACHE16,16,"hitbox%d",hitboxheadfind);
     modelheadfind = MQFindModelByName(*data,"player-cabeca");
-    snprintf(ABINCACHE16,16,"model%d",modelheadfind);
     for(int i = 0; i < 14; i++)
     {
         modelIndex =  modelheadfind+i;
         hitboxIndex = hitboxheadfind+i;
         snprintf(buffer,128,"player%d",quem);
-        snprintf(ABINCACHE16,16,"hitbox%d",hitboxheadfind);
-        snprintf(ABINCACHE16,16,"model%d",modelheadfind);
-        LocalMesh = MQApplyMeshTransformFromBone(data->file.model[modelIndex], data->file.anim[modelIndex][qualAnim], data->queue.render.model[MQFindRenderModelIndexByName(*data,buffer)].currentFrame);
+        /* abinDEBUGint("debug.txt",modelIndex); */
+        /* abinDEBUGint("debug.txt",hitboxIndex); */
+        LocalMesh = MQApplyMeshTransformFromBone(data->files.models[modelIndex].model, data->files.models[modelIndex].anim[qualAnim], data->queue.render.model[MQFindRenderModelIndexByName(*data,buffer)].currentFrame);
         
 
         for(int i = 0; i < LocalMesh.vertexCount * 3; i += 3)
@@ -223,13 +266,13 @@ void MQPlayerUpdateBodyBox(DATA *data, int quem, int qualAnim)
             LocalMesh.vertices[i + 1] = LocVec3.y;
             LocalMesh.vertices[i + 2] = LocVec3.z;
         }
-        data->file.hitbox[hitboxIndex] = GetMeshBoundingBox(LocalMesh);
+        data->files.hitboxes[hitboxIndex].hitbox = GetMeshBoundingBox(LocalMesh);
 
-        data->file.hitbox[hitboxIndex].min = Vector3Add(data->file.hitbox[hitboxIndex].min, (Vector3) {0.06, 0.06, 0.06});
-        data->file.hitbox[hitboxIndex].max = Vector3Subtract(data->file.hitbox[hitboxIndex].max, (Vector3) {0.06, 0.06, 0.06});
+        data->files.hitboxes[hitboxIndex].hitbox.min = Vector3Add(data->files.hitboxes[hitboxIndex].hitbox.min, (Vector3) {0.06, 0.06, 0.06});
+        data->files.hitboxes[hitboxIndex].hitbox.max = Vector3Subtract(data->files.hitboxes[hitboxIndex].hitbox.max, (Vector3) {0.06, 0.06, 0.06});
 
-        data->file.hitbox[hitboxIndex].min = Vector3Add(data->file.hitbox[hitboxIndex].min, data->game.personagem[quem].posicao);
-        data->file.hitbox[hitboxIndex].max = Vector3Add(data->file.hitbox[hitboxIndex].max, data->game.personagem[quem].posicao);
+        data->files.hitboxes[hitboxIndex].hitbox.min = Vector3Add(data->files.hitboxes[hitboxIndex].hitbox.min, data->game.personagem[quem].posicao);
+        data->files.hitboxes[hitboxIndex].hitbox.max = Vector3Add(data->files.hitboxes[hitboxIndex].hitbox.max, data->game.personagem[quem].posicao);
     }
 }
 
@@ -237,7 +280,7 @@ void MQPlayerUpdateBodyBox(DATA *data, int quem, int qualAnim)
 //LOADALL
 //---------------------------------------
 
-void MQLoadAllModels(DATA *data)
+void MQLoadAllModels(MQDATA *data)
 {
     MQLoadModelsFromText( *&data, "./data/models/player.text");
     MQLoadModelsFromText( *&data, "./data/models/playerhitbox.text");
