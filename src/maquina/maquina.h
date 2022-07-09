@@ -1,3 +1,6 @@
+//MAQUINA
+//AKA MQEngine
+
 #if defined(PLATFORM_DESKTOP)
 #define GLSL_VERSION            330
 #else   // PLATFORM_RPI, PLATFORM_ANDROID, PLATFORM_WEB
@@ -40,17 +43,9 @@ unsigned int MAXANIM = 1;
 
 bool MQEXIT = false;
 
-//events
-
 //-----------------------------------
-//DATA
+//DATA_GAME
 //-----------------------------------
-
-struct DATA_IMAGEM
-{
-    Texture2D textura[MAXOBJ + 1];
-};
-typedef struct DATA_IMAGEM DATA_IMAGEM;
 
 struct DATA_MAPA
 {
@@ -76,6 +71,10 @@ struct DATA_GAME
 };
 typedef struct DATA_GAME DATA_GAME;
 
+//-----------------------------------
+//DATA_FILE
+//-----------------------------------
+
 struct DATA_FILES
 {
     Model model[MAXOBJ];
@@ -88,6 +87,34 @@ struct DATA_FILES
     Music audio[MAXOBJ];
 };
 typedef struct DATA_FILES DATA_FILES;
+
+//-----------------------------------
+//DATA_SESSION
+//-----------------------------------
+
+struct DATA_SESSION_LOADEDFILENAMES
+{
+    char model[MAXOBJ][255],hitbox[MAXOBJ][255],text[MAXOBJ][255],eventbox[MAXOBJ][255];
+};
+typedef struct DATA_SESSION_LOADEDFILENAMES DATA_SESSION_LOADEDFILENAMES;
+
+struct DATA_SESSION_COUNTERS
+{
+     int model, hitbox, text, lang, eventbox;
+};
+typedef struct DATA_SESSION_COUNTERS DATA_SESSION_COUNTERS;
+
+struct DATA_SESSION
+{
+    long int frame;
+    DATA_SESSION_COUNTERS counter;
+    DATA_SESSION_LOADEDFILENAMES LoadedFilenames;
+};
+typedef struct DATA_SESSION DATA_SESSION;
+
+//-----------------------------------
+//DATA_QUEUE_RENDER
+//-----------------------------------
 
 struct DATA_RENDER_MODEL
 {
@@ -115,28 +142,20 @@ struct DATA_RENDER_TEXT
 };
 typedef struct DATA_RENDER_TEXT DATA_RENDER_TEXT;
 
-struct DATA_SESSION_RENDER
+//-----------------------------------
+//DATA_QUEUE
+//-----------------------------------
+
+struct DATA_QUEUE_RENDER
 {
     DATA_RENDER_MODEL model[MAXOBJ];
     DATA_RENDER_TEXT text[MAXOBJ];
     Color background;
     Camera camera;
 };
-typedef struct DATA_SESSION_RENDER DATA_SESSION_RENDER;
+typedef struct DATA_QUEUE_RENDER DATA_QUEUE_RENDER;
 
-struct DATA_SESSION_LoadedFilenames
-{
-    char model[MAXOBJ][255],hitbox[MAXOBJ][255],text[MAXOBJ][255],eventbox[MAXOBJ][255];
-};
-typedef struct DATA_SESSION_LoadedFilenames DATA_SESSION_LoadedFilenames;
-
-struct DATA_SESSION_COUNTERS
-{
-     int model, hitbox, text, lang, eventbox;
-};
-typedef struct DATA_SESSION_COUNTERS DATA_SESSION_COUNTERS;
-
-struct DATA_SESSION_EVENT
+struct DATA_QUEUE_EVENT
 {
     bool active;
     bool persistent;
@@ -146,22 +165,18 @@ struct DATA_SESSION_EVENT
     float rotation;
     char *name;
 };
-typedef struct DATA_SESSION_EVENT DATA_SESSION_EVENT;
-
-struct DATA_SESSION
-{
-    long int frame;
-    DATA_SESSION_COUNTERS counter;
-    DATA_SESSION_LoadedFilenames LoadedFilenames;
-};
-typedef struct DATA_SESSION DATA_SESSION;
+typedef struct DATA_QUEUE_EVENT DATA_QUEUE_EVENT;
 
 struct DATA_QUEUE
 {
-    DATA_SESSION_RENDER render;
-    DATA_SESSION_EVENT event[MAXOBJ];
+    DATA_QUEUE_RENDER render;
+    DATA_QUEUE_EVENT event[MAXOBJ];
 };
 typedef struct DATA_QUEUE DATA_QUEUE;
+
+//-----------------------------------
+//DATA
+//-----------------------------------
 
 struct DATA
 {
@@ -172,5 +187,5 @@ struct DATA
 };
 typedef struct DATA DATA;
 
-#include "1964.c"
+#include "maquina.c"
 #include "../event.c"

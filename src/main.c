@@ -1,7 +1,7 @@
 //LIB C
 
 //ENGINE
-#include "./1964/1964.h"
+#include "./maquina/maquina.h"
 
 int main(void)
 {

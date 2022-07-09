@@ -42,28 +42,6 @@ Vector3 MQDifferenceVec3(Vector3 vec1, Vector3 vec2)
 }
 
 //-----------------------------------
-//VERTICES
-//-----------------------------------
-
-Vector3 MQRotateVerticeSelf(float angle, Vector3 vertice)
-{
-    Vector3 NewVertice;
-    NewVertice.y = vertice.y;
-    NewVertice.x = vertice.x * cos(angle) - vertice.z * sin(angle);
-    NewVertice.z = vertice.x * sin(angle) + vertice.z * cos(angle);
-    return NewVertice;
-}
-
-Vector3 MQRotateVertice(Vector3 pivot, float angle, Vector3 vertice)
-{
-    Vector3 NewVertice;
-    NewVertice.y = vertice.y;
-    NewVertice.x = ((vertice.x - pivot.x) * cos(angle)) - ((vertice.z - pivot.z) * sin(angle)) + pivot.x;
-    NewVertice.z = ((vertice.x - pivot.x) * sin(angle)) + ((vertice.z - pivot.z) * cos(angle)) + pivot.z;
-    return NewVertice;
-}
-
-//-----------------------------------
 //WINDOW
 //-----------------------------------
 
@@ -77,97 +55,6 @@ void MQWindowStart()
     snprintf(buffer,255,"%s",abinCoreReturnData("config.text", "TITLE"));
     InitAudioDevice();
     InitWindow(atoi(abinCoreReturnData("config.text", "SCRX")), atoi(abinCoreReturnData("config.text", "SCRY")), buffer);
-}
-
-
-//-----------------------------------
-//HTIBOX
-//-----------------------------------
-
-BoundingBox MQHitboxUpdateX(BoundingBox hitboxbase, Vector3 targetPosi)
-{
-    hitboxbase.min.x += targetPosi.x;
-    hitboxbase.max.x += targetPosi.x;
-    return hitboxbase;
-}
-
-BoundingBox MQHitboxUpdateY(BoundingBox hitboxbase, Vector3 targetPosi)
-{
-    hitboxbase.min.y += targetPosi.y;
-    hitboxbase.max.y += targetPosi.y;
-    return hitboxbase;
-}
-
-BoundingBox MQHitboxUpdateZ(BoundingBox hitboxbase, Vector3 targetPosi)
-{
-    hitboxbase.min.z += targetPosi.z;
-    hitboxbase.max.z += targetPosi.z;
-    return hitboxbase;
-}
-
-BoundingBox MQHitboxUpdateXYZ(BoundingBox hitboxbase, Vector3 targetPosi)
-{
-    BoundingBox hitbox;
-    hitbox = hitboxbase;
-    hitbox.max = Vector3Add(hitboxbase.max,targetPosi);
-    hitbox.min = Vector3Add(hitboxbase.min, targetPosi);
-    return hitbox;
-}
-
-void MQLoadModelsFromText(DATA *data, char *fileloc)
-{
-    char buffer[128];
-    for(int i = 0; i < atoi(abinCoreReturnData(fileloc, "SIZE")); i++)
-    {
-        strcpy(buffer,abinCoreReturnData(fileloc, MQStrAddInt("link",i)));
-        data->file.model[data->session.counter.model] = LoadModel(buffer);
-        strcpy(data->session.LoadedFilenames.model[data->session.counter.model] ,abinCoreReturnData(fileloc, MQStrAddInt("name",i)));
-        if(strcmp(abinCoreReturnData(fileloc, MQStrAddInt("animated",i)), "true") == 0)
-        {
-            data->file.anim[data->session.counter.model] = LoadModelAnimations(buffer, &MAXANIM);
-        }
-        data->session.counter.model++;
-    }
-}
-
-void MQLoadHitboxFromText(DATA *data, char *fileloc)
-{
-    Model localModel;
-    for(int i = 0; i < atoi(abinCoreReturnData(fileloc, "SIZE")); i++)
-    {
-        localModel = LoadModel(abinCoreReturnData(fileloc, MQStrAddInt("link",i)));
-        data->file.hitbox[data->session.counter.hitbox] = GetModelBoundingBox(localModel);
-        UnloadModel(localModel);
-        strcpy(data->session.LoadedFilenames.hitbox[data->session.counter.hitbox],abinCoreReturnData(fileloc, MQStrAddInt("name",i)));
-        data->session.counter.hitbox++;
-    }
-}
-
-void MQCreateHitbox(DATA *data, char *name, BoundingBox Hitbox)
-{
-    data->file.hitbox[data->session.counter.hitbox] = Hitbox;
-    strcpy(data->session.LoadedFilenames.hitbox[data->session.counter.hitbox],name);
-    data->session.counter.hitbox++;
-}
-
-void MQCreateEmptyHitbox(DATA *data, char *name)
-{
-    strcpy(data->session.LoadedFilenames.hitbox[data->session.counter.hitbox],name);
-    data->session.counter.hitbox++;
-}
-
-void MQPlayerCreateBodyBox(DATA *data, int quem)
-{
-    //abinCoreReturnData("./data/models/playerhitbox.text", MQStrAddInt("name",0));
-    char buffer[128],buffer0[128];
-    for(int i = 0; i < 14; i++)
-    {
-        snprintf(buffer,128,"%s%d",abinCoreReturnData("./data/models/playerhitbox.text", MQStrAddInt("name",i)),quem);
-        snprintf(buffer0,128,"%s",abinCoreReturnData("./data/models/playerhitbox.text", MQStrAddInt("name",i)));
-        data->file.hitbox[data->session.counter.hitbox] = GetModelBoundingBox(data->file.model[MQFindModelByName(*data,buffer0)]);
-        strcpy(data->session.LoadedFilenames.hitbox[data->session.counter.hitbox],buffer);
-        data->session.counter.hitbox++;
-    } 
 }
 
 //-----------------------------------
@@ -287,6 +174,34 @@ int MQFindRenderTextIndexByName(DATA data, char* name)
 }
 
 //-----------------------------------
+//VERTICES
+//-----------------------------------
+
+Vector3 MQRotateVerticeSelf(float angle, Vector3 vertice)
+{
+    Vector3 NewVertice;
+    NewVertice.y = vertice.y;
+    NewVertice.x = vertice.x * cos(angle) - vertice.z * sin(angle);
+    NewVertice.z = vertice.x * sin(angle) + vertice.z * cos(angle);
+    return NewVertice;
+}
+
+Vector3 MQRotateVertice(Vector3 pivot, float angle, Vector3 vertice)
+{
+    Vector3 NewVertice;
+    NewVertice.y = vertice.y;
+    NewVertice.x = ((vertice.x - pivot.x) * cos(angle)) - ((vertice.z - pivot.z) * sin(angle)) + pivot.x;
+    NewVertice.z = ((vertice.x - pivot.x) * sin(angle)) + ((vertice.z - pivot.z) * cos(angle)) + pivot.z;
+    return NewVertice;
+}
+
+//-----------------------------------
+//MODELS&HITBOXES
+//-----------------------------------
+
+#include "models.c"
+
+//-----------------------------------
 //PLAYER
 //-----------------------------------
 
@@ -344,12 +259,6 @@ Camera MQCameraStart(Camera *camera)
     SetCameraMode(*camera, CAMERA_CUSTOM);
     return (*camera);
 }
-
-//-----------------------------------
-//MODELS
-//-----------------------------------
-
-#include "models.c"
 
 //-----------------------------------
 //DOORS

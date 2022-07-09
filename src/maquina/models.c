@@ -1,3 +1,7 @@
+//---------------------------------------
+//MODEL
+//---------------------------------------
+
 // Update model animated vertex data (positions and normals) for a given frame
 // NOTE: Updated data is returned as mesh
 Mesh MQApplyMeshTransformFromBone(Model model, ModelAnimation anim, int frame)
@@ -100,6 +104,95 @@ Mesh MQApplyMeshTransformFromBone(Model model, ModelAnimation anim, int frame)
     }
 }
 
+void MQLoadModelsFromText(DATA *data, char *fileloc)
+{
+    char buffer[128];
+    for(int i = 0; i < atoi(abinCoreReturnData(fileloc, "SIZE")); i++)
+    {
+        strcpy(buffer,abinCoreReturnData(fileloc, MQStrAddInt("link",i)));
+        data->file.model[data->session.counter.model] = LoadModel(buffer);
+        strcpy(data->session.LoadedFilenames.model[data->session.counter.model] ,abinCoreReturnData(fileloc, MQStrAddInt("name",i)));
+        if(strcmp(abinCoreReturnData(fileloc, MQStrAddInt("animated",i)), "true") == 0)
+        {
+            data->file.anim[data->session.counter.model] = LoadModelAnimations(buffer, &MAXANIM);
+        }
+        data->session.counter.model++;
+    }
+}
+
+//---------------------------------------
+//HITBOX
+//---------------------------------------
+
+BoundingBox MQHitboxUpdateX(BoundingBox hitboxbase, Vector3 targetPosi)
+{
+    hitboxbase.min.x += targetPosi.x;
+    hitboxbase.max.x += targetPosi.x;
+    return hitboxbase;
+}
+
+BoundingBox MQHitboxUpdateY(BoundingBox hitboxbase, Vector3 targetPosi)
+{
+    hitboxbase.min.y += targetPosi.y;
+    hitboxbase.max.y += targetPosi.y;
+    return hitboxbase;
+}
+
+BoundingBox MQHitboxUpdateZ(BoundingBox hitboxbase, Vector3 targetPosi)
+{
+    hitboxbase.min.z += targetPosi.z;
+    hitboxbase.max.z += targetPosi.z;
+    return hitboxbase;
+}
+
+BoundingBox MQHitboxUpdateXYZ(BoundingBox hitboxbase, Vector3 targetPosi)
+{
+    BoundingBox hitbox;
+    hitbox = hitboxbase;
+    hitbox.max = Vector3Add(hitboxbase.max,targetPosi);
+    hitbox.min = Vector3Add(hitboxbase.min, targetPosi);
+    return hitbox;
+}
+
+void MQLoadHitboxFromText(DATA *data, char *fileloc)
+{
+    Model localModel;
+    for(int i = 0; i < atoi(abinCoreReturnData(fileloc, "SIZE")); i++)
+    {
+        localModel = LoadModel(abinCoreReturnData(fileloc, MQStrAddInt("link",i)));
+        data->file.hitbox[data->session.counter.hitbox] = GetModelBoundingBox(localModel);
+        UnloadModel(localModel);
+        strcpy(data->session.LoadedFilenames.hitbox[data->session.counter.hitbox],abinCoreReturnData(fileloc, MQStrAddInt("name",i)));
+        data->session.counter.hitbox++;
+    }
+}
+
+void MQCreateHitbox(DATA *data, char *name, BoundingBox Hitbox)
+{
+    data->file.hitbox[data->session.counter.hitbox] = Hitbox;
+    strcpy(data->session.LoadedFilenames.hitbox[data->session.counter.hitbox],name);
+    data->session.counter.hitbox++;
+}
+
+void MQCreateEmptyHitbox(DATA *data, char *name)
+{
+    strcpy(data->session.LoadedFilenames.hitbox[data->session.counter.hitbox],name);
+    data->session.counter.hitbox++;
+}
+
+void MQPlayerCreateBodyBox(DATA *data, int quem)
+{
+    char buffer[128],buffer0[128];
+    for(int i = 0; i < 14; i++)
+    {
+        snprintf(buffer,128,"%s%d",abinCoreReturnData("./data/models/playerhitbox.text", MQStrAddInt("name",i)),quem);
+        snprintf(buffer0,128,"%s",abinCoreReturnData("./data/models/playerhitbox.text", MQStrAddInt("name",i)));
+        data->file.hitbox[data->session.counter.hitbox] = GetModelBoundingBox(data->file.model[MQFindModelByName(*data,buffer0)]);
+        strcpy(data->session.LoadedFilenames.hitbox[data->session.counter.hitbox],buffer);
+        data->session.counter.hitbox++;
+    } 
+}
+
 void MQPlayerUpdateBodyBox(DATA *data, int quem, int qualAnim)
 {
     Mesh LocalMesh;
@@ -139,6 +232,10 @@ void MQPlayerUpdateBodyBox(DATA *data, int quem, int qualAnim)
         data->file.hitbox[hitboxIndex].max = Vector3Add(data->file.hitbox[hitboxIndex].max, data->game.personagem[quem].posicao);
     }
 }
+
+//---------------------------------------
+//LOADALL
+//---------------------------------------
 
 void MQLoadAllModels(DATA *data)
 {
