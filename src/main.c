@@ -9,8 +9,8 @@ int main(void)
     MQWindowStart(abinCoreReturnData("config.text", "TITLE"));
     MQCleanAllRenderSlots(&data);
     MQCleanAllEventSlots(&data);
-    data.session.render.camera = MQCameraStart(&data.session.render.camera);
-    data.session.render.background = (Color){115, 105, 97, 255};
+    data.queue.render.camera = MQCameraStart(&data.queue.render.camera);
+    data.queue.render.background = (Color){115, 105, 97, 255};
     data.session.counter.model = 0;
     data.session.counter.hitbox = 0;
     data.session.counter.lang = 0;
@@ -29,33 +29,33 @@ int main(void)
     data.file.audio[0] = LoadMusicStream("./data/audio/music/maintheme_by_kayoa.mp3");
     MQEXIT = MQMenu(&data,0);
     
-    data.session.render.camera.target = (Vector3)
+    data.queue.render.camera.target = (Vector3)
     {
         data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.x, data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.y, data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.z
     };
     SetExitKey(KEY_END);
-    data.session.render.camera.position = (Vector3){0.4375, 3.5, 11.0625};
+    data.queue.render.camera.position = (Vector3){0.4375, 3.5, 11.0625};
     MQRenderAddModelToQueue(&data, "mapa0", MQFindModelByName(data,"map0"), WHITE,(Vector3){0.0f, 0.0f, 0.0f}, 0,  0,0,true,false,false);
     MQRenderAddModelToQueue(&data, "player0", MQFindModelByName(data,"player"), COR_PELE0,data.game.personagem[0].posicao, data.game.personagem[0].rotacao,  0,0,true,true,false);
     
     data.file.eventbox[data.session.counter.eventbox].min = (Vector3){-0.5,0,-0.5};
-    data.file.eventbox[data.session.counter.eventbox].max = (Vector3){0.5,2,1};
+    data.file.eventbox[data.session.counter.eventbox].max = (Vector3){0.5,2.3,0.5};
     MQCreateEventbox(&data, "playeruse",data.file.eventbox[data.session.counter.eventbox]);
     MQAddEventToQueue(&data,"playeruse0",MQTRUE,data.file.eventbox[MQFindEventboxIndexByName(data,"playeruse")],(Vector3){0,0,0},0,true);
 
     while(!WindowShouldClose() && !MQEXIT)
     {
-        data.session.render.camera.target = (Vector3){data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.x, data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.y, data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.z};
+        data.queue.render.camera.target = (Vector3){data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.x, data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.y, data.file.hitbox[MQFindHitboxByName(data, "player-cabeca0")].min.z};
         data.session.frame++;
-        UpdateCamera(&data.session.render.camera);
+        UpdateCamera(&data.queue.render.camera);
 
 
-        data.session.render.model[MQFindRenderModelIndexByName(data,"player0")].position = data.game.personagem[0].posicao;
-        data.session.render.model[MQFindRenderModelIndexByName(data,"player0")].rotation = data.game.personagem[0].rotacao;
-        data.session.event[MQFindEventIndexByName(data,"playeruse0")].position = data.game.personagem[0].posicao;
+        data.queue.render.model[MQFindRenderModelIndexByName(data,"player0")].position = data.game.personagem[0].posicao;
+        data.queue.render.model[MQFindRenderModelIndexByName(data,"player0")].rotation = data.game.personagem[0].rotacao;
+        data.queue.event[MQFindEventIndexByName(data,"playeruse0")].position = data.game.personagem[0].posicao;
 
         TECLADO_MAIN(&data);
-        MQPlayerUpdateBodyBox( &data, 0, data.session.render.model[MQFindRenderModelIndexByName(data,"player0")].currentAnim);
+        MQPlayerUpdateBodyBox( &data, 0, data.queue.render.model[MQFindRenderModelIndexByName(data,"player0")].currentAnim);
         
         if((int)data.game.personagem[0].rotacao%360 == 0)
             data.game.personagem[0].rotacao = 0;

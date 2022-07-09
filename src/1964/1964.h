@@ -124,11 +124,11 @@ struct DATA_SESSION_RENDER
 };
 typedef struct DATA_SESSION_RENDER DATA_SESSION_RENDER;
 
-struct DATA_SESSION_LOADEDNAMES
+struct DATA_SESSION_LoadedFilenames
 {
     char model[MAXOBJ][255],hitbox[MAXOBJ][255],text[MAXOBJ][255],eventbox[MAXOBJ][255];
 };
-typedef struct DATA_SESSION_LOADEDNAMES DATA_SESSION_LOADEDNAMES;
+typedef struct DATA_SESSION_LoadedFilenames DATA_SESSION_LoadedFilenames;
 
 struct DATA_SESSION_COUNTERS
 {
@@ -139,6 +139,7 @@ typedef struct DATA_SESSION_COUNTERS DATA_SESSION_COUNTERS;
 struct DATA_SESSION_EVENT
 {
     bool active;
+    bool persistent;
     int eventFuncionIndex;
     BoundingBox originEventbox;
     Vector3 position;
@@ -149,19 +150,25 @@ typedef struct DATA_SESSION_EVENT DATA_SESSION_EVENT;
 
 struct DATA_SESSION
 {
-    DATA_SESSION_RENDER render;
-    DATA_SESSION_COUNTERS counter;
-    DATA_SESSION_LOADEDNAMES LoadedNames;
-    DATA_SESSION_EVENT event[MAXOBJ];
     long int frame;
+    DATA_SESSION_COUNTERS counter;
+    DATA_SESSION_LoadedFilenames LoadedFilenames;
 };
 typedef struct DATA_SESSION DATA_SESSION;
+
+struct DATA_QUEUE
+{
+    DATA_SESSION_RENDER render;
+    DATA_SESSION_EVENT event[MAXOBJ];
+};
+typedef struct DATA_QUEUE DATA_QUEUE;
 
 struct DATA
 {
     DATA_GAME game;
     DATA_FILES file;
     DATA_SESSION session;
+    DATA_QUEUE queue;
 };
 typedef struct DATA DATA;
 

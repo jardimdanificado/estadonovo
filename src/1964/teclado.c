@@ -22,8 +22,8 @@ void TECLADO_MAIN(DATA *data)
     }
     if(IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
     {
-        data->session.render.model[MQFindRenderModelIndexByName(*data,"player0")].reverse = true;
-        data->session.render.model[MQFindRenderModelIndexByName(*data,"player0")].currentAnim = 1;
+        data->queue.render.model[MQFindRenderModelIndexByName(*data,"player0")].reverse = true;
+        data->queue.render.model[MQFindRenderModelIndexByName(*data,"player0")].currentAnim = 1;
     }
     if(IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
     {
@@ -66,7 +66,7 @@ void TECLADO_MAIN(DATA *data)
     }
     if(IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
     {
-        data->session.render.model[MQFindRenderModelIndexByName(*data,"player0")].currentAnim = 1;
+        data->queue.render.model[MQFindRenderModelIndexByName(*data,"player0")].currentAnim = 1;
     }
     if(IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
     {
@@ -110,12 +110,12 @@ void TECLADO_MAIN(DATA *data)
     }
     if(IsKeyReleased(KEY_UP) || IsKeyReleased(KEY_W))
     {
-        data->session.render.model[MQFindRenderModelIndexByName(*data,"player0")].currentAnim = 0;
+        data->queue.render.model[MQFindRenderModelIndexByName(*data,"player0")].currentAnim = 0;
     }
     if(IsKeyReleased(KEY_DOWN) || IsKeyReleased(KEY_S))
     {
-        data->session.render.model[MQFindRenderModelIndexByName(*data,"player0")].reverse = false;
-        data->session.render.model[MQFindRenderModelIndexByName(*data,"player0")].currentAnim = 0;
+        data->queue.render.model[MQFindRenderModelIndexByName(*data,"player0")].reverse = false;
+        data->queue.render.model[MQFindRenderModelIndexByName(*data,"player0")].currentAnim = 0;
     }
     if(IsKeyDown(KEY_SPACE))
     {
