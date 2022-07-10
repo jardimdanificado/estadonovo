@@ -119,7 +119,6 @@ void MQRenderAddTextToQueue(MQDATA *data,char* name, int textIndex, Color color,
 
 void MQRenderQueue(MQDATA* data)
 {
-    
     BeginDrawing();
     ClearBackground(data->queue.render.background);
     BeginMode3D(data->queue.render.camera);
@@ -127,6 +126,7 @@ void MQRenderQueue(MQDATA* data)
     {
         DrawBoundingBox(data->files.hitboxes[i].hitbox,BLACK);
         DrawBoundingBox(MQHitboxUpdateXYZ(data->queue.event[i].hitbox, data->queue.event[i].position),GREEN);
+        DrawBoundingBox(MQHitboxUpdateXYZ(data->queue.map.item[i].hitbox, data->queue.map.item[i].position),RED);
         if(data->queue.render.model[i].modelIndex != __INT_MAX__)
         {
             if(data->queue.render.model[i].playing == true)

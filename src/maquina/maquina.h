@@ -189,11 +189,15 @@ typedef struct MQDATA_EVENTBOX_SLOT MQDATA_EVENTBOX_SLOT;
 
 struct MQDATA_QUEUE_ITEM
 {
-    char name[128];
-    char type[16];
+    char *name;
+    char *type;
     int index;
     float content;
     bool active;
+    BoundingBox hitbox;
+    Vector3 position;
+    float rotation;
+    int function;
 };
 typedef struct MQDATA_QUEUE_ITEM MQDATA_QUEUE_ITEM;
 

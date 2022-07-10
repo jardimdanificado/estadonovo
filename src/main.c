@@ -1,5 +1,3 @@
-//LIB C
-
 //ENGINE
 #include "./maquina/maquina.h"
 
@@ -10,6 +8,8 @@ int main(void)
     MQWindowStart(abinCoreReturnData("config.text", "TITLE"));
     MQCleanAllRenderSlots(&data);
     MQCleanAllEventSlots(&data);
+    
+    MQCleanAllItemSlots(&data);
     data.queue.render.camera = MQCameraStart(&data.queue.render.camera);
     data.queue.render.background = (Color){115, 105, 97, 255};
     data.session.frame = 0;
@@ -38,6 +38,7 @@ int main(void)
     MQCreateEventbox(&data, "playeruse",data.files.eventboxes[0].hitbox);
     MQAddEventToQueue(&data,"playeruse0",MQTRUE,data.files.eventboxes[MQFindEventbox(data,"playeruse")].hitbox,(Vector3){0,0,0},0,true,false);
 
+    MQAddItemToQueue(&data,"teste","teste",(Vector3){0,0,0},0,0,0,0,(BoundingBox){(Vector3){0,0,0},(Vector3){1,1,1}},true);
     while(!WindowShouldClose() && !MQEXIT)
     {
         data.queue.render.camera.target = (Vector3){data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.x, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.y, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.z};

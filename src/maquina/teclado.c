@@ -5,6 +5,15 @@ void TECLADO_MAIN(MQDATA *data)
     {
         MQEXIT = MQMenu(*&data, 1);
     }
+    if(IsKeyPressed(KEY_E) || IsKeyPressed(KEY_E))
+    {
+        int boxindex;
+        boxindex = MQVerifyItemColision(*data, MQHitboxUpdateXYZ(data->queue.event[MQFindEvent(*data,"playeruse0")].hitbox, data->queue.event[MQFindEvent(*data,"playeruse0")].position));
+        if(boxindex!=-1)
+        {
+            MQEventFunctions[data->queue.map.item[boxindex].function](*&data,0);
+        }
+    }   
     if(IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
     {
         if(data->game.personagem[0].rotacao == 0)

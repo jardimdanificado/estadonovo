@@ -2,6 +2,7 @@ typedef float (*EVENTFUNC)(MQDATA*, float);
 
 float event0(MQDATA* data, float b) 
 {
+    data->game.personagem[0].posicao.y += 5;
     return 0;
 }
 

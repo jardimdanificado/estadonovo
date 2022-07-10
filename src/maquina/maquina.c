@@ -241,40 +241,49 @@ Vector3 MQRotateVertice(Vector3 pivot, float angle, Vector3 vertice)
 //ITEM
 //-----------------------------------
 
-void MQCleanAllItemSlots(MQDATA_QUEUE_ITEM* itemTree[])
+void MQCleanAllItemSlots(MQDATA* data)
 {
     for (short int i = 0; i < MAXOBJ; i++)
     {
-        strcpy(itemTree[i]->name," ");
-        strcpy(itemTree[i]->type," ");
-        itemTree[i]->index = MQTRUE;
-        itemTree[i]->content = MQTRUE;
-        itemTree[i]->active = false;
+        data->queue.map.item[i].name = " ";
+        data->queue.map.item[i].type = " ";
+        data->queue.map.item[i].index = MQTRUE;
+        data->queue.map.item[i].content = MQTRUE;
+        data->queue.map.item[i].active = false;
+        data->queue.map.item[i].hitbox = (BoundingBox){(Vector3){MQTRUE,MQTRUE,MQTRUE},(Vector3){MQTRUE,MQTRUE,MQTRUE}};
+        data->queue.map.item[i].position = (Vector3){MQTRUE,MQTRUE,MQTRUE};
+        data->queue.map.item[i].rotation = MQTRUE;
+        data->queue.map.item[i].function = MQTRUE;
     }
 }
 
-void MQAddItemToQueue(MQDATA_QUEUE_ITEM* itemTree[], char*name, char*type, int index, float content, bool active)
+void MQAddItemToQueue(MQDATA *data, char*name, char*type, Vector3 position, float rotation, int index, float content, int function, BoundingBox hitbox, bool active)
 {
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
     {
-        if(strcmp(itemTree[i]->name," ")==0)
+        if(strcmp(data->queue.map.item[i].name," ")==0)
         {
             LocalIndex = i;
             break;
         }
     }
-    strcpy(itemTree[LocalIndex]->name,name);
-    strcpy(itemTree[LocalIndex]->type,type);
-    itemTree[LocalIndex]->index = index;
-    itemTree[LocalIndex]->content = content;
+    data->queue.map.item[LocalIndex].name = name;
+    data->queue.map.item[LocalIndex].type = type;
+    data->queue.map.item[LocalIndex].position = position;
+    data->queue.map.item[LocalIndex].rotation = rotation;
+    data->queue.map.item[LocalIndex].index = index;
+    data->queue.map.item[LocalIndex].content = content;
+    data->queue.map.item[LocalIndex].function = function;
+    data->queue.map.item[LocalIndex].hitbox = hitbox;
+    data->queue.map.item[LocalIndex].active = true;
 }
 
-int MQFindItem(MQDATA_QUEUE_ITEM itemTree[], char* name)
+int MQFindItem(MQDATA data, char* name)
 {
     for(int i = 0;i<MAXOBJ;i++)
     {
-        if(strcmp(itemTree[i].name , name)==0)
+        if(strcmp(data.queue.map.item[i].name , name)==0)
         {
             return i;
         }
@@ -282,10 +291,32 @@ int MQFindItem(MQDATA_QUEUE_ITEM itemTree[], char* name)
     return -1;
 }
 
-void MQDeleteEvent(MQDATA_QUEUE_ITEM* item)
+void MQDeleteItem(MQDATA* data, int index)
 {
-    strcpy(item->name," ");
-    item->active = false;
+    data->queue.map.item[index].name = " ";
+    data->queue.map.item[index].type = " ";
+    data->queue.map.item[index].index = MQTRUE;
+    data->queue.map.item[index].content = MQTRUE;
+    data->queue.map.item[index].active = false;
+    data->queue.map.item[index].hitbox = (BoundingBox){(Vector3){MQTRUE,MQTRUE,MQTRUE},(Vector3){MQTRUE,MQTRUE,MQTRUE}};
+    data->queue.map.item[index].position = (Vector3){MQTRUE,MQTRUE,MQTRUE};
+    data->queue.map.item[index].rotation = 0;
+    data->queue.map.item[index].function = MQTRUE;
+}
+
+int MQVerifyItemColision(MQDATA data, BoundingBox collider)
+{
+    for (short int i = 0; i < MAXOBJ; i++)
+    {
+        if(data.queue.map.item[i].active == true)
+        {
+            if(CheckCollisionBoxes(collider,data.queue.map.item[i].hitbox)==true)
+            {
+                return i;
+            }
+        }
+    }
+    return -1;
 }
 
 //-----------------------------------
