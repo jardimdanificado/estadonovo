@@ -79,7 +79,7 @@ Vector3 MQCheckWall(MQDATA data, char *hitboxID,float LocalRotation)
     int hitboxMax;
     for(int i = MAXOBJ-1;i>0;i--)
     {
-        if(strcmp(data.queue.event[i].name," ")==0)
+        if(strcmp(data.game.event[i].name," ")==0)
         {
             hitboxMax = i;
             break;
@@ -174,7 +174,7 @@ float MQReturnYMaxCollisionPoint(MQDATA data, Vector3 posi)
     int hitboxMax;
     for(int i = MAXOBJ-1;i>0;i--)
     {
-        if(strcmp(data.queue.event[i].name," ")==0)
+        if(strcmp(data.game.event[i].name," ")==0)
         {
             hitboxMax = i;
             break;

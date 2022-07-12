@@ -8,31 +8,28 @@ void TECLADO_MAIN(MQDATA *data)
     if(IsKeyPressed(KEY_E) || IsKeyPressed(KEY_E))
     {
         int boxindex;
-        boxindex = MQVerifyItemColision(*data, MQHitboxUpdateXYZ(data->queue.event[MQFindEvent(*data,"playeruse0")].hitbox, data->queue.event[MQFindEvent(*data,"playeruse0")].position));
+        boxindex = MQVerifyMapItemColision(*data, MQHitboxUpdateXYZ(data->game.event[MQFindEvent(*data,"playeruse0")].hitbox, data->game.event[MQFindEvent(*data,"playeruse0")].position));
         if(boxindex!=-1)
         {
-            MQEventFunctions[data->queue.map.item[boxindex].function](*&data,0);
+            MQEventFunctions[data->game.map.item[boxindex].function](*&data,0,0);
         }
     }   
     if(IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
     {
         if(data->game.personagem[0].rotacao == 0)
             data->game.personagem[0].rotacao = 360;
-        //             data.game.personagem[0].posicao.x -= 0.03f;
         data->game.personagem[0].rotacao -= 6;
     }
     if(IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
     {
         if(data->game.personagem[0].rotacao == 360)
             data->game.personagem[0].rotacao = 0;
-        //             data.game.personagem[0].posicao.x += 0.03f;
         data->game.personagem[0].rotacao += 6;
-
     }
     if(IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
     {
-        data->queue.render.model[MQFindRenderModel(*data,"player0")].reverse = true;
-        data->queue.render.model[MQFindRenderModel(*data,"player0")].currentAnim = 1;
+        data->session.render.model[MQFindRenderModel(*data,"player0")].reverse = true;
+        data->session.render.model[MQFindRenderModel(*data,"player0")].currentAnim = 1;
     }
     if(IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
     {
@@ -75,7 +72,7 @@ void TECLADO_MAIN(MQDATA *data)
     }
     if(IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
     {
-        data->queue.render.model[MQFindRenderModel(*data,"player0")].currentAnim = 1;
+        data->session.render.model[MQFindRenderModel(*data,"player0")].currentAnim = 1;
     }
     if(IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
     {
@@ -119,12 +116,12 @@ void TECLADO_MAIN(MQDATA *data)
     }
     if(IsKeyReleased(KEY_UP) || IsKeyReleased(KEY_W))
     {
-        data->queue.render.model[MQFindRenderModel(*data,"player0")].currentAnim = 0;
+        data->session.render.model[MQFindRenderModel(*data,"player0")].currentAnim = 0;
     }
     if(IsKeyReleased(KEY_DOWN) || IsKeyReleased(KEY_S))
     {
-        data->queue.render.model[MQFindRenderModel(*data,"player0")].reverse = false;
-        data->queue.render.model[MQFindRenderModel(*data,"player0")].currentAnim = 0;
+        data->session.render.model[MQFindRenderModel(*data,"player0")].reverse = false;
+        data->session.render.model[MQFindRenderModel(*data,"player0")].currentAnim = 0;
     }
     if(IsKeyDown(KEY_SPACE))
     {

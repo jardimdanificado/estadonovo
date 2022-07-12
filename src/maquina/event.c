@@ -1,17 +1,17 @@
-typedef float (*EVENTFUNC)(MQDATA*, float);
+typedef float (*EVENTFUNC)(MQDATA*, float, float);
 
-float event0(MQDATA* data, float b) 
+float event0(MQDATA* data, float optionalIn0, float optionalIn1) 
 {
     data->game.personagem[0].posicao.y += 5;
     return 0;
 }
 
-float event1(MQDATA* data, float b) 
+float event1(MQDATA* data, float optionalIn0, float optionalIn1) 
 {
     return 0;
 }
 
-float event2(MQDATA* data, float b) 
+float event2(MQDATA* data, float optionalIn0, float optionalIn1) 
 {
     return 0;
 }
@@ -24,7 +24,7 @@ void MQCreateEventbox(MQDATA *data, char *name, BoundingBox Hitbox)
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
     {
-        if(strcmp(data->queue.event[i].name," ")==0)
+        if(strcmp(data->game.event[i].name," ")==0)
         {
             LocalIndex = i;
             break;
@@ -40,7 +40,7 @@ void MQCreateEmptyEventbox(MQDATA *data, char *name)
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
     {
-        if(strcmp(data->queue.event[i].name," ")==0)
+        if(strcmp(data->game.event[i].name," ")==0)
         {
             LocalIndex = i;
             break;
@@ -66,13 +66,13 @@ void MQCleanAllEventSlots(MQDATA *data)
 {
     for(int i = 0;i<MAXOBJ;i++)
     { 
-        data->queue.event[i].name = " ";
-        data->queue.event[i].hitbox = (BoundingBox){(Vector3){0,0,0},(Vector3){0,0,0}};
-        data->queue.event[i].function = MQTRUE;
-        data->queue.event[i].position = (Vector3){0,0,0};
-        data->queue.event[i].rotation = 0;
-        data->queue.event[i].active = false;
-        data->queue.event[i].persistent = false;
+        data->game.event[i].name = " ";
+        data->game.event[i].hitbox = (BoundingBox){(Vector3){0,0,0},(Vector3){0,0,0}};
+        data->game.event[i].function = MQTRUE;
+        data->game.event[i].position = (Vector3){0,0,0};
+        data->game.event[i].rotation = 0;
+        data->game.event[i].active = false;
+        data->game.event[i].persistent = false;
     }
 }
 
@@ -81,33 +81,33 @@ void MQAddEventToQueue(MQDATA *data, char*name, int functionIndex, BoundingBox h
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
     {
-        if(strcmp(data->queue.event[i].name," ")==0)
+        if(strcmp(data->game.event[i].name," ")==0)
         {
             LocalIndex = i;
             break;
         }
     }
-    data->queue.event[LocalIndex].name = name;
-    data->queue.event[LocalIndex].hitbox = hitbox;
-    data->queue.event[LocalIndex].function = functionIndex;
-    data->queue.event[LocalIndex].position = position;
-    data->queue.event[LocalIndex].rotation = rotation;
-    data->queue.event[LocalIndex].active = active;
-    data->queue.event[LocalIndex].persistent = persistent;
+    data->game.event[LocalIndex].name = name;
+    data->game.event[LocalIndex].hitbox = hitbox;
+    data->game.event[LocalIndex].function = functionIndex;
+    data->game.event[LocalIndex].position = position;
+    data->game.event[LocalIndex].rotation = rotation;
+    data->game.event[LocalIndex].active = active;
+    data->game.event[LocalIndex].persistent = persistent;
 }
 
 void MQDeleteEvent(MQDATA* data, int index)
 {
-    data->queue.event[index].name = " ";
-    data->queue.event[index].active = false;
-    data->queue.event[index].persistent = false;
+    data->game.event[index].name = " ";
+    data->game.event[index].active = false;
+    data->game.event[index].persistent = false;
 }
 
 int MQFindEvent(MQDATA data, char* name)
 {
     for(int i = 0;i<MAXOBJ;i++)
     {
-        if(strcmp(data.queue.event[i].name , name)==0)
+        if(strcmp(data.game.event[i].name , name)==0)
         {
             return i;
         }
@@ -119,49 +119,49 @@ int MQFindEvent(MQDATA data, char* name)
 //ITEM
 //-----------------------------------
 
-void MQCleanAllItemSlots(MQDATA* data)
+void MQCleanAllMapItemSlots(MQDATA* data)
 {
     for (short int i = 0; i < MAXOBJ; i++)
     {
-        data->queue.map.item[i].name = " ";
-        data->queue.map.item[i].type = " ";
-        data->queue.map.item[i].index = MQTRUE;
-        data->queue.map.item[i].content = MQTRUE;
-        data->queue.map.item[i].active = false;
-        data->queue.map.item[i].hitbox = (BoundingBox){(Vector3){MQTRUE,MQTRUE,MQTRUE},(Vector3){MQTRUE,MQTRUE,MQTRUE}};
-        data->queue.map.item[i].position = (Vector3){MQTRUE,MQTRUE,MQTRUE};
-        data->queue.map.item[i].rotation = MQTRUE;
-        data->queue.map.item[i].function = MQTRUE;
+        data->game.map.item[i].name = " ";
+        data->game.map.item[i].type = " ";
+        data->game.map.item[i].index = MQTRUE;
+        data->game.map.item[i].content = MQTRUE;
+        data->game.map.item[i].active = false;
+        data->game.map.item[i].hitbox = (BoundingBox){(Vector3){MQTRUE,MQTRUE,MQTRUE},(Vector3){MQTRUE,MQTRUE,MQTRUE}};
+        data->game.map.item[i].position = (Vector3){MQTRUE,MQTRUE,MQTRUE};
+        data->game.map.item[i].rotation = MQTRUE;
+        data->game.map.item[i].function = MQTRUE;
     }
 }
 
-void MQAddItemToQueue(MQDATA *data, char*name, char*type, Vector3 position, float rotation, int index, float content, int function, BoundingBox hitbox, bool active)
+void MQAddMapItemToQueue(MQDATA *data, char*name, char*type, Vector3 position, float rotation, int index, float content, int function, BoundingBox hitbox, bool active)
 {
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
     {
-        if(strcmp(data->queue.map.item[i].name," ")==0)
+        if(strcmp(data->game.map.item[i].name," ")==0)
         {
             LocalIndex = i;
             break;
         }
     }
-    data->queue.map.item[LocalIndex].name = name;
-    data->queue.map.item[LocalIndex].type = type;
-    data->queue.map.item[LocalIndex].position = position;
-    data->queue.map.item[LocalIndex].rotation = rotation;
-    data->queue.map.item[LocalIndex].index = index;
-    data->queue.map.item[LocalIndex].content = content;
-    data->queue.map.item[LocalIndex].function = function;
-    data->queue.map.item[LocalIndex].hitbox = hitbox;
-    data->queue.map.item[LocalIndex].active = true;
+    data->game.map.item[LocalIndex].name = name;
+    data->game.map.item[LocalIndex].type = type;
+    data->game.map.item[LocalIndex].position = position;
+    data->game.map.item[LocalIndex].rotation = rotation;
+    data->game.map.item[LocalIndex].index = index;
+    data->game.map.item[LocalIndex].content = content;
+    data->game.map.item[LocalIndex].function = function;
+    data->game.map.item[LocalIndex].hitbox = hitbox;
+    data->game.map.item[LocalIndex].active = true;
 }
 
-int MQFindItem(MQDATA data, char* name)
+int MQFindMapItem(MQDATA data, char* name)
 {
     for(int i = 0;i<MAXOBJ;i++)
     {
-        if(strcmp(data.queue.map.item[i].name , name)==0)
+        if(strcmp(data.game.map.item[i].name , name)==0)
         {
             return i;
         }
@@ -169,26 +169,26 @@ int MQFindItem(MQDATA data, char* name)
     return -1;
 }
 
-void MQDeleteItem(MQDATA* data, int index)
+void MQDeleteMapItem(MQDATA* data, int index)
 {
-    data->queue.map.item[index].name = " ";
-    data->queue.map.item[index].type = " ";
-    data->queue.map.item[index].index = MQTRUE;
-    data->queue.map.item[index].content = MQTRUE;
-    data->queue.map.item[index].active = false;
-    data->queue.map.item[index].hitbox = (BoundingBox){(Vector3){MQTRUE,MQTRUE,MQTRUE},(Vector3){MQTRUE,MQTRUE,MQTRUE}};
-    data->queue.map.item[index].position = (Vector3){MQTRUE,MQTRUE,MQTRUE};
-    data->queue.map.item[index].rotation = 0;
-    data->queue.map.item[index].function = MQTRUE;
+    data->game.map.item[index].name = " ";
+    data->game.map.item[index].type = " ";
+    data->game.map.item[index].index = MQTRUE;
+    data->game.map.item[index].content = MQTRUE;
+    data->game.map.item[index].active = false;
+    data->game.map.item[index].hitbox = (BoundingBox){(Vector3){MQTRUE,MQTRUE,MQTRUE},(Vector3){MQTRUE,MQTRUE,MQTRUE}};
+    data->game.map.item[index].position = (Vector3){MQTRUE,MQTRUE,MQTRUE};
+    data->game.map.item[index].rotation = 0;
+    data->game.map.item[index].function = MQTRUE;
 }
 
-int MQVerifyItemColision(MQDATA data, BoundingBox collider)
+int MQVerifyMapItemColision(MQDATA data, BoundingBox collider)
 {
     for (short int i = 0; i < MAXOBJ; i++)
     {
-        if(data.queue.map.item[i].active == true)
+        if(data.game.map.item[i].active == true)
         {
-            if(CheckCollisionBoxes(collider,data.queue.map.item[i].hitbox)==true)
+            if(CheckCollisionBoxes(collider,data.game.map.item[i].hitbox)==true)
             {
                 return i;
             }

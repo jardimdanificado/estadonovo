@@ -44,25 +44,6 @@ unsigned int MAXANIM = 1;
 bool MQEXIT = false;
 
 //-----------------------------------
-//DATA_GAME
-//-----------------------------------
-
-struct MQDATA_PLAYER
-{
-    float velocidade;
-    int tempoGravit;
-    Vector3 posicao;
-    float rotacao;
-};
-typedef struct MQDATA_PLAYER MQDATA_PLAYER;
-
-struct MQDATA_GAME
-{
-    MQDATA_PLAYER personagem[MAXOBJ];
-};
-typedef struct MQDATA_GAME MQDATA_GAME;
-
-//-----------------------------------
 //DATA_FILE
 //-----------------------------------
 
@@ -126,16 +107,6 @@ typedef struct MQDATA_FILES MQDATA_FILES;
 //DATA_SESSION
 //-----------------------------------
 
-struct MQDATA_SESSION
-{
-    long int frame;
-};
-typedef struct MQDATA_SESSION MQDATA_SESSION;
-
-//-----------------------------------
-//DATA_QUEUE_RENDER
-//-----------------------------------
-
 struct MQDATA_RENDER_MODEL
 {
     bool visible, playing, reverse;
@@ -162,19 +133,26 @@ struct MQDATA_RENDER_TEXT
 };
 typedef struct MQDATA_RENDER_TEXT MQDATA_RENDER_TEXT;
 
-//-----------------------------------
-//DATA_QUEUE
-//-----------------------------------
-
-struct MQDATA_QUEUE_RENDER
+struct MQDATA_SESSION_RENDER
 {
     MQDATA_RENDER_MODEL model[MAXOBJ];
     MQDATA_RENDER_TEXT text[MAXOBJ];
     Color background;
     Camera camera;
 };
-typedef struct MQDATA_QUEUE_RENDER MQDATA_QUEUE_RENDER;
+typedef struct MQDATA_SESSION_RENDER MQDATA_SESSION_RENDER;
 
+struct MQDATA_SESSION
+{
+    long int frame;
+    MQDATA_SESSION_RENDER render;
+};
+typedef struct MQDATA_SESSION MQDATA_SESSION;
+
+
+//-----------------------------------
+//DATA_GAME
+//-----------------------------------
 struct MQDATA_EVENTBOX_SLOT
 {
     bool active;
@@ -187,7 +165,7 @@ struct MQDATA_EVENTBOX_SLOT
 };
 typedef struct MQDATA_EVENTBOX_SLOT MQDATA_EVENTBOX_SLOT;
 
-struct MQDATA_QUEUE_ITEM
+struct MQDATA_GAME_ITEM
 {
     char *name;
     char *type;
@@ -199,21 +177,30 @@ struct MQDATA_QUEUE_ITEM
     float rotation;
     int function;
 };
-typedef struct MQDATA_QUEUE_ITEM MQDATA_QUEUE_ITEM;
+typedef struct MQDATA_GAME_ITEM MQDATA_GAME_ITEM;
 
-struct MQDATA_QUEUE_MAP
+struct MQDATA_GAME_MAP
 {
-    MQDATA_QUEUE_ITEM item[MAXOBJ];
+    MQDATA_GAME_ITEM item[MAXOBJ];
 };
-typedef struct MQDATA_QUEUE_MAP MQDATA_QUEUE_MAP;
+typedef struct MQDATA_GAME_MAP MQDATA_GAME_MAP;
 
-struct MQDATA_QUEUE
+struct MQDATA_PLAYER
 {
-    MQDATA_QUEUE_RENDER render;
+    float velocidade;
+    int tempoGravit;
+    Vector3 posicao;
+    float rotacao;
+};
+typedef struct MQDATA_PLAYER MQDATA_PLAYER;
+
+struct MQDATA_GAME
+{
     MQDATA_EVENTBOX_SLOT event[MAXOBJ];
-    MQDATA_QUEUE_MAP map;
+    MQDATA_GAME_MAP map;
+    MQDATA_PLAYER personagem[MAXOBJ];
 };
-typedef struct MQDATA_QUEUE MQDATA_QUEUE;
+typedef struct MQDATA_GAME MQDATA_GAME;
 
 //-----------------------------------
 //DATA
@@ -221,10 +208,9 @@ typedef struct MQDATA_QUEUE MQDATA_QUEUE;
 
 struct MQDATA
 {
-    MQDATA_GAME game;
     MQDATA_FILES files;
     MQDATA_SESSION session;
-    MQDATA_QUEUE queue;
+    MQDATA_GAME game;
 };
 typedef struct MQDATA MQDATA;
 

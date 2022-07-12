@@ -183,7 +183,7 @@ int MQFindRenderModel(MQDATA data, char* name)
 {
     for(int i = 0;i<MAXOBJ;i++)
     {
-        if(strcmp(data.queue.render.model[i].name, name)==0)
+        if(strcmp(data.session.render.model[i].name, name)==0)
         {
             return i;
         }
@@ -195,7 +195,7 @@ int MQFindRenderTextIndexByName(MQDATA data, char* name)
 {
     for(int i = 0;i<MAXOBJ;i++)
     {
-        if(strcmp(data.queue.render.text[i].name, name)==0)
+        if(strcmp(data.session.render.text[i].name, name)==0)
         {
             return i;
         }
