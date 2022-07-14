@@ -94,7 +94,7 @@ void MQMenuRender(MQDATA data, int max, int opt ,char quotes[][255])
 
 bool MQMenu(MQDATA *data, int menuIndex)
 {
-    PlayMusicStream(data->files.musics[0].music);
+    //PlayMusicStream(data->files.musics[0].music);
     int allmax[] = {2,3,3,0,0};
     int langIndex[3][3] = {{0,1},{4,7,1},{4,2,3}};
 
@@ -110,7 +110,7 @@ bool MQMenu(MQDATA *data, int menuIndex)
     }
     while(menuIndex < MQTRUE&& menuIndex > MQFALSE)
     {
-        UpdateMusicStream(data->files.musics[0].music);
+        //UpdateMusicStream(data->files.musics[0].music);
         //RENDER
         MQRenderLogo(*data,title[0],title[1],localframe);
         MQMenuRender(*data,  allmax[menuIndex], optIndex, quotes );

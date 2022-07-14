@@ -21,7 +21,7 @@ int main(void)
     data.files.fonts[2].font= MQFontStart("data/font/Mockery.ttf", 24);
     SetTargetFPS(60);
 
-    data.files.musics[0].music = LoadMusicStream("./data/audio/music/maintheme_by_kayoa.mp3");
+    //data.files.musics[0].music = LoadMusicStream("./data/audio/music/maintheme_by_kayoa.mp3");
     MQEXIT = MQMenu(&data,0);
     
     data.session.render.camera.target = (Vector3)
