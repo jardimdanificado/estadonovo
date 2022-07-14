@@ -53,7 +53,7 @@ void MQWindowStart()
         SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     char buffer[255];
     snprintf(buffer,255,"%s",abinCoreReturnData("config.text", "TITLE"));
-    InitAudioDevice();
+    //InitAudioDevice();
     InitWindow(atoi(abinCoreReturnData("config.text", "SCRX")), atoi(abinCoreReturnData("config.text", "SCRY")), buffer);
 }
 
