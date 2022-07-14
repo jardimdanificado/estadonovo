@@ -11,8 +11,8 @@ void TECLADO_MAIN(MQDATA *data)
         boxindex = MQVerifyMapItemColision(*data, MQHitboxUpdateXYZ(data->game.event[MQFindEvent(*data,"playeruse0")].hitbox, data->game.event[MQFindEvent(*data,"playeruse0")].position));
         if(boxindex!=-1)
         {
-            MQEventFunctions[data->game.map.item[boxindex].function](*&data,0,0);
-        }
+/*             MQEventFunctions[data->game.map.item[boxindex].function](*&data,data->game.map.item[boxindex].type,data->game.map.item[boxindex].index);
+ */        }
     }   
     if(IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
     {

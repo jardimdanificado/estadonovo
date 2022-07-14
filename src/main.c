@@ -38,14 +38,12 @@ int main(void)
     MQCreateEventbox(&data, "playeruse",data.files.eventboxes[0].hitbox);
     MQAddEventToQueue(&data,"playeruse0",MQTRUE,data.files.eventboxes[MQFindEventbox(data,"playeruse")].hitbox,(Vector3){0,0,0},0,true,false);
 
-    MQAddMapItemToQueue(&data,"teste","teste",(Vector3){0,0,0},0,0,0,0,(BoundingBox){(Vector3){0,0,0},(Vector3){1,1,1}},true);
+    MQAddMapItemToQueue(&data,"teste",0,1,(Vector3){0,0,0},0,0,0,(BoundingBox){(Vector3){0,0,0},(Vector3){1,1,1}},true);
     while(!WindowShouldClose() && !MQEXIT)
     {
         data.session.render.camera.target = (Vector3){data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.x, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.y, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.z};
         data.session.frame++;
         UpdateCamera(&data.session.render.camera);
-
-
         data.session.render.model[MQFindRenderModel(data,"player0")].position = data.game.personagem[0].posicao;
         data.session.render.model[MQFindRenderModel(data,"player0")].rotation = data.game.personagem[0].rotacao;
         data.game.event[MQFindEvent(data,"playeruse0")].position = data.game.personagem[0].posicao;

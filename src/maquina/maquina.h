@@ -149,10 +149,10 @@ struct MQDATA_SESSION
 };
 typedef struct MQDATA_SESSION MQDATA_SESSION;
 
-
 //-----------------------------------
 //DATA_GAME
 //-----------------------------------
+
 struct MQDATA_EVENTBOX_SLOT
 {
     bool active;
@@ -165,10 +165,12 @@ struct MQDATA_EVENTBOX_SLOT
 };
 typedef struct MQDATA_EVENTBOX_SLOT MQDATA_EVENTBOX_SLOT;
 
+
+//0- calca, 1- camisa, 2- chapeu, 3- oculos, 4- sapatos, 5- arma
 struct MQDATA_GAME_ITEM
 {
     char *name;
-    char *type;
+    int type;
     int index;
     float content;
     bool active;
@@ -184,6 +186,32 @@ struct MQDATA_GAME_MAP
     MQDATA_GAME_ITEM item[MAXOBJ];
 };
 typedef struct MQDATA_GAME_MAP MQDATA_GAME_MAP;
+
+//0- calca, 1- camisa, 2- chapeu, 3- oculos, 4- sapatos, 5- arma
+struct MQDATA_GAME_PLAYER_ITEM
+{
+    char *name;
+    int type;
+    int index;
+    float content;
+    bool active;
+    BoundingBox hitbox;
+    int function;
+};
+typedef struct MQDATA_GAME_PLAYER_ITEM MQDATA_GAME_PLAYER_ITEM;
+
+struct MQDATA_PLAYER_INVENTORY_EQUIP
+{
+    MQDATA_GAME_ITEM item[MAXOBJ];
+};
+typedef struct MQDATA_PLAYER_INVENTORY_EQUIP MQDATA_PLAYER_INVENTORY_EQUIP;
+
+struct MQDATA_PLAYER_INVENTORY
+{
+    MQDATA_PLAYER_INVENTORY_EQUIP equip;
+    MQDATA_GAME_ITEM item[16];
+};
+typedef struct MQDATA_PLAYER_INVENTORY MQDATA_PLAYER_INVENTORY;
 
 struct MQDATA_PLAYER
 {

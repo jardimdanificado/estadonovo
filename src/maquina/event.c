@@ -1,19 +1,17 @@
-typedef float (*EVENTFUNC)(MQDATA*, float, float);
+typedef Vector3 (*EVENTFUNC)(MQDATA*, Vector3);
 
-float event0(MQDATA* data, float optionalIn0, float optionalIn1) 
+//quem,equipType,equipIndex
+Vector3 event0(MQDATA* data, Vector3 in) 
 {
     data->game.personagem[0].posicao.y += 5;
-    return 0;
 }
 
-float event1(MQDATA* data, float optionalIn0, float optionalIn1) 
+Vector3 event1(MQDATA* data, Vector3 in) 
 {
-    return 0;
 }
 
-float event2(MQDATA* data, float optionalIn0, float optionalIn1) 
+Vector3 event2(MQDATA* data, Vector3 in) 
 {
-    return 0;
 }
 
 EVENTFUNC MQEventFunctions[3] = {&event0,&event1,&event2};
@@ -124,7 +122,7 @@ void MQCleanAllMapItemSlots(MQDATA* data)
     for (short int i = 0; i < MAXOBJ; i++)
     {
         data->game.map.item[i].name = " ";
-        data->game.map.item[i].type = " ";
+        data->game.map.item[i].type = MQTRUE;
         data->game.map.item[i].index = MQTRUE;
         data->game.map.item[i].content = MQTRUE;
         data->game.map.item[i].active = false;
@@ -135,7 +133,7 @@ void MQCleanAllMapItemSlots(MQDATA* data)
     }
 }
 
-void MQAddMapItemToQueue(MQDATA *data, char*name, char*type, Vector3 position, float rotation, int index, float content, int function, BoundingBox hitbox, bool active)
+void MQAddMapItemToQueue(MQDATA *data, char*name,int index, int type, Vector3 position, float rotation,  float content, int function, BoundingBox hitbox, bool active)
 {
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
@@ -172,7 +170,7 @@ int MQFindMapItem(MQDATA data, char* name)
 void MQDeleteMapItem(MQDATA* data, int index)
 {
     data->game.map.item[index].name = " ";
-    data->game.map.item[index].type = " ";
+    data->game.map.item[index].type = MQTRUE;
     data->game.map.item[index].index = MQTRUE;
     data->game.map.item[index].content = MQTRUE;
     data->game.map.item[index].active = false;

@@ -6,7 +6,7 @@
 *   that provides a pseudo-OpenGL 1.1 immediate-mode style API (rlVertex, rlTranslate, rlRotate...)
 *
 *   When chosing an OpenGL backend different than OpenGL 1.1, some internal buffer are
-*   initialized on rlglInit() to accumulate vertex data->
+*   initialized on rlglInit() to accumulate vertex data.
 *
 *   When an internal state change is required all the stored vertex data is renderer in batch,
 *   additioanlly, rlDrawRenderBatchActive() could be called to force flushing of the batch.
@@ -2467,7 +2467,7 @@ void rlDrawRenderBatch(rlRenderBatch *batch)
         // If GPU is working with this buffer, glMapBuffer() will wait(stall) until GPU to finish its job.
         // To avoid waiting (idle), you can call first glBufferData() with NULL pointer before glMapBuffer().
         // If you do that, the previous data in PBO will be discarded and glMapBuffer() returns a new
-        // allocated pointer immediately even if GPU is still working with the previous data->
+        // allocated pointer immediately even if GPU is still working with the previous data.
 
         // Another option: map the buffer object into client's memory
         // Probably this code could be moved somewhere else...
