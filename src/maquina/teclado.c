@@ -16,15 +16,15 @@ void TECLADO_MAIN(MQDATA *data)
     }   
     if(IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
     {
-        if(data->game.personagem[0].rotacao == 0)
-            data->game.personagem[0].rotacao = 360;
-        data->game.personagem[0].rotacao -= 6;
+        if(data->game.player[0].rotation == 0)
+            data->game.player[0].rotation = 360;
+        data->game.player[0].rotation -= 6;
     }
     if(IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
     {
-        if(data->game.personagem[0].rotacao == 360)
-            data->game.personagem[0].rotacao = 0;
-        data->game.personagem[0].rotacao += 6;
+        if(data->game.player[0].rotation == 360)
+            data->game.player[0].rotation = 0;
+        data->game.player[0].rotation += 6;
     }
     if(IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
     {
@@ -34,23 +34,23 @@ void TECLADO_MAIN(MQDATA *data)
     if(IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
     {
 
-        data->game.personagem[0].posicao = MQPlayerMove(data->game.personagem[0].posicao, data->game.personagem[0].rotacao, (data->game.personagem[0].velocidade) * (-1));
+        data->game.player[0].position = MQPlayerMove(data->game.player[0].position, data->game.player[0].rotation, (data->game.player[0].speed) * (-1));
         float reverseRotation;
-        if(data->game.personagem[0].rotacao<180)
-            reverseRotation = 180 + data->game.personagem[0].rotacao;
+        if(data->game.player[0].rotation<180)
+            reverseRotation = 180 + data->game.player[0].rotation;
         else
-            reverseRotation = data->game.personagem[0].rotacao-180;
+            reverseRotation = data->game.player[0].rotation-180;
         
         Vector3 Vec3buff = MQCheckWall(*data,"player-barriga0",reverseRotation);
         if(Vec3buff.x != __INT_MAX__)
         {
-            if(data->game.personagem[0].posicao.x+0.5 > Vec3buff.x&&data->game.personagem[0].posicao.x-0.5<Vec3buff.x)
-                data->game.personagem[0].posicao.x = Vec3buff.x;
+            if(data->game.player[0].position.x+0.5 > Vec3buff.x&&data->game.player[0].position.x-0.5<Vec3buff.x)
+                data->game.player[0].position.x = Vec3buff.x;
         } 
         if(Vec3buff.z != __INT_MAX__)
         {
-            if(data->game.personagem[0].posicao.z+0.5 > Vec3buff.z&&data->game.personagem[0].posicao.z-0.5<Vec3buff.z)
-                data->game.personagem[0].posicao.z = Vec3buff.z;
+            if(data->game.player[0].position.z+0.5 > Vec3buff.z&&data->game.player[0].position.z-0.5<Vec3buff.z)
+                data->game.player[0].position.z = Vec3buff.z;
         }
 
 
@@ -60,13 +60,13 @@ void TECLADO_MAIN(MQDATA *data)
             Vec3buff = MQCheckWall(*data,"player-barriga0",reverseRotation);
             if(Vec3buff.x != __INT_MAX__)
             {
-                if(data->game.personagem[0].posicao.x+0.5 > Vec3buff.x&&data->game.personagem[0].posicao.x-0.5<Vec3buff.x)
-                    data->game.personagem[0].posicao.x = Vec3buff.x;
+                if(data->game.player[0].position.x+0.5 > Vec3buff.x&&data->game.player[0].position.x-0.5<Vec3buff.x)
+                    data->game.player[0].position.x = Vec3buff.x;
             } 
             if(Vec3buff.z != __INT_MAX__)
             {
-                if(data->game.personagem[0].posicao.z+0.5 > Vec3buff.z&&data->game.personagem[0].posicao.z-0.5<Vec3buff.z)
-                    data->game.personagem[0].posicao.z = Vec3buff.z;
+                if(data->game.player[0].position.z+0.5 > Vec3buff.z&&data->game.player[0].position.z-0.5<Vec3buff.z)
+                    data->game.player[0].position.z = Vec3buff.z;
             }
         }
     }
@@ -76,43 +76,43 @@ void TECLADO_MAIN(MQDATA *data)
     }
     if(IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
     {
-        data->game.personagem[0].posicao = MQPlayerMove(data->game.personagem[0].posicao, data->game.personagem[0].rotacao, data->game.personagem[0].velocidade);
-        Vector3 Vec3buff = MQCheckWall(*data,"player-barriga0",data->game.personagem[0].rotacao);
+        data->game.player[0].position = MQPlayerMove(data->game.player[0].position, data->game.player[0].rotation, data->game.player[0].speed);
+        Vector3 Vec3buff = MQCheckWall(*data,"player-barriga0",data->game.player[0].rotation);
         if(Vec3buff.x != __INT_MAX__)
         {
-            if(data->game.personagem[0].posicao.x+0.5 > Vec3buff.x&&data->game.personagem[0].posicao.x-0.5<Vec3buff.x)
-                data->game.personagem[0].posicao.x = Vec3buff.x;
+            if(data->game.player[0].position.x+0.5 > Vec3buff.x&&data->game.player[0].position.x-0.5<Vec3buff.x)
+                data->game.player[0].position.x = Vec3buff.x;
         } 
         if(Vec3buff.z != __INT_MAX__)
         {
-            if(data->game.personagem[0].posicao.z+0.5 > Vec3buff.z&&data->game.personagem[0].posicao.z-0.5<Vec3buff.z)
-                data->game.personagem[0].posicao.z = Vec3buff.z;
+            if(data->game.player[0].position.z+0.5 > Vec3buff.z&&data->game.player[0].position.z-0.5<Vec3buff.z)
+                data->game.player[0].position.z = Vec3buff.z;
         }
 
 
         if(MQWALLEXCLUDEINDEX != __INT_MAX__)
         {
             MQWALLEXCLUDE=true;
-            Vec3buff = MQCheckWall(*data,"player-barriga0",data->game.personagem[0].rotacao);
+            Vec3buff = MQCheckWall(*data,"player-barriga0",data->game.player[0].rotation);
             if(Vec3buff.x != __INT_MAX__)
             {
-                if(data->game.personagem[0].posicao.x+0.5 > Vec3buff.x&&data->game.personagem[0].posicao.x-0.5<Vec3buff.x)
-                    data->game.personagem[0].posicao.x = Vec3buff.x;
+                if(data->game.player[0].position.x+0.5 > Vec3buff.x&&data->game.player[0].position.x-0.5<Vec3buff.x)
+                    data->game.player[0].position.x = Vec3buff.x;
             } 
             if(Vec3buff.z != __INT_MAX__)
             {
-                if(data->game.personagem[0].posicao.z+0.5 > Vec3buff.z&&data->game.personagem[0].posicao.z-0.5<Vec3buff.z)
-                    data->game.personagem[0].posicao.z = Vec3buff.z;
+                if(data->game.player[0].position.z+0.5 > Vec3buff.z&&data->game.player[0].position.z-0.5<Vec3buff.z)
+                    data->game.player[0].position.z = Vec3buff.z;
             }
         }
     }
     if(IsKeyDown(KEY_LEFT_SHIFT))
     {
-        data->game.personagem[0].velocidade = 0.2f;
+        data->game.player[0].speed = 0.2f;
     }
     if(IsKeyReleased(KEY_LEFT_SHIFT))
     {
-        data->game.personagem[0].velocidade = 0.1f;
+        data->game.player[0].speed = 0.1f;
     }
     if(IsKeyReleased(KEY_UP) || IsKeyReleased(KEY_W))
     {
@@ -125,6 +125,6 @@ void TECLADO_MAIN(MQDATA *data)
     }
     if(IsKeyDown(KEY_SPACE))
     {
-        data->game.personagem[0].posicao.y +=0.14;
+        data->game.player[0].position.y +=0.14;
     }
 }

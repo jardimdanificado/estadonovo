@@ -1,19 +1,19 @@
 SIZE 14
 
-link0 ./data/models/personagem/body/cabeca.iqm
-link1 ./data/models/personagem/body/pescoco.iqm
-link2 ./data/models/personagem/body/peitoral.iqm
-link3 ./data/models/personagem/body/barriga.iqm
-link4 ./data/models/personagem/body/maodireita.iqm
-link5 ./data/models/personagem/body/maoesquerda.iqm
-link6 ./data/models/personagem/body/bracodireito.iqm
-link7 ./data/models/personagem/body/bracoesquerdo.iqm
-link8 ./data/models/personagem/body/ombrodireito.iqm
-link9 ./data/models/personagem/body/ombroesquerdo.iqm
-link10 ./data/models/personagem/body/coxadireita.iqm
-link11 ./data/models/personagem/body/coxaesquerda.iqm
-link12 ./data/models/personagem/body/pernadireita.iqm
-link13 ./data/models/personagem/body/pernaesquerda.iqm
+link0 ./data/models/player/body/cabeca.iqm
+link1 ./data/models/player/body/pescoco.iqm
+link2 ./data/models/player/body/peitoral.iqm
+link3 ./data/models/player/body/barriga.iqm
+link4 ./data/models/player/body/maodireita.iqm
+link5 ./data/models/player/body/maoesquerda.iqm
+link6 ./data/models/player/body/bracodireito.iqm
+link7 ./data/models/player/body/bracoesquerdo.iqm
+link8 ./data/models/player/body/ombrodireito.iqm
+link9 ./data/models/player/body/ombroesquerdo.iqm
+link10 ./data/models/player/body/coxadireita.iqm
+link11 ./data/models/player/body/coxaesquerda.iqm
+link12 ./data/models/player/body/pernadireita.iqm
+link13 ./data/models/player/body/pernaesquerda.iqm
 
 name0 player-cabeca
 name1 player-pescoco

@@ -7,7 +7,7 @@ Leonardo Reis (https://github.com/reonardoleis) - Wrote the windows build files,
 
 Kayoa - Composed main theme music.
 
-assblasterplastered (https://sketchfab.com/assblasterplastered) - Made the base mesh used for player and npcs. License is included in path data/models/personagem/license.txt
+assblasterplastered (https://sketchfab.com/assblasterplastered) - Made the base mesh used for player and npcs. License is included in path data/models/player/license.txt
 
 raylib (https://www.raylib.com/) - Robust lib for opengl manipulation and game development.
 

@@ -1,6 +1,6 @@
 SIZE 5
 
-link0 ./data/models/personagem/model.iqm
+link0 ./data/models/player/model.iqm
 link1 ./data/models/equips/calca/1.iqm
 link2 ./data/models/equips/camisa/1.iqm
 link3 ./data/models/equips/chapeu/1.iqm

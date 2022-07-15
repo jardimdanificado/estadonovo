@@ -241,22 +241,22 @@ Vector3 MQRotateVertice(Vector3 pivot, float angle, Vector3 vertice)
 //COLISION
 //-----------------------------------
 
-float MQGravity(Vector3 posicao, float gravidade, int tempo)
+float MQGravity(Vector3 position, float gravidade, int tempo)
 {
-    return(posicao.y - gravidade*((tempo*(tempo/5)))/60);
+    return(position.y - gravidade*((tempo*(tempo/5)))/60);
 }
 
 void MQGravit(MQDATA* data, int quem)
 {
-    if(MQReturnYMaxCollisionPoint(*data, data->game.personagem[quem].posicao) == MQFALSE)
+    if(MQReturnYMaxCollisionPoint(*data, data->game.player[quem].position) == MQFALSE)
     {
-        data->game.personagem[quem].posicao.y = MQGravity(data->game.personagem[quem].posicao, 0.1, data->game.personagem[quem].tempoGravit);
-        data->game.personagem[quem].tempoGravit++;
+        data->game.player[quem].position.y = MQGravity(data->game.player[quem].position, 0.1, data->game.player[quem].fallTime);
+        data->game.player[quem].fallTime++;
     }
     else 
     {
-        data->game.personagem[quem].posicao.y = MQReturnYMaxCollisionPoint(*data, data->game.personagem[quem].posicao);
-        data->game.personagem[quem].tempoGravit = 0;
+        data->game.player[quem].position.y = MQReturnYMaxCollisionPoint(*data, data->game.player[quem].position);
+        data->game.player[quem].fallTime = 0;
     }
 }
 

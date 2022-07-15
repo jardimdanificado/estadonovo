@@ -3,7 +3,7 @@ typedef Vector3 (*EVENTFUNC)(MQDATA*, Vector3);
 //quem,equipType,equipIndex
 Vector3 event0(MQDATA* data, Vector3 in) 
 {
-    data->game.personagem[0].posicao.y += 5;
+    data->game.player[0].position.y += 5;
 }
 
 Vector3 event1(MQDATA* data, Vector3 in) 

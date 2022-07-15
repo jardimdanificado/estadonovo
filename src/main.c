@@ -31,7 +31,7 @@ int main(void)
     SetExitKey(KEY_END);
     data.session.render.camera.position = (Vector3){0.4375, 3.5, 11.0625};
     MQRenderAddModelToQueue(&data, "mapa0", MQFindModelByName(data,"map0"), WHITE,(Vector3){0.0f, 0.0f, 0.0f}, 0,  0,0,true,false,false);
-    MQRenderAddModelToQueue(&data, "player0", MQFindModelByName(data,"player"), COR_PELE0,data.game.personagem[0].posicao, data.game.personagem[0].rotacao,  0,0,true,true,false);
+    MQRenderAddModelToQueue(&data, "player0", MQFindModelByName(data,"player"), COR_PELE0,data.game.player[0].position, data.game.player[0].rotation,  0,0,true,true,false);
     
     data.files.eventboxes[0].hitbox.min = (Vector3){-0.5,0,-0.5};
     data.files.eventboxes[0].hitbox.max = (Vector3){0.5,2.3,0.5};
@@ -44,15 +44,15 @@ int main(void)
         data.session.render.camera.target = (Vector3){data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.x, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.y, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.z};
         data.session.frame++;
         UpdateCamera(&data.session.render.camera);
-        data.session.render.model[MQFindRenderModel(data,"player0")].position = data.game.personagem[0].posicao;
-        data.session.render.model[MQFindRenderModel(data,"player0")].rotation = data.game.personagem[0].rotacao;
-        data.game.event[MQFindEvent(data,"playeruse0")].position = data.game.personagem[0].posicao;
+        data.session.render.model[MQFindRenderModel(data,"player0")].position = data.game.player[0].position;
+        data.session.render.model[MQFindRenderModel(data,"player0")].rotation = data.game.player[0].rotation;
+        data.game.event[MQFindEvent(data,"playeruse0")].position = data.game.player[0].position;
 
         TECLADO_MAIN(&data);
         MQPlayerUpdateBodyBox( &data, 0, data.session.render.model[MQFindRenderModel(data,"player0")].currentAnim);
         
-        if((int)data.game.personagem[0].rotacao%360 == 0)
-            data.game.personagem[0].rotacao = 0;
+        if((int)data.game.player[0].rotation%360 == 0)
+            data.game.player[0].rotation = 0;
 
         MQGravit(&data, 0);
         MQRenderQueue(&data);

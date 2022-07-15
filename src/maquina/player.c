@@ -1,3 +1,18 @@
+/* void MQCleanPlayerInventory(MQDATA *data)
+{
+    for(int i = 0;i<MAXOBJ;i++)
+    { 
+        data->game.player[i].inventory = " ";
+        data->game.event[i].hitbox = (BoundingBox){(Vector3){0,0,0},(Vector3){0,0,0}};
+        data->game.event[i].function = MQTRUE;
+        data->game.event[i].position = (Vector3){0,0,0};
+        data->game.event[i].rotation = 0;
+        data->game.event[i].active = false;
+        data->game.event[i].persistent = false;
+    }
+}
+ */
+
 bool MQCheckCollisionPoint(Vector3 inPosi,BoundingBox target, int size)
 {
     BoundingBox localhitbox;
@@ -202,51 +217,51 @@ void MQPlayerConfigStart(MQDATA *data, int quem, Vector3 posi)
     //3 - sapatos
     //4 - oculos
     //5 - arma
-    data->game.personagem[quem].tempoGravit = 0;
-    data->game.personagem[quem].rotacao = 180;
-    data->game.personagem[quem].posicao.y = posi.y;
-    data->game.personagem[quem].posicao.x = posi.x;
-    data->game.personagem[quem].posicao.z = posi.z;
-    data->game.personagem[quem].velocidade = 0.1f;
+    data->game.player[quem].fallTime = 0;
+    data->game.player[quem].rotation = 180;
+    data->game.player[quem].position.y = posi.y;
+    data->game.player[quem].position.x = posi.x;
+    data->game.player[quem].position.z = posi.z;
+    data->game.player[quem].speed = 0.1f;
 }
 
-Vector3 MQPlayerMove(Vector3 posicao, float rotacao, float velocidade)
+Vector3 MQPlayerMove(Vector3 position, float rotation, float speed)
 {
     //z+ frente
     //x+ esquerda
     float  valorZ, valorX;
-    int giro = rotacao / 90;
-    float resto = rotacao - (90 * giro);
+    int giro = rotation / 90;
+    float resto = rotation - (90 * giro);
     float restodoresto = 90 - resto;
-    valorZ = velocidade - resto * (velocidade / 90);
-    valorX = velocidade - restodoresto * (velocidade / 90);
+    valorZ = speed - resto * (speed / 90);
+    valorX = speed - restodoresto * (speed / 90);
     switch(giro)
     {
         case 0:
         {
-            posicao.z += valorZ;
-            posicao.x += valorX;
+            position.z += valorZ;
+            position.x += valorX;
         }
         break;
         case 1:
         {
-            posicao.z -= valorX;
-            posicao.x += valorZ;
+            position.z -= valorX;
+            position.x += valorZ;
         }
         break;
         case 2:
         {
-            posicao.z -= valorZ;
-            posicao.x -= valorX;
+            position.z -= valorZ;
+            position.x -= valorX;
         }
         break;
         case 3:
         {
-            posicao.z += valorX;
-            posicao.x -= valorZ;
+            position.z += valorX;
+            position.x -= valorZ;
         }
         break;
     }
-    return posicao;
+    return position;
 }
 

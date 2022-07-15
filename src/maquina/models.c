@@ -260,7 +260,7 @@ void MQPlayerUpdateBodyBox(MQDATA *data, int quem, int qualAnim)
 
         for(int i = 0; i < LocalMesh.vertexCount * 3; i += 3)
         {
-            LocVec3 = MQRotateVerticeSelf(270 - ((PI / 180) * (data->game.personagem[quem].rotacao)), (Vector3) {LocalMesh.vertices[i], LocalMesh.vertices[i + 1], LocalMesh.vertices[i + 2]});
+            LocVec3 = MQRotateVerticeSelf(270 - ((PI / 180) * (data->game.player[quem].rotation)), (Vector3) {LocalMesh.vertices[i], LocalMesh.vertices[i + 1], LocalMesh.vertices[i + 2]});
 
             LocalMesh.vertices[i] = LocVec3.x;
             LocalMesh.vertices[i + 1] = LocVec3.y;
@@ -271,8 +271,8 @@ void MQPlayerUpdateBodyBox(MQDATA *data, int quem, int qualAnim)
         data->files.hitboxes[hitboxIndex].hitbox.min = Vector3Add(data->files.hitboxes[hitboxIndex].hitbox.min, (Vector3) {0.06, 0.06, 0.06});
         data->files.hitboxes[hitboxIndex].hitbox.max = Vector3Subtract(data->files.hitboxes[hitboxIndex].hitbox.max, (Vector3) {0.06, 0.06, 0.06});
 
-        data->files.hitboxes[hitboxIndex].hitbox.min = Vector3Add(data->files.hitboxes[hitboxIndex].hitbox.min, data->game.personagem[quem].posicao);
-        data->files.hitboxes[hitboxIndex].hitbox.max = Vector3Add(data->files.hitboxes[hitboxIndex].hitbox.max, data->game.personagem[quem].posicao);
+        data->files.hitboxes[hitboxIndex].hitbox.min = Vector3Add(data->files.hitboxes[hitboxIndex].hitbox.min, data->game.player[quem].position);
+        data->files.hitboxes[hitboxIndex].hitbox.max = Vector3Add(data->files.hitboxes[hitboxIndex].hitbox.max, data->game.player[quem].position);
     }
 }
 

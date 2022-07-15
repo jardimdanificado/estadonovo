@@ -153,6 +153,10 @@ typedef struct MQDATA_SESSION MQDATA_SESSION;
 //DATA_GAME
 //-----------------------------------
 
+    //-----------------------------------
+    //DATA_MAP
+    //-----------------------------------
+
 struct MQDATA_EVENTBOX_SLOT
 {
     bool active;
@@ -165,14 +169,15 @@ struct MQDATA_EVENTBOX_SLOT
 };
 typedef struct MQDATA_EVENTBOX_SLOT MQDATA_EVENTBOX_SLOT;
 
-
-//0- calca, 1- camisa, 2- chapeu, 3- oculos, 4- sapatos, 5- arma
+//item types
+//0- calca, 1- camisa, 2- chapeu, 3- oculos, 4- sapatos, 5- arma, 6- anel, 7- medalha
 struct MQDATA_GAME_ITEM
 {
     char *name;
-    int type;
+    char *type;
     int index;
     float content;
+    float condition;
     bool active;
     BoundingBox hitbox;
     Vector3 position;
@@ -187,38 +192,56 @@ struct MQDATA_GAME_MAP
 };
 typedef struct MQDATA_GAME_MAP MQDATA_GAME_MAP;
 
-//0- calca, 1- camisa, 2- chapeu, 3- oculos, 4- sapatos, 5- arma
+    //-----------------------------------
+    //DATA_PLAYER
+    //-----------------------------------
+
+//item types
+//0- calca, 1- camisa, 2- chapeu, 3- oculos, 4- sapatos, 5- arma, 6- anel, 7- medalha
 struct MQDATA_GAME_PLAYER_ITEM
 {
     char *name;
-    int type;
+    char *type;
     int index;
     float content;
-    bool active;
-    BoundingBox hitbox;
+    float condition;
     int function;
+
+    bool active;
+    bool locked;
 };
 typedef struct MQDATA_GAME_PLAYER_ITEM MQDATA_GAME_PLAYER_ITEM;
 
-struct MQDATA_PLAYER_INVENTORY_EQUIP
+//equip slots
+//0- calca, 1- camisa, 2- chapeu, 3- oculos, 4- sapatos, 5- arma, 6- anel left, 7- anel right, 8-15 medalhas
+struct MQDATA_GAME_PLAYER_EQUIP
 {
-    MQDATA_GAME_ITEM item[MAXOBJ];
+    char *name;
+    char *type;
+    int index;
+    float content;
+    float condition;
+    int function;
+
+    bool active;
+    bool locked;
 };
-typedef struct MQDATA_PLAYER_INVENTORY_EQUIP MQDATA_PLAYER_INVENTORY_EQUIP;
+typedef struct MQDATA_GAME_PLAYER_EQUIP MQDATA_GAME_PLAYER_EQUIP;
 
 struct MQDATA_PLAYER_INVENTORY
 {
-    MQDATA_PLAYER_INVENTORY_EQUIP equip;
-    MQDATA_GAME_ITEM item[16];
+    MQDATA_GAME_PLAYER_EQUIP equip[16];
+    MQDATA_GAME_PLAYER_ITEM item[MAXOBJ];
 };
 typedef struct MQDATA_PLAYER_INVENTORY MQDATA_PLAYER_INVENTORY;
 
 struct MQDATA_PLAYER
 {
-    float velocidade;
-    int tempoGravit;
-    Vector3 posicao;
-    float rotacao;
+    MQDATA_PLAYER_INVENTORY inventory;
+    float speed;
+    int fallTime;
+    Vector3 position;
+    float rotation;
 };
 typedef struct MQDATA_PLAYER MQDATA_PLAYER;
 
@@ -226,7 +249,7 @@ struct MQDATA_GAME
 {
     MQDATA_EVENTBOX_SLOT event[MAXOBJ];
     MQDATA_GAME_MAP map;
-    MQDATA_PLAYER personagem[MAXOBJ];
+    MQDATA_PLAYER player[MAXOBJ];
 };
 typedef struct MQDATA_GAME MQDATA_GAME;
 
