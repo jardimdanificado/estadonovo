@@ -14,7 +14,7 @@ int main(void)
     data.session.render.background = (Color){115, 105, 97, 255};
     data.session.frame = 0;
     MQLoadLang(&data,"ptbr");
-    MQLoadAllModels(&data);
+    
     MQPlayerConfigStart(&data, 0, (Vector3) {-0.0625, 5, 6.0625});
     data.files.fonts[0].font= MQFontStart("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16);
     data.files.fonts[1].font= MQFontStart("data/font/Mockery.ttf", 48);
@@ -23,7 +23,7 @@ int main(void)
 
     data.files.musics[0].music = LoadMusicStream("./data/audio/music/maintheme_by_kayoa.mp3");
     MQEXIT = MQMenu(&data,0);
-    
+    MQLoadAllModels(&data);
     data.session.render.camera.target = (Vector3)
     {
         data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.x, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.y, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.z
