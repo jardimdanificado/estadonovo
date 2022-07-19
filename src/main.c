@@ -1,6 +1,10 @@
 //ENGINE
 #include "./maquina/maquina.h"
 
+#ifndef PLATFORM_ANDROID
+	ChangeDirectory("assets");
+#endif
+
 int main(void)
 {
     MQDATA data;

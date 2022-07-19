@@ -19,7 +19,7 @@ cd ../../..
 
 #mv ./commandlinetools*.zip ./zip
 
-wget https://dl.google.com/android/repository/android-ndk-r21e-linux-x86_64.zip
+wget https://dl.google.com/android/repository/android-ndk-r17c-windows-x86.zip
 unzip -q android-ndk*.zip
 
 #mv ../android-ndk*.zip ./zip
