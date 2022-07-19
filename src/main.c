@@ -2,11 +2,14 @@
 #include "./maquina/maquina.h"
 
 #ifndef PLATFORM_ANDROID
-	ChangeDirectory("assets");
+    #include <unistd.h>
 #endif
 
 int main(void)
 {
+    #ifndef PLATFORM_ANDROID
+        ChangeDirectory("assets");
+    #endif
     MQDATA data;
     MQResetAllFileSlots(&data);
     MQWindowStart(abinCoreReturnData("config.text", "TITLE"));
