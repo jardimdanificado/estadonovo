@@ -110,7 +110,7 @@ bool MQMenu(MQDATA *data, int menuIndex)
     }
     while(menuIndex < MQTRUE&& menuIndex > MQFALSE)
     {
-        UpdateMusicStream(data->files.musics[0].music);
+        //UpdateMusicStream(data->files.musics[0].music);
         //RENDER
         MQRenderLogo(*data,title[0],title[1],localframe);
         MQMenuRender(*data,  allmax[menuIndex], optIndex, quotes );
