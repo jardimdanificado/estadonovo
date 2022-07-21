@@ -51,8 +51,8 @@ VERSION_NAME=1.0
 # are not supported, so the MIN_API_VERSION should be set to 23. To support
 # versions 19 (4.4) to 22 (5.1), both the API_VERSION and MIN_API_VERSION should
 # be set to 19.
-API_VERSION=19
-MIN_API_VERSION=19
+API_VERSION=31
+MIN_API_VERSION=23
 
 # The app's screen orientation, portrait or landscape.
 SCREEN_ORIENTATION=landscape

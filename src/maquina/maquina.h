@@ -15,11 +15,11 @@
 #include <math.h>
 
 //RAYLIB
-#include "./raylib/raylib.h"
-#include "./raylib/raymath.h"
+#include "raylib/raylib.h"
+#include "raylib/raymath.h"
 
 //ABIN Files
-#include "./abin.h"
+#include "abin.h"
 
 #define COR_VERMELHO CLITERAL(Color){235, 64, 52,255}
 #define COR_SELECIONADO   CLITERAL(Color){202,137,109,255}
@@ -42,6 +42,17 @@
 unsigned int MAXANIM = 1;
 
 bool MQEXIT = false;
+
+//-----------------------------------
+//CONFIG
+//-----------------------------------
+
+const char* MQTitle = "Estado Novo";
+const char* MQSubTitle = "Uma obra por Jardel Torres";
+int MQScreenX = 600;
+int MQScreenY = 400;
+bool MQMSAAX4 = false;
+bool MQResizeble = false;
 
 //-----------------------------------
 //DATA_FILE

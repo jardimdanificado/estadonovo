@@ -104,31 +104,6 @@ Mesh MQApplyMeshTransformFromBone(Model model, ModelAnimation anim, int frame)
     }
 }
 
-void MQLoadModelsFromText(MQDATA *data, char *fileloc)
-{
-    int LocalIndex;
-    for(int i = 0;i<MAXOBJ;i++)
-    {
-        if(strcmp(data->files.models[i].name," ")==0)
-        {
-            LocalIndex = i;
-            break;
-        }
-    }
-    char buffer[128];
-    for(int i = 0; i < atoi(abinCoreReturnData(fileloc, "SIZE")); i++)
-    {
-        strcpy(buffer,abinCoreReturnData(fileloc, MQStrAddInt("link",i)));
-        data->files.models[LocalIndex].model= LoadModel(buffer);
-        strcpy(data->files.models[LocalIndex].name ,abinCoreReturnData(fileloc, MQStrAddInt("name",i)));
-        if(strcmp(abinCoreReturnData(fileloc, MQStrAddInt("animated",i)), "true") == 0)
-        {
-            data->files.models[LocalIndex].anim= LoadModelAnimations(buffer, &MAXANIM);
-        }
-        LocalIndex++;
-    }
-}
-
 //---------------------------------------
 //HITBOX
 //---------------------------------------
@@ -163,28 +138,6 @@ BoundingBox MQHitboxUpdateXYZ(BoundingBox hitboxbase, Vector3 targetPosi)
     return hitbox;
 }
 
-void MQLoadHitboxFromText(MQDATA *data, char *fileloc)
-{
-    int LocalIndex;
-    for(int i = 0;i<MAXOBJ;i++)
-    {
-        if(strcmp(data->files.hitboxes[i].name," ")==0)
-        {
-            LocalIndex = i;
-            break;
-        }
-    }
-    Model localModel;
-    for(int i = 0; i < atoi(abinCoreReturnData(fileloc, "SIZE")); i++)
-    {
-        localModel = LoadModel(abinCoreReturnData(fileloc, MQStrAddInt("link",i)));
-        data->files.hitboxes[LocalIndex].hitbox= GetModelBoundingBox(localModel);
-        UnloadModel(localModel);
-        strcpy(data->files.hitboxes[LocalIndex].name,abinCoreReturnData(fileloc, MQStrAddInt("name",i)));
-        LocalIndex++;
-    }
-}
-
 void MQCreateHitbox(MQDATA *data, char *name, BoundingBox Hitbox)
 {
     int LocalIndex;
@@ -196,7 +149,7 @@ void MQCreateHitbox(MQDATA *data, char *name, BoundingBox Hitbox)
             break;
         }
     }
-    data->files.hitboxes[LocalIndex].hitbox= Hitbox;
+    data->files.hitboxes[LocalIndex].hitbox = Hitbox;
     strcpy(data->files.hitboxes[LocalIndex].name,name);
     LocalIndex++;
 }
@@ -216,25 +169,37 @@ void MQCreateEmptyHitbox(MQDATA *data, char *name)
     LocalIndex++;
 }
 
-void MQPlayerCreateBodyBox(MQDATA *data, int quem)
+void MQLoadModel(MQDATA *data, char *name, char *link, bool animated, bool isHitbox)
 {
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
     {
-        if(strcmp(data->files.hitboxes[i].name," ")==0)
+        if(strcmp(data->files.models[i].name," ")==0)
         {
             LocalIndex = i;
             break;
         }
     }
+    data->files.models[LocalIndex].model = LoadModel(link);
+    strcpy(data->files.models[LocalIndex].name ,name);
+    if(animated==true)
+    {
+        data->files.models[LocalIndex].anim = LoadModelAnimations(link, &MAXANIM);
+    }
+    if(isHitbox==true)
+    {
+        MQCreateHitbox(*&data,name,GetModelBoundingBox(data->files.models[LocalIndex].model));
+    }
+}
+
+void MQPlayerCreateBodyBox(MQDATA *data, int quem)
+{
     char buffer[128],buffer0[128];
     for(int i = 0; i < 14; i++)
     {
-        snprintf(buffer,128,"%s%d",abinCoreReturnData("./data/models/playerhitbox.text", MQStrAddInt("name",i)),quem);
-        snprintf(buffer0,128,"%s",abinCoreReturnData("./data/models/playerhitbox.text", MQStrAddInt("name",i)));
-        data->files.hitboxes[LocalIndex].hitbox= GetModelBoundingBox(data->files.models[MQFindModelByName(*data,buffer0)].model);
-        strcpy(data->files.hitboxes[LocalIndex].name,buffer);
-        LocalIndex++;
+        snprintf(buffer,266,"%s%d",data->files.models[i].name,quem);
+        snprintf(buffer0,255,"%s",data->files.models[i].name);
+        MQCreateHitbox(*&data, buffer, GetModelBoundingBox(data->files.models[MQFindModelByName(*data,buffer0)].model));
     } 
 }
 
@@ -276,16 +241,3 @@ void MQPlayerUpdateBodyBox(MQDATA *data, int quem, int qualAnim)
     }
 }
 
-//---------------------------------------
-//LOADALL
-//---------------------------------------
-
-void MQLoadAllModels(MQDATA *data)
-{
-    MQLoadModelsFromText( *&data, "./data/models/player.text");
-    MQLoadModelsFromText( *&data, "./data/models/playerhitbox.text");
-    MQLoadModelsFromText( *&data, "./data/models/porta.text");
-    MQLoadModelsFromText( *&data, "./data/models/map/level0/lvl0.text");
-    MQLoadHitboxFromText( *&data, "./data/models/map/level0/hitbox.text");
-    MQPlayerCreateBodyBox( *&data, 0);
-}

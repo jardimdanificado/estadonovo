@@ -1,10 +1,10 @@
 SIZE 5
 
-link0 ./data/models/player/model.iqm
-link1 ./data/models/equips/calca/1.iqm
-link2 ./data/models/equips/camisa/1.iqm
-link3 ./data/models/equips/chapeu/1.iqm
-link4 ./data/models/equips/arma/1.iqm
+,data/models/player/model.iqm
+,data/models/equips/calca/1.iqm
+,data/models/equips/camisa/1.iqm
+,data/models/equips/chapeu/1.iqm
+,data/models/equips/arma/1.iqm
 
 name0 player
 name1 calca1

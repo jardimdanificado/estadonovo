@@ -101,8 +101,8 @@ bool MQMenu(MQDATA *data, int menuIndex)
     int optIndex = 0;
     char quotes[allmax[menuIndex]][255];
     char title[2][64];
-    strcpy(title[0],abinCoreReturnData("./config.text","TITLE"));
-    strcpy(title[1],abinCoreReturnData("./config.text","SUBTITLE"));
+    strcpy(title[0],MQTitle);
+    strcpy(title[1],MQSubTitle);
     int localframe = 0;
     for(short int i = 0 ;i<allmax[menuIndex];i++)
     {

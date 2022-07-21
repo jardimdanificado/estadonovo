@@ -1,7 +1,7 @@
 SIZE 2
 
-link0 ./data/models/map/level0/0.glb
-link1 ./data/models/map/level0/props/0.glb
+link0 data/models/map/level0/0.glb
+link1 data/models/map/level0/props/0.glb
 
 name0 map0
 name1 props0

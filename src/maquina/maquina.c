@@ -47,14 +47,12 @@ Vector3 MQDifferenceVec3(Vector3 vec1, Vector3 vec2)
 
 void MQWindowStart()
 {
-    if(strcmp(abinCoreReturnData("./config.text", "MSAA"), "true") == 0)
+    if(MQMSAAX4 == true)
         SetConfigFlags(FLAG_MSAA_4X_HINT);
-    if(strcmp(abinCoreReturnData("./config.text", "RESIZE"), "true") == 0)
+    if(MQResizeble == true)
         SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    char buffer[255];
-    snprintf(buffer,255,"%s",abinCoreReturnData("config.text", "TITLE"));
-    //InitAudioDevice();
-    InitWindow(atoi(abinCoreReturnData("config.text", "SCRX")), atoi(abinCoreReturnData("config.text", "SCRY")), buffer);
+    InitAudioDevice();
+    InitWindow(MQScreenX, MQScreenY, MQTitle);
 }
 
 //-----------------------------------
@@ -70,30 +68,6 @@ char *MQStrAddInt(char* string, int value)
     string = malloc(sizeof(string)+8);
     snprintf(string,sizeof(string)+8,"%s%d",buffer,value);
     return string;
-}
-
-void MQLoadLang(MQDATA* data, char lang[4])
-{
-    int LocalIndex;
-    for(int i = 0;i<MAXOBJ;i++)
-    {
-        if(strcmp(data->files.langs[i].name," ")==0)
-        {
-            LocalIndex = i;
-            break;
-        }
-    }
-    remove("./data/temp/lang");
-    char buffer[27];
-    snprintf(buffer,27,"./data/lang/%s/text.text",lang);
-    abinCoreFileCopy(buffer, "./data/temp/lang");
-    for(int i = 0; i <atoi(abinCoreReturnData("./data/temp/lang","SIZE"));i++)
-    {
-        snprintf(buffer,4,"%d",i);
-        strcpy(data->files.langs[LocalIndex].text,abinCoreReturnData("./data/temp/lang",buffer));
-        strcpy(data->files.langs[LocalIndex].name,"sem-nome");
-        LocalIndex++;
-    }
 }
 
 Font MQFontStart(char *FontLoc, int FontSize)
@@ -172,7 +146,6 @@ int MQFindModelByName(MQDATA data, char* name)
 {
     for(int i = 0; i < MAXOBJ; i++)
     {
-        /* abinDEBUGtext("debug.txt",data.files.models[i].name); */
         if(strcmp(data.files.models[i].name,name)==0)
             return i;
     }
@@ -285,23 +258,29 @@ Camera MQCameraStart(Camera *camera)
 }
 
 //-----------------------------------
-//SAVE
+//LOAD
+//-----------------------------------
+#include "load.c"
+
+
+//-----------------------------------
+//SAVEGAME
 //-----------------------------------
 
 void MQLoadGame(MQDATA *data)
 {
-    FILE *file;
+/*     FILE *file;
     file = fopen("data/save/savegame", "r+b");
     fread(&data->game, sizeof(struct MQDATA_GAME), 1, file);
-    fclose(file);
+    fclose(file); */
 }
 
 void MQSaveGame(MQDATA data)
 {
-    remove("data/save/savegame");
+/*     remove("data/save/savegame");
     FILE *file = fopen("data/save/savegame", "w+b");
     fwrite(&data.game, sizeof(struct MQDATA_GAME), 1, file);
-    fclose(file);
+    fclose(file); */
 }
 
 //-----------------------------------

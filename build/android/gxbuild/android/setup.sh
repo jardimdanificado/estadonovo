@@ -102,6 +102,7 @@ echo "        android:versionCode=\"$VERSION_CODE\" android:versionName=\"$VERSI
 echo "    <uses-sdk android:minSdkVersion=\"$MIN_API_VERSION\" android:targetSdkVersion=\"$API_VERSION\"/>"        >> AndroidManifest.xml
 echo "    <uses-feature android:glEsVersion=\"0x00020000\" android:required=\"true\"/>"                            >> AndroidManifest.xml
 echo "    <uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>"                           >> AndroidManifest.xml
+echo "    <uses-permission android:name=\"android.permission.READ_EXTERNAL_STORAGE\"/>"                           >> AndroidManifest.xml
 echo "    <application android:allowBackup=\"false\" android:label=\"$APP_NAME\" android:icon=\"@drawable/icon\">" >> AndroidManifest.xml
 echo "        <activity android:name=\"com.$DEV_NAME.$PKG_NAME.NativeLoader\""                                     >> AndroidManifest.xml
 echo "            android:theme=\"@android:style/Theme.NoTitleBar.Fullscreen\""                                    >> AndroidManifest.xml
