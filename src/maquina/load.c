@@ -49,7 +49,6 @@ void MQLoadAll(MQDATA* data)
     MQLoadModel(*&data, "hitbox7","data/models/map/level0/hitbox/hitbox7.glb",false,true);
     MQLoadModel(*&data, "hitbox8","data/models/map/level0/hitbox/hitbox8.glb",false,true);
     MQLoadModel(*&data, "hitbox9","data/models/map/level0/hitbox/hitbox9.glb",false,true);
-    MQLoadModel(*&data, "chao0","data/models/map/level0/hitbox/chao.glb",false,true);
     MQLoadModel(*&data, "map0item0","data/models/map/level0/item/0.glb",false,true);
     MQLoadModel(*&data, "map0item1","data/models/map/level0/item/1.glb",false,true);
     MQLoadModel(*&data, "map0item2","data/models/map/level0/item/2.glb",false,true);
@@ -60,4 +59,8 @@ void MQLoadAll(MQDATA* data)
     MQLoadModel(*&data, "area3","data/models/map/level0/area/3.glb",false,false);
     MQLoadModel(*&data, "area4","data/models/map/level0/area/4.glb",false,false);
     MQLoadModel(*&data, "area5","data/models/map/level0/area/5.glb",false,false);
+
+    MQLoadModel(*&data, "chao0","data/models/map/level0/hitbox/chao.glb",false,true);
+    data->files.hitboxes[MQFindHitbox(*data,"chao0")].hitbox.min.y -= 2;
+
 }

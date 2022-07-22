@@ -16,7 +16,6 @@ int main(void)
     data.session.render.camera = MQCameraStart(&data.session.render.camera);
     data.session.render.background = (Color){115, 105, 97, 255};
     data.session.frame = 0;
-    //MQLoadLang(&data,"ptbr");
     
     MQPlayerConfigStart(&data, 0, (Vector3) {-0.0625, 5, 6.0625});
     data.files.fonts[0].font= MQFontStart("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16);
