@@ -188,6 +188,14 @@ void MQLoadModel(MQDATA *data, char *name, char *link, bool animated, bool isHit
     }
     if(isHitbox==true)
     {
+        for(int i = 0;i<MAXOBJ;i++)
+        {
+            if(strcmp(data->files.hitboxes[i].name," ")==0)
+            {
+                LocalIndex = i;
+                break;
+            }
+        }
         MQCreateHitbox(*&data,name,GetModelBoundingBox(data->files.models[LocalIndex].model));
     }
 }
@@ -218,8 +226,6 @@ void MQPlayerUpdateBodyBox(MQDATA *data, int quem, int qualAnim)
         modelIndex =  modelheadfind+i;
         hitboxIndex = hitboxheadfind+i;
         snprintf(buffer,128,"player%d",quem);
-        /* abinDEBUGint("debug.txt",modelIndex); */
-        /* abinDEBUGint("debug.txt",hitboxIndex); */
         LocalMesh = MQApplyMeshTransformFromBone(data->files.models[modelIndex].model, data->files.models[modelIndex].anim[qualAnim], data->session.render.model[MQFindRenderModel(*data,buffer)].currentFrame);
         
 

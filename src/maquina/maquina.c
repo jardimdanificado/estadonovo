@@ -260,6 +260,7 @@ Camera MQCameraStart(Camera *camera)
 //-----------------------------------
 //LOAD
 //-----------------------------------
+
 #include "load.c"
 
 

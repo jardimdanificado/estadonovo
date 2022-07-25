@@ -189,7 +189,7 @@ float MQReturnYMaxCollisionPoint(MQDATA data, Vector3 posi)
     int hitboxMax;
     for(int i = MAXOBJ-1;i>0;i--)
     {
-        if(strcmp(data.game.event[i].name," ")==0)
+        if(strcmp(data.files.hitboxes[i].name," ")==0)
         {
             hitboxMax = i;
             break;

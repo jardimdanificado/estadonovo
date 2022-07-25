@@ -7,12 +7,12 @@ int main(void)
     MQDATA data;
 
     
-    MQPlayerCreateBodyBox(&data,0);
+    MQCleanAllMapItemSlots(&data);
     MQResetAllFileSlots(&data);
     MQCleanAllRenderSlots(&data);
     MQCleanAllEventSlots(&data);
     MQLoadAll(&data);
-    MQCleanAllMapItemSlots(&data);
+    
     data.session.render.camera = MQCameraStart(&data.session.render.camera);
     data.session.render.background = (Color){115, 105, 97, 255};
     data.session.frame = 0;
@@ -22,7 +22,7 @@ int main(void)
     data.files.fonts[1].font= MQFontStart("data/font/Mockery.ttf", 48);
     data.files.fonts[2].font= MQFontStart("data/font/Mockery.ttf", 24);
     SetTargetFPS(60);
-
+    MQPlayerCreateBodyBox(&data,0);
     //data.files.musics[0].music = LoadMusicStream("data/audio/music/maintheme_by_kayoa.mp3");
     MQEXIT = MQMenu(&data,0);
     data.session.render.camera.target = (Vector3)
@@ -59,7 +59,6 @@ int main(void)
         MQRenderQueue(&data);
     }
     CloseAudioDevice();
-    remove("data/temp/lang");
     CloseWindow();          
     // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
