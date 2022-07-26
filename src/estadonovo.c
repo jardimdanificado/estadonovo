@@ -23,7 +23,7 @@ int main(void)
     data.files.fonts[2].font= MQFontStart("data/font/Mockery.ttf", 24);
     SetTargetFPS(60);
     MQPlayerCreateBodyBox(&data,0);
-    //data.files.musics[0].music = LoadMusicStream("data/audio/music/maintheme_by_kayoa.mp3");
+    data.files.musics[0].music = LoadMusicStream("data/audio/music/maintheme_by_kayoa.mp3");
     MQEXIT = MQMenu(&data,0);
     data.session.render.camera.target = (Vector3)
     {
@@ -36,6 +36,7 @@ int main(void)
     
     data.files.eventboxes[0].hitbox.min = (Vector3){-0.5,0,-0.5};
     data.files.eventboxes[0].hitbox.max = (Vector3){0.5,2.3,0.5};
+    
     MQCreateEventbox(&data, "playeruse",data.files.eventboxes[0].hitbox);
     MQAddEventToQueue(&data,"playeruse0",MQTRUE,data.files.eventboxes[MQFindEventbox(data,"playeruse")].hitbox,(Vector3){0,0,0},0,true,false);
 
