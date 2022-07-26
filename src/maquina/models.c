@@ -195,7 +195,9 @@ void MQLoadModel(MQDATA *data, char *name, char *link, bool animated, bool isHit
 void MQPlayerCreateBodyBox(MQDATA *data, int quem)
 {
     char buffer[128],buffer0[128];
-    for(int i = 0; i < 14; i++)
+    int modelheadfind;
+    modelheadfind = MQFindModelByName(*data,"player-cabeca");
+    for(int i = modelheadfind; i < modelheadfind+14; i++)
     {
         snprintf(buffer,266,"%s%d",data->files.models[i].name,quem);
         snprintf(buffer0,255,"%s",data->files.models[i].name);

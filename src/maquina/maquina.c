@@ -221,14 +221,14 @@ float MQGravity(Vector3 position, float gravidade, int tempo)
 
 void MQGravit(MQDATA* data, int quem)
 {
-    if(MQReturnPlayerLegsColisionHeight(*data,  quem) == MQFALSE)
+    if(MQReturnYMaxCollisionPoint(*data,  data->game.player[quem].position) == MQFALSE)
     {
         data->game.player[quem].position.y = MQGravity(data->game.player[quem].position, 0.1, data->game.player[quem].fallTime);
         data->game.player[quem].fallTime++;
     }
     else 
     {
-        data->game.player[quem].position.y = MQReturnPlayerLegsColisionHeight(*data, quem);
+        data->game.player[quem].position.y = MQReturnYMaxCollisionPoint(*data, data->game.player[quem].position);
         data->game.player[quem].fallTime = 0;
     }
 }
