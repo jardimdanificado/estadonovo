@@ -188,14 +188,6 @@ void MQLoadModel(MQDATA *data, char *name, char *link, bool animated, bool isHit
     }
     if(isHitbox==true)
     {
-        for(int i = 0;i<MAXOBJ;i++)
-        {
-            if(strcmp(data->files.hitboxes[i].name," ")==0)
-            {
-                LocalIndex = i;
-                break;
-            }
-        }
         MQCreateHitbox(*&data,name,GetModelBoundingBox(data->files.models[LocalIndex].model));
     }
 }

@@ -184,26 +184,34 @@ Vector3 MQCheckWall(MQDATA data, char *hitboxID,float LocalRotation)
     return ((Vector3){__INT_MAX__,__INT_MAX__,__INT_MAX__});
 }
 
-float MQReturnYMaxCollisionPoint(MQDATA data, Vector3 posi)
+float MQReturnPlayerLegsColisionHeight(MQDATA data, int quem)
 {
-    int hitboxMax;
-    for(int i = MAXOBJ-1;i>0;i--)
+    char bufferlocal[64];
+    BoundingBox pdireita, pesquerda;
+    int indexd,indexe;
+
+    snprintf(bufferlocal,64,"player-pernad%d",quem);
+    indexd = MQFindHitbox(data,bufferlocal);
+    snprintf(bufferlocal,64,"player-pernae%d",quem);
+    indexe = MQFindHitbox(data,bufferlocal);
+
+    pdireita = data.files.hitboxes[indexd].hitbox;
+    pesquerda = data.files.hitboxes[indexe].hitbox;
+
+    for(int i = 0; i < MAXOBJ; i++)
     {
-        if(strcmp(data.files.hitboxes[i].name," ")==0)
+        if(i != indexd&&i != indexe)
         {
-            hitboxMax = i;
-            break;
+            if(CheckCollisionBoxes(data.files.hitboxes[i].hitbox,pdireita)==true)
+            {
+                return data.files.hitboxes[i].hitbox.max.y;
+            }
+            else if(CheckCollisionBoxes(data.files.hitboxes[i].hitbox,pesquerda)==true)
+            {
+                return data.files.hitboxes[i].hitbox.max.y;
+            }
         }
-    }
-    BoundingBox hitboxLocal;
-    hitboxLocal.max = (Vector3){posi.x+0.005,posi.y-0.05,posi.z+0.005};
-    hitboxLocal.min = (Vector3){posi.x-0.005,posi.y-0.1,posi.z-0.005};
-    for(int i = 0; i < hitboxMax; i++)
-    {
-        if(CheckCollisionBoxes(data.files.hitboxes[i].hitbox,hitboxLocal))
-        {
-            return data.files.hitboxes[i].hitbox.max.y;
-        }
+        
     }
     return MQFALSE;
 }

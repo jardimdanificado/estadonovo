@@ -1,6 +1,19 @@
 
 void TECLADO_MAIN(MQDATA *data)
 {
+/*     if(IsKeyPressed(KEY_L))
+    {
+        for(int i = 0;i<MAXOBJ;i++)
+        {
+            abinDEBUGtext("hitbox.txt",data->files.hitboxes[i].name);
+            abinDEBUGtext("hitbox.txt",MQStrAddInt("maxX=",(data->files.hitboxes[i].hitbox.max.x*1000)));
+            abinDEBUGtext("hitbox.txt",MQStrAddInt("maxY=",(data->files.hitboxes[i].hitbox.max.y*1000)));
+            abinDEBUGtext("hitbox.txt",MQStrAddInt("maxZ=",(data->files.hitboxes[i].hitbox.max.z*1000)));
+            abinDEBUGtext("hitbox.txt",MQStrAddInt("minX=",(data->files.hitboxes[i].hitbox.min.x*1000)));
+            abinDEBUGtext("hitbox.txt",MQStrAddInt("minY=",(data->files.hitboxes[i].hitbox.min.y*1000)));
+            abinDEBUGtext("hitbox.txt",MQStrAddInt("minZ=",(data->files.hitboxes[i].hitbox.min.z*1000)));
+        }
+    } */
     if(IsKeyPressed(KEY_ESCAPE))
     {
         MQEXIT = MQMenu(*&data, 1);
