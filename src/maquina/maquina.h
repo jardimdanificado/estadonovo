@@ -189,11 +189,12 @@ struct MQDATA_GAME_ITEM
     int index;
     float content;
     float condition;
+    int function;
     bool active;
+    bool locked;
     BoundingBox hitbox;
     Vector3 position;
     float rotation;
-    int function;
 };
 typedef struct MQDATA_GAME_ITEM MQDATA_GAME_ITEM;
 
@@ -209,40 +210,11 @@ typedef struct MQDATA_GAME_MAP MQDATA_GAME_MAP;
 
 //item types
 //0- calca, 1- camisa, 2- chapeu, 3- oculos, 4- sapatos, 5- arma, 6- anel, 7- medalha
-struct MQDATA_GAME_PLAYER_ITEM
-{
-    char *name;
-    char *type;
-    int index;
-    float content;
-    float condition;
-    int function;
-
-    bool active;
-    bool locked;
-};
-typedef struct MQDATA_GAME_PLAYER_ITEM MQDATA_GAME_PLAYER_ITEM;
-
-//equip slots
-//0- calca, 1- camisa, 2- chapeu, 3- oculos, 4- sapatos, 5- arma, 6- anel left, 7- anel right, 8-15 medalhas
-struct MQDATA_GAME_PLAYER_EQUIP
-{
-    char *name;
-    char *type;
-    int index;
-    float content;
-    float condition;
-    int function;
-
-    bool active;
-    bool locked;
-};
-typedef struct MQDATA_GAME_PLAYER_EQUIP MQDATA_GAME_PLAYER_EQUIP;
 
 struct MQDATA_PLAYER_INVENTORY
 {
-    MQDATA_GAME_PLAYER_EQUIP equip[16];
-    MQDATA_GAME_PLAYER_ITEM item[MAXOBJ];
+    MQDATA_GAME_ITEM equip[MAXOBJ];
+    MQDATA_GAME_ITEM item[MAXOBJ];
 };
 typedef struct MQDATA_PLAYER_INVENTORY MQDATA_PLAYER_INVENTORY;
 
@@ -255,6 +227,12 @@ struct MQDATA_PLAYER
     float rotation;
 };
 typedef struct MQDATA_PLAYER MQDATA_PLAYER;
+
+struct MQDATA_PLAYER_MISC
+{
+    MQDATA_GAME_ITEM dummyItem[MAXOBJ];
+};
+typedef struct MQDATA_PLAYER_MISC MQDATA_PLAYER_MISC;
 
 struct MQDATA_GAME
 {

@@ -20,12 +20,48 @@ void TECLADO_MAIN(MQDATA *data)
     }
     if(IsKeyPressed(KEY_E) || IsKeyPressed(KEY_E))
     {
-        int boxindex;
-        boxindex = MQVerifyMapItemColision(*data, MQHitboxUpdateXYZ(data->game.event[MQFindEvent(*data,"playeruse0")].hitbox, data->game.event[MQFindEvent(*data,"playeruse0")].position));
-        if(boxindex!=-1)
+        int mapboxindex;
+
+        mapboxindex = MQVerifyMapItemColision(*data, MQHitboxUpdateXYZ(data->game.event[MQFindEvent(*data,"playeruse0")].hitbox, data->game.event[MQFindEvent(*data,"playeruse0")].position));
+        if(mapboxindex!=-1)
         {
-/*             MQEventFunctions[data->game.map.item[boxindex].function](*&data,data->game.map.item[boxindex].type,data->game.map.item[boxindex].index);
- */        }
+            int localIndex=-1;
+            for(int i = 0;i<MAXOBJ;i++)
+            {
+                if(strcmp(data->game.player[0].inventory.equip[i].name," ")==0)
+                {
+                    localIndex = i;
+                    break;
+                }
+            }
+            if(localIndex!=-1&&data->game.map.item[mapboxindex].active==true&&strcmp(data->game.map.item[mapboxindex].name," ")==0)
+            {
+                if(strcmp(data->game.map.item[mapboxindex].type,"calca")==0)
+                {
+                    MQAddEquipToPlayerInventory(*&data,0,data->game.map.item[mapboxindex].name,data->game.map.item[mapboxindex].type,data->game.map.item[mapboxindex].index,data->game.map.item[mapboxindex].position,data->game.map.item[mapboxindex].rotation,data->game.map.item[mapboxindex].condition,data->game.map.item[mapboxindex].content,data->game.map.item[mapboxindex].function,data->game.map.item[mapboxindex].hitbox,data->game.map.item[mapboxindex].locked,data->game.map.item[mapboxindex].active);
+                }
+                else if(strcmp(data->game.map.item[mapboxindex].type,"camisa")==0)
+                {
+                    
+                }
+                else if(strcmp(data->game.map.item[mapboxindex].type,"chapeu")==0)
+                {
+                    
+                }
+                else if(strcmp(data->game.map.item[mapboxindex].type,"sapatos")==0)
+                {
+                    
+                }
+                else if(strcmp(data->game.map.item[mapboxindex].type,"calca")==0)
+                {
+                    
+                }
+                else if(strcmp(data->game.map.item[mapboxindex].type,"arma")==0)
+                {
+                    
+                }
+            }
+        }
     }   
     if(IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
     {

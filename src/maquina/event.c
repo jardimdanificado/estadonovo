@@ -1,22 +1,3 @@
-typedef Vector3 (*EVENTFUNC)(MQDATA*, Vector3);
-
-//quem,equipType,equipIndex
-Vector3 event0(MQDATA* data, Vector3 in) 
-{
-    data->game.player[0].position.y += 5;
-}
-
-Vector3 event1(MQDATA* data, Vector3 in) 
-{
-}
-
-Vector3 event2(MQDATA* data, Vector3 in) 
-{
-}
-
-EVENTFUNC MQEventFunctions[3] = {&event0,&event1,&event2};
-char *MQEventNames[3] = {"evento0","evento1","evento2"};
-
 void MQCreateEventbox(MQDATA *data, char *name, BoundingBox Hitbox)
 {
     int LocalIndex;
@@ -117,23 +98,44 @@ int MQFindEvent(MQDATA data, char* name)
 //ITEM
 //-----------------------------------
 
-void MQCleanAllMapItemSlots(MQDATA* data)
+//only use this with MQDATA_GAME_ITEM pointers
+MQDATA_GAME_ITEM MQCreateItem(char*name, char* type, int index,Vector3 position, float rotation, float condition, float content, int function, BoundingBox hitbox, bool locked, bool active)
+{
+    return((MQDATA_GAME_ITEM){name,type,index,content,condition,function,active,locked,hitbox,position,rotation});
+}
+
+MQDATA_GAME_ITEM MQCreateEmptyItem()
+{
+    return((MQDATA_GAME_ITEM){" "," ",MQTRUE,MQTRUE,MQTRUE,MQTRUE,false,false,(BoundingBox){(Vector3){MQTRUE,MQTRUE,MQTRUE},(Vector3){MQTRUE,MQTRUE,MQTRUE}},MQTRUE,MQTRUE});
+}
+
+void MQCleanAllItemSlots(MQDATA* data)
 {
     for (short int i = 0; i < MAXOBJ; i++)
     {
-        data->game.map.item[i].name = " ";
-        data->game.map.item[i].type = MQTRUE;
-        data->game.map.item[i].index = MQTRUE;
-        data->game.map.item[i].content = MQTRUE;
-        data->game.map.item[i].active = false;
-        data->game.map.item[i].hitbox = (BoundingBox){(Vector3){MQTRUE,MQTRUE,MQTRUE},(Vector3){MQTRUE,MQTRUE,MQTRUE}};
-        data->game.map.item[i].position = (Vector3){MQTRUE,MQTRUE,MQTRUE};
-        data->game.map.item[i].rotation = MQTRUE;
-        data->game.map.item[i].function = MQTRUE;
+        data->game.map.item[i] = MQCreateEmptyItem();
+        for (short int x = 0; x < MAXOBJ; x++)
+        {
+            data->game.player[i].inventory.equip[x] = MQCreateEmptyItem();
+            data->game.player[i].inventory.item[x] = MQCreateEmptyItem();
+        }
     }
 }
 
-void MQAddMapItemToQueue(MQDATA *data, char*name,int index, int type, Vector3 position, float rotation,  float content, int function, BoundingBox hitbox, bool active)
+void MQAddEquipToPlayerInventory(MQDATA *data, int quem, char*name, char* type,int index, Vector3 position, float rotation, float condition, float content, int function, BoundingBox hitbox, bool locked, bool active)
+{
+    int LocalIndex;
+    for(int i = 0;i<MAXOBJ;i++)
+    {
+        if(strcmp(data->game.player[quem].inventory.item[i].name," ")==0)
+        {
+            LocalIndex = i;
+            break;
+        }
+    }
+    data->game.player[quem].inventory.item[LocalIndex] = MQCreateItem(name,type,index,position,rotation,condition,content,function,hitbox,locked,active);
+}
+void MQAddMapItemToQueue(MQDATA *data, char*name, char* type,int index, Vector3 position, float rotation, float condition, float content, int function, BoundingBox hitbox, bool locked, bool active)
 {
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
@@ -144,6 +146,7 @@ void MQAddMapItemToQueue(MQDATA *data, char*name,int index, int type, Vector3 po
             break;
         }
     }
+    
     data->game.map.item[LocalIndex].name = name;
     data->game.map.item[LocalIndex].type = type;
     data->game.map.item[LocalIndex].position = position;
@@ -152,7 +155,8 @@ void MQAddMapItemToQueue(MQDATA *data, char*name,int index, int type, Vector3 po
     data->game.map.item[LocalIndex].content = content;
     data->game.map.item[LocalIndex].function = function;
     data->game.map.item[LocalIndex].hitbox = hitbox;
-    data->game.map.item[LocalIndex].active = true;
+    data->game.map.item[LocalIndex].active = active;
+    data->game.map.item[LocalIndex].locked = locked;
 }
 
 int MQFindMapItem(MQDATA data, char* name)
@@ -170,7 +174,7 @@ int MQFindMapItem(MQDATA data, char* name)
 void MQDeleteMapItem(MQDATA* data, int index)
 {
     data->game.map.item[index].name = " ";
-    data->game.map.item[index].type = MQTRUE;
+    data->game.map.item[index].type = " ";
     data->game.map.item[index].index = MQTRUE;
     data->game.map.item[index].content = MQTRUE;
     data->game.map.item[index].active = false;

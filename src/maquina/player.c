@@ -1,18 +1,3 @@
-/* void MQCleanPlayerInventory(MQDATA *data)
-{
-    for(int i = 0;i<MAXOBJ;i++)
-    { 
-        data->game.player[i].inventory = " ";
-        data->game.event[i].hitbox = (BoundingBox){(Vector3){0,0,0},(Vector3){0,0,0}};
-        data->game.event[i].function = MQTRUE;
-        data->game.event[i].position = (Vector3){0,0,0};
-        data->game.event[i].rotation = 0;
-        data->game.event[i].active = false;
-        data->game.event[i].persistent = false;
-    }
-}
- */
-
 bool MQCheckCollisionPoint(Vector3 inPosi,BoundingBox target, int size)
 {
     BoundingBox localhitbox;

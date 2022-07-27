@@ -7,10 +7,11 @@ int main(void)
     MQDATA data;
 
     
-    MQCleanAllMapItemSlots(&data);
+    MQCleanAllItemSlots(&data);
     MQResetAllFileSlots(&data);
     MQCleanAllRenderSlots(&data);
     MQCleanAllEventSlots(&data);
+    //MQCleanAllPlayersInventories(&data);
     MQLoadAll(&data);
     
     data.session.render.camera = MQCameraStart(&data.session.render.camera);
@@ -36,11 +37,11 @@ int main(void)
     
     data.files.eventboxes[0].hitbox.min = (Vector3){-0.5,0,-0.5};
     data.files.eventboxes[0].hitbox.max = (Vector3){0.5,2.3,0.5};
-    
+
     MQCreateEventbox(&data, "playeruse",data.files.eventboxes[0].hitbox);
     MQAddEventToQueue(&data,"playeruse0",MQTRUE,data.files.eventboxes[MQFindEventbox(data,"playeruse")].hitbox,(Vector3){0,0,0},0,true,false);
 
-    MQAddMapItemToQueue(&data,"teste",0,1,(Vector3){0,0,0},0,0,0,(BoundingBox){(Vector3){0,0,0},(Vector3){1,1,1}},true);
+    MQAddMapItemToQueue(&data,"teste","calca",1,(Vector3){0,0,0},0,0,0,0,(BoundingBox){(Vector3){0,0,0},(Vector3){1,1,1}},false,true);
     while(!WindowShouldClose() && !MQEXIT)
     {
         data.session.render.camera.target = (Vector3){data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.x, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.y, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.z};
