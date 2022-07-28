@@ -21,36 +21,26 @@ void TECLADO_MAIN(MQDATA *data)
                     break;
                 }
             }
+
+            MQDATA_GAME_ITEM item = MQCreateItem(data->game.map.item[mapboxindex].name,data->game.map.item[mapboxindex].type,data->game.map.item[mapboxindex].index,data->game.map.item[mapboxindex].position,data->game.map.item[mapboxindex].rotation,data->game.map.item[mapboxindex].condition,data->game.map.item[mapboxindex].content,data->game.map.item[mapboxindex].function,data->game.map.item[mapboxindex].hitbox,data->game.map.item[mapboxindex].locked,data->game.map.item[mapboxindex].active);
+
             if(localIndex!=-1&&data->game.map.item[mapboxindex].active==true&&strcmp(data->game.map.item[mapboxindex].name," ")==0)
             {
-                MQDATA_GAME_ITEM item = MQCreateItem(data->game.map.item[mapboxindex].name,data->game.map.item[mapboxindex].type,data->game.map.item[mapboxindex].index,data->game.map.item[mapboxindex].position,data->game.map.item[mapboxindex].rotation,data->game.map.item[mapboxindex].condition,data->game.map.item[mapboxindex].content,data->game.map.item[mapboxindex].function,data->game.map.item[mapboxindex].hitbox,data->game.map.item[mapboxindex].locked,data->game.map.item[mapboxindex].active);
-                if(strcmp(data->game.map.item[mapboxindex].type,"calca")==0)
+                if(strcmp(data->game.map.item[mapboxindex].type,"calca")==0&&strcmp(data->game.map.item[mapboxindex].type,"camisa")==0&&strcmp(data->game.map.item[mapboxindex].type,"chapeu")==0&&strcmp(data->game.map.item[mapboxindex].type,"sapatos")==0&&strcmp(data->game.map.item[mapboxindex].type,"oculos")==0&&strcmp(data->game.map.item[mapboxindex].type,"arma")==0)
                 {
                     MQAddEquipToPlayerInventory(*&data,0,item);
                 }
-                else if(strcmp(data->game.map.item[mapboxindex].type,"camisa")==0)
+                else
                 {
-                    
-                }
-                else if(strcmp(data->game.map.item[mapboxindex].type,"chapeu")==0)
-                {
-                    
-                }
-                else if(strcmp(data->game.map.item[mapboxindex].type,"sapatos")==0)
-                {
-                    
-                }
-                else if(strcmp(data->game.map.item[mapboxindex].type,"oculos")==0)
-                {
-                    
-                }
-                else if(strcmp(data->game.map.item[mapboxindex].type,"arma")==0)
-                {
-                    
+                    MQAddItemToPlayerInventory(*&data,0,item);
                 }
             }
+            else
+            {
+                MQAddItemToPlayerInventory(*&data,0,item);
+            }
         }
-    }   
+    } 
     if(IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
     {
         if(data->game.player[0].rotation == 0)
