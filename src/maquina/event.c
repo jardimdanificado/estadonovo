@@ -122,7 +122,21 @@ void MQCleanAllItemSlots(MQDATA* data)
     }
 }
 
-void MQAddEquipToPlayerInventory(MQDATA *data, int quem, char*name, char* type,int index, Vector3 position, float rotation, float condition, float content, int function, BoundingBox hitbox, bool locked, bool active)
+void MQAddEquipToPlayerInventory(MQDATA *data, int quem, MQDATA_GAME_ITEM item)
+{
+    int LocalIndex;
+    for(int i = 0;i<MAXOBJ;i++)
+    {
+        if(strcmp(data->game.player[quem].inventory.equip[i].name," ")==0)
+        {
+            LocalIndex = i;
+            break;
+        }
+    }
+    data->game.player[quem].inventory.equip[LocalIndex] = MQCreateItem(item.name,item.type,item.index,item.position,item.rotation,item.condition,item.content,item.function,item.hitbox,item.locked,item.active);
+}
+
+void MQAddItemToPlayerInventory(MQDATA *data, int quem, MQDATA_GAME_ITEM item)
 {
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
@@ -133,9 +147,10 @@ void MQAddEquipToPlayerInventory(MQDATA *data, int quem, char*name, char* type,i
             break;
         }
     }
-    data->game.player[quem].inventory.item[LocalIndex] = MQCreateItem(name,type,index,position,rotation,condition,content,function,hitbox,locked,active);
+    data->game.player[quem].inventory.item[LocalIndex] = MQCreateItem(item.name,item.type,item.index,item.position,item.rotation,item.condition,item.content,item.function,item.hitbox,item.locked,item.active);
 }
-void MQAddMapItemToQueue(MQDATA *data, char*name, char* type,int index, Vector3 position, float rotation, float condition, float content, int function, BoundingBox hitbox, bool locked, bool active)
+
+void MQAddItemToMapQueue(MQDATA *data, MQDATA_GAME_ITEM item)
 {
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
@@ -146,17 +161,7 @@ void MQAddMapItemToQueue(MQDATA *data, char*name, char* type,int index, Vector3 
             break;
         }
     }
-    
-    data->game.map.item[LocalIndex].name = name;
-    data->game.map.item[LocalIndex].type = type;
-    data->game.map.item[LocalIndex].position = position;
-    data->game.map.item[LocalIndex].rotation = rotation;
-    data->game.map.item[LocalIndex].index = index;
-    data->game.map.item[LocalIndex].content = content;
-    data->game.map.item[LocalIndex].function = function;
-    data->game.map.item[LocalIndex].hitbox = hitbox;
-    data->game.map.item[LocalIndex].active = active;
-    data->game.map.item[LocalIndex].locked = locked;
+    data->game.map.item[LocalIndex] = MQCreateItem(item.name,item.type,item.index,item.position,item.rotation,item.condition,item.content,item.function,item.hitbox,item.locked,item.active);
 }
 
 int MQFindMapItem(MQDATA data, char* name)

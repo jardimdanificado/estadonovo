@@ -168,7 +168,7 @@ typedef struct MQDATA_SESSION MQDATA_SESSION;
     //DATA_MAP
     //-----------------------------------
 
-struct MQDATA_EVENTBOX_SLOT
+struct MQDATA_GAME_EVENT
 {
     bool active;
     bool persistent;
@@ -178,7 +178,7 @@ struct MQDATA_EVENTBOX_SLOT
     float rotation;
     char *name;
 };
-typedef struct MQDATA_EVENTBOX_SLOT MQDATA_EVENTBOX_SLOT;
+typedef struct MQDATA_GAME_EVENT MQDATA_GAME_EVENT;
 
 //item types
 //0- calca, 1- camisa, 2- chapeu, 3- oculos, 4- sapatos, 5- arma, 6- anel, 7- medalha
@@ -236,7 +236,7 @@ typedef struct MQDATA_PLAYER_MISC MQDATA_PLAYER_MISC;
 
 struct MQDATA_GAME
 {
-    MQDATA_EVENTBOX_SLOT event[MAXOBJ];
+    MQDATA_GAME_EVENT event[MAXOBJ];
     MQDATA_GAME_MAP map;
     MQDATA_PLAYER player[MAXOBJ];
 };

@@ -23,9 +23,10 @@ void TECLADO_MAIN(MQDATA *data)
             }
             if(localIndex!=-1&&data->game.map.item[mapboxindex].active==true&&strcmp(data->game.map.item[mapboxindex].name," ")==0)
             {
+                MQDATA_GAME_ITEM item = MQCreateItem(data->game.map.item[mapboxindex].name,data->game.map.item[mapboxindex].type,data->game.map.item[mapboxindex].index,data->game.map.item[mapboxindex].position,data->game.map.item[mapboxindex].rotation,data->game.map.item[mapboxindex].condition,data->game.map.item[mapboxindex].content,data->game.map.item[mapboxindex].function,data->game.map.item[mapboxindex].hitbox,data->game.map.item[mapboxindex].locked,data->game.map.item[mapboxindex].active);
                 if(strcmp(data->game.map.item[mapboxindex].type,"calca")==0)
                 {
-                    MQAddEquipToPlayerInventory(*&data,0,data->game.map.item[mapboxindex].name,data->game.map.item[mapboxindex].type,data->game.map.item[mapboxindex].index,data->game.map.item[mapboxindex].position,data->game.map.item[mapboxindex].rotation,data->game.map.item[mapboxindex].condition,data->game.map.item[mapboxindex].content,data->game.map.item[mapboxindex].function,data->game.map.item[mapboxindex].hitbox,data->game.map.item[mapboxindex].locked,data->game.map.item[mapboxindex].active);
+                    MQAddEquipToPlayerInventory(*&data,0,item);
                 }
                 else if(strcmp(data->game.map.item[mapboxindex].type,"camisa")==0)
                 {
@@ -39,7 +40,7 @@ void TECLADO_MAIN(MQDATA *data)
                 {
                     
                 }
-                else if(strcmp(data->game.map.item[mapboxindex].type,"calca")==0)
+                else if(strcmp(data->game.map.item[mapboxindex].type,"oculos")==0)
                 {
                     
                 }
