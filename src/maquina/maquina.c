@@ -205,98 +205,6 @@ Vector3 MQRotateVertice(Vector3 pivot, float angle, Vector3 vertice)
 #include "models.c"
 
 //-----------------------------------
-//PLAYER
-//-----------------------------------
-
-#include "player.c"
-
-//-----------------------------------
-//COLISION
-//-----------------------------------
-
-float MQGravity(Vector3 position, float gravidade, int tempo)
-{
-    return(position.y - gravidade*((tempo*(tempo/5)))/60);
-}
-
-void MQGravit(MQDATA* data, int quem)
-{
-    if(MQReturnYMaxCollisionPoint(*data,  data->game.player[quem].position) == MQFALSE)
-    {
-        data->game.player[quem].position.y = MQGravity(data->game.player[quem].position, 0.1, data->game.player[quem].fallTime);
-        data->game.player[quem].fallTime++;
-    }
-    else 
-    {
-        data->game.player[quem].position.y = MQReturnYMaxCollisionPoint(*data, data->game.player[quem].position);
-        data->game.player[quem].fallTime = 0;
-    }
-}
-
-//-----------------------------------
-//CAMERA
-//-----------------------------------
-
-Camera MQCameraStart(Camera *camera)
-{
-    camera->position = (Vector3)
-    {
-        10.0f, 10.0f, 10.0f
-    };
-    camera->target = (Vector3)
-    {
-        0.0f, 0.0f, 0.0f
-    };
-    camera->up = (Vector3)
-    {
-        0.0f, 1.0f, 0.0f
-    };
-    camera->fovy = 30.0f;
-    camera->projection = CAMERA_PERSPECTIVE;
-    SetCameraMode(*camera, CAMERA_CUSTOM);
-    return (*camera);
-}
-
-//-----------------------------------
-//LOAD
-//-----------------------------------
-
-#include "load.c"
-
-
-//-----------------------------------
-//SAVEGAME
-//-----------------------------------
-
-void MQLoadGame(MQDATA *data)
-{
-/*     FILE *file;
-    file = fopen("data/save/savegame", "r+b");
-    fread(&data->game, sizeof(struct MQDATA_GAME), 1, file);
-    fclose(file); */
-}
-
-void MQSaveGame(MQDATA data)
-{
-/*     remove("data/save/savegame");
-    FILE *file = fopen("data/save/savegame", "w+b");
-    fwrite(&data.game, sizeof(struct MQDATA_GAME), 1, file);
-    fclose(file); */
-}
-
-//-----------------------------------
-//RENDER
-//-----------------------------------
-
-#include "render.c"
-
-//-----------------------------------
-//MENU
-//-----------------------------------
-
-#include "menu.c"
-
-//-----------------------------------
 //ITEM
 //-----------------------------------
 
@@ -505,6 +413,100 @@ int MQFindEvent(MQDATA data, char* name)
     }
     return -1;
 }
+
+
+//-----------------------------------
+//PLAYER
+//-----------------------------------
+
+#include "player.c"
+
+//-----------------------------------
+//COLISION
+//-----------------------------------
+
+float MQGravity(Vector3 position, float gravidade, int tempo)
+{
+    return(position.y - gravidade*((tempo*(tempo/5)))/60);
+}
+
+void MQGravit(MQDATA* data, int quem)
+{
+    if(MQReturnYMaxCollisionPoint(*data,  data->game.player[quem].position) == MQFALSE)
+    {
+        data->game.player[quem].position.y = MQGravity(data->game.player[quem].position, 0.1, data->game.player[quem].fallTime);
+        data->game.player[quem].fallTime++;
+    }
+    else 
+    {
+        data->game.player[quem].position.y = MQReturnYMaxCollisionPoint(*data, data->game.player[quem].position);
+        data->game.player[quem].fallTime = 0;
+    }
+}
+
+//-----------------------------------
+//CAMERA
+//-----------------------------------
+
+Camera MQCameraStart(Camera *camera)
+{
+    camera->position = (Vector3)
+    {
+        10.0f, 10.0f, 10.0f
+    };
+    camera->target = (Vector3)
+    {
+        0.0f, 0.0f, 0.0f
+    };
+    camera->up = (Vector3)
+    {
+        0.0f, 1.0f, 0.0f
+    };
+    camera->fovy = 30.0f;
+    camera->projection = CAMERA_PERSPECTIVE;
+    SetCameraMode(*camera, CAMERA_CUSTOM);
+    return (*camera);
+}
+
+//-----------------------------------
+//LOAD
+//-----------------------------------
+
+#include "load.c"
+
+
+//-----------------------------------
+//SAVEGAME
+//-----------------------------------
+
+void MQLoadGame(MQDATA *data)
+{
+/*     FILE *file;
+    file = fopen("data/save/savegame", "r+b");
+    fread(&data->game, sizeof(struct MQDATA_GAME), 1, file);
+    fclose(file); */
+}
+
+void MQSaveGame(MQDATA data)
+{
+/*     remove("data/save/savegame");
+    FILE *file = fopen("data/save/savegame", "w+b");
+    fwrite(&data.game, sizeof(struct MQDATA_GAME), 1, file);
+    fclose(file); */
+}
+
+//-----------------------------------
+//RENDER
+//-----------------------------------
+
+#include "render.c"
+
+//-----------------------------------
+//MENU
+//-----------------------------------
+
+#include "menu.c"
+
 
 //-----------------------------------
 //KEYBOARD
