@@ -46,6 +46,7 @@
 unsigned int MAXANIM = 1;
 
 #define MQEmptyVec3 (Vector3){MQTrue,MQTrue,MQTrue}
+#define MQEmptyVec2 (Vector2){MQTrue,MQTrue}
 #define MQEmptyHitbox (BoundingBox){MQEmptyVec3,MQEmptyVec3}
 
 //Necessary to MQMenu()
@@ -139,7 +140,7 @@ struct MQDATA_RENDER_MODEL
     char *name;
 };
 typedef struct MQDATA_RENDER_MODEL MQDATA_RENDER_MODEL;
-#define MQEmptyRenderModel(MQDATA_RENDER_MODEL){false,false,false,MQTrue,MQTrue,MQTrue,PINK,MQCreateEmptyVec3(),MQTrue," "};
+#define MQEmptyRenderModel (MQDATA_RENDER_MODEL){false,false,false,MQTrue,MQTrue,MQTrue,PINK,MQCreateEmptyVec3(),MQTrue," "};
 
 struct MQDATA_RENDER_TEXT
 {
@@ -153,7 +154,7 @@ struct MQDATA_RENDER_TEXT
     char *name;
 };
 typedef struct MQDATA_RENDER_TEXT MQDATA_RENDER_TEXT;
-#define MQEmptyRenderText(MQDATA_RENDER_TEXT){false,MQTrue,MQEmptyVec3,PINK," ",MQTrue,MQTrue," "};
+#define MQEmptyRenderText (MQDATA_RENDER_TEXT){false,MQTrue,MQEmptyVec2,PINK," ",MQTrue,MQTrue," "};
 
 struct MQDATA_SESSION_RENDER
 {
@@ -194,7 +195,7 @@ struct MQDATA_GAME_ITEM
     float rotation;
 };
 typedef struct MQDATA_GAME_ITEM MQDATA_GAME_ITEM;
-#define MQEmptyRenderItem(MQDATA_GAME_ITEM){" "," ",MQTrue,MQTrue,MQTrue,MQTrue,false,false,MQEmptyHitbox,MQEmptyVec3,MQTrue};
+#define MQEmptyItem (MQDATA_GAME_ITEM){" "," ",MQTrue,MQTrue,MQTrue,MQTrue,false,false,MQEmptyHitbox,MQEmptyVec3,MQTrue};
 
     //-----------------------------------
     //GAME_MAP
@@ -211,6 +212,8 @@ struct MQDATA_GAME_EVENT
     char *name;
 };
 typedef struct MQDATA_GAME_EVENT MQDATA_GAME_EVENT;
+#define MQEmptyEvent (MQDATA_GAME_ITEM){false,false,MQTrue,MQEmptyHitbox,MQEmptyVec3,MQTrue," "};
+
 
 struct MQDATA_GAME_MAP
 {

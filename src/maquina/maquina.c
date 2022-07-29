@@ -449,20 +449,15 @@ MQDATA_GAME_ITEM MQCreateItem(char*name, char* type, int index,Vector3 position,
     return((MQDATA_GAME_ITEM){name,type,index,content,condition,function,active,locked,hitbox,position,rotation});
 }
 
-MQDATA_GAME_ITEM MQCreateEmptyItem()
-{
-    return((MQDATA_GAME_ITEM){" "," ",MQTrue,MQTrue,MQTrue,MQTrue,false,false,(BoundingBox){(Vector3){MQTrue,MQTrue,MQTrue},(Vector3){MQTrue,MQTrue,MQTrue}},MQTrue,MQTrue});
-}
-
 void MQCleanAllItemSlots(MQDATA* data)
 {
     for (short int i = 0; i < MAXOBJ; i++)
     {
-        data->game.map.item[i] = MQCreateEmptyItem();
+        data->game.map.item[i] = MQEmptyItem;
         for (short int x = 0; x < MAXOBJ; x++)
         {
-            data->game.player[i].inventory.equip[x] = MQCreateEmptyItem();
-            data->game.player[i].inventory.item[x] = MQCreateEmptyItem();
+            data->game.player[i].inventory.equip[x] = MQEmptyItem;
+            data->game.player[i].inventory.item[x] = MQEmptyItem;
         }
     }
 }
@@ -519,19 +514,6 @@ int MQFindMapItem(MQDATA data, char* name)
         }
     }
     return -1;
-}
-
-void MQDeleteMapItem(MQDATA* data, int index)
-{
-    data->game.map.item[index].name = " ";
-    data->game.map.item[index].type = " ";
-    data->game.map.item[index].index = MQTrue;
-    data->game.map.item[index].content = MQTrue;
-    data->game.map.item[index].active = false;
-    data->game.map.item[index].hitbox = (BoundingBox){(Vector3){MQTrue,MQTrue,MQTrue},(Vector3){MQTrue,MQTrue,MQTrue}};
-    data->game.map.item[index].position = (Vector3){MQTrue,MQTrue,MQTrue};
-    data->game.map.item[index].rotation = 0;
-    data->game.map.item[index].function = MQTrue;
 }
 
 int MQVerifyMapItemColision(MQDATA data, BoundingBox collider)
@@ -628,13 +610,6 @@ void MQAddEventToQueue(MQDATA *data, char*name, int functionIndex, BoundingBox h
     data->game.event[LocalIndex].rotation = rotation;
     data->game.event[LocalIndex].active = active;
     data->game.event[LocalIndex].persistent = persistent;
-}
-
-void MQDeleteEvent(MQDATA* data, int index)
-{
-    data->game.event[index].name = " ";
-    data->game.event[index].active = false;
-    data->game.event[index].persistent = false;
 }
 
 int MQFindEvent(MQDATA data, char* name)

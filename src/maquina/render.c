@@ -7,30 +7,8 @@ void MQCleanAllRenderSlots(MQDATA *data)
 {
     for(int i = 0;i<MAXOBJ;i++)
     { 
-        data->session.render.model[i].color.r = 0;
-        data->session.render.model[i].color.g = 0;
-        data->session.render.model[i].color.b = 0;
-        data->session.render.model[i].color.a = 0;
-        data->session.render.model[i].modelIndex = MQTrue;
-        data->session.render.model[i].position = (Vector3){ MQTrue,MQTrue,MQTrue };
-        data->session.render.model[i].rotation = MQTrue;
-        data->session.render.model[i].visible = false;
-        data->session.render.model[i].playing = false;
-        data->session.render.model[i].reverse = false;
-        data->session.render.model[i].name = " ";
-        data->session.render.model[i].currentAnim = 0;
-        data->session.render.model[i].currentFrame = 0;
-        data->session.render.text[i].color.r = 0;
-        data->session.render.text[i].color.g = 0;
-        data->session.render.text[i].color.b = 0;
-        data->session.render.text[i].color.a = 0;
-        data->session.render.text[i].textIndex = MQTrue;
-        data->session.render.text[i].position = (Vector2){ MQTrue,MQTrue };
-        data->session.render.text[i].visible = false;
-        data->session.render.text[i].fontSize = MQTrue;
-        data->session.render.text[i].fontIndex = MQTrue;
-        data->session.render.text[i].string = " ";
-        data->session.render.text[i].name = " ";
+        data->session.render.model[i] = MQEmptyRenderModel;
+        data->session.render.text[i] = MQEmptyRenderText;
     }
 }
 
@@ -38,19 +16,7 @@ void MQCleanAllRenderModelSlots(MQDATA *data)
 {
     for(int i = 0;i<MAXOBJ;i++)
     { 
-        data->session.render.model[i].color.r = 0;
-        data->session.render.model[i].color.g = 0;
-        data->session.render.model[i].color.b = 0;
-        data->session.render.model[i].color.a = 0;
-        data->session.render.model[i].modelIndex = MQTrue;
-        data->session.render.model[i].position = (Vector3){ MQTrue,MQTrue,MQTrue };
-        data->session.render.model[i].rotation = MQTrue;
-        data->session.render.model[i].visible = false;
-        data->session.render.model[i].playing = false;
-        data->session.render.model[i].reverse = false;
-        data->session.render.model[i].name = " ";
-        data->session.render.model[i].currentAnim = 0;
-        data->session.render.model[i].currentFrame = 0;
+        data->session.render.model[i] = MQEmptyRenderModel;
     }
 }
 
@@ -58,17 +24,7 @@ void MQCleanAllRenderTextSlots(MQDATA *data)
 {
     for(int i = 0;i<MAXOBJ;i++)
     { 
-        data->session.render.text[i].color.r = 0;
-        data->session.render.text[i].color.g = 0;
-        data->session.render.text[i].color.b = 0;
-        data->session.render.text[i].color.a = 0;
-        data->session.render.text[i].textIndex = MQTrue;
-        data->session.render.text[i].position = (Vector2){ MQTrue,MQTrue };
-        data->session.render.text[i].visible = false;
-        data->session.render.text[i].fontSize = MQTrue;
-        data->session.render.text[i].fontIndex = MQTrue;
-        data->session.render.text[i].string = " ";
-        data->session.render.text[i].name = " ";
+        data->session.render.text[i] = MQEmptyRenderText;
     }
 }
 
