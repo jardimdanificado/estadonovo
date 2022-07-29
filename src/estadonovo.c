@@ -4,11 +4,12 @@
 int main(void)
 {
     MQWindowStart();
-    MQDATA data;
-
+    SetTargetFPS(60);
+    SetExitKey(KEY_END);
     
+    MQDATA data;
+    MQCleanAllFileSlots(&data);
     MQCleanAllItemSlots(&data);
-    MQResetAllFileSlots(&data);
     MQCleanAllRenderSlots(&data);
     MQCleanAllEventSlots(&data);
     MQCleanAllWallExcludeSlots(&data);
@@ -22,7 +23,7 @@ int main(void)
     data.files.fonts[0].font= MQFontStart("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16);
     data.files.fonts[1].font= MQFontStart("data/font/Mockery.ttf", 48);
     data.files.fonts[2].font= MQFontStart("data/font/Mockery.ttf", 24);
-    SetTargetFPS(60);
+    
     MQPlayerCreateBodyBox(&data,0);
     data.files.musics[0].music = LoadMusicStream("data/audio/music/maintheme_by_kayoa.mp3");
     MQExit = MQMenu(&data,0);
@@ -30,13 +31,12 @@ int main(void)
     {
         data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.x, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.y, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.z
     };
-    SetExitKey(KEY_END);
+    
     data.session.render.camera.position = (Vector3){0.4375, 3.5, 11.0625};
     MQCreateRenderModel(false,false,true,MQFindModelByName(data,"map0"),0,0,WHITE,(Vector3){0,0,0},0,"map0");
     MQAddRenderModelToQueue(&data, MQCreateRenderModel(false,false,true,MQFindModelByName(data,"map0"),0,0,WHITE,(Vector3){0,0,0},0,"map0"));
-    MQAddRenderModelToQueue(&data, MQCreateRenderModel(false,true,true,MQFindModelByName(data,"player"),0,0,COR_PELE0,data.game.player[0].position,data.game.player[0].rotation,"map0"));    
-    data.files.eventboxes[0].hitbox.min = (Vector3){-0.5,0,-0.5};
-    data.files.eventboxes[0].hitbox.max = (Vector3){0.5,2.3,0.5};
+    MQAddRenderModelToQueue(&data, MQCreateRenderModel(true,true,false,MQFindModelByName(data,"player"),0,0,COR_PELE0,data.game.player[0].position,data.game.player[0].rotation,"player0"));    
+    data.files.eventboxes[0].hitbox = (BoundingBox){(Vector3){-0.5,0,-0.5},(Vector3){0.5,2.3,0.5}};
 
     MQCreateEventbox(&data, "playeruse",data.files.eventboxes[0].hitbox);
     MQAddEventToQueue(&data,"playeruse0",MQTrue,data.files.eventboxes[MQFindEventbox(data,"playeruse")].hitbox,(Vector3){0,0,0},0,true,false);

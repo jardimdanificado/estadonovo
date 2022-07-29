@@ -122,7 +122,7 @@ Font MQFontStart(char *FontLoc, int FontSize)
 //FILES
 //-----------------------------------
 
-void MQResetAllFileSlots(MQDATA* data)
+void MQCleanAllFileSlots(MQDATA* data)
 {
     for(int i = 0; i < MAXOBJ; i++)
     {
