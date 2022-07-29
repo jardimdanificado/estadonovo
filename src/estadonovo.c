@@ -32,8 +32,8 @@ int main(void)
     };
     SetExitKey(KEY_END);
     data.session.render.camera.position = (Vector3){0.4375, 3.5, 11.0625};
-    MQRenderAddModelToQueue(&data, "mapa0", MQFindModelByName(data,"map0"), WHITE,(Vector3){0.0f, 0.0f, 0.0f}, 0,  0,0,true,false,false);
-    MQRenderAddModelToQueue(&data, "player0", MQFindModelByName(data,"player"), COR_PELE0,data.game.player[0].position, data.game.player[0].rotation,  0,0,true,true,false);
+    MQAddRenderModelToQueue(&data, "mapa0", MQFindModelByName(data,"map0"), WHITE,(Vector3){0.0f, 0.0f, 0.0f}, 0,  0,0,true,false,false);
+    MQAddRenderModelToQueue(&data, "player0", MQFindModelByName(data,"player"), COR_PELE0,data.game.player[0].position, data.game.player[0].rotation,  0,0,true,true,false);
     
     data.files.eventboxes[0].hitbox.min = (Vector3){-0.5,0,-0.5};
     data.files.eventboxes[0].hitbox.max = (Vector3){0.5,2.3,0.5};
