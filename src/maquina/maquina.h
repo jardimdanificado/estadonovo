@@ -21,6 +21,10 @@
 //ABIN Files
 #include "abin.h"
 
+//-----------------------------------
+//COLORS
+//-----------------------------------
+
 #define COR_VERMELHO CLITERAL(Color){235, 64, 52,255}
 #define COR_SELECIONADO   CLITERAL(Color){202,137,109,255}
 #define COR_SELECIONADO2 CLITERAL(Color){145, 39, 32,255}
@@ -34,14 +38,19 @@
 #define COR_ROUPA0 CLITERAL(Color){103, 122, 137,255}
 #define COR_ROUPA1 CLITERAL(Color){110, 125, 103,255}
 
-#define MQFALSE __INT_MAX__*(-1)
-#define MQTRUE __INT_MAX__
+#define MQTrue __INT_MAX__
+#define MQFalse MQTrue*(-1)
 
 #define MAXOBJ 64
 
 unsigned int MAXANIM = 1;
 
-bool MQEXIT = false;
+#define MQEmptyVec3 (Vector3){MQTrue,MQTrue,MQTrue}
+#define MQEmptyHitbox (BoundingBox){MQEmptyVec3,MQEmptyVec3}
+
+//Necessary to MQMenu()
+//If set it to true the loop will end and game will close
+bool MQExit = false;
 
 //-----------------------------------
 //CONFIG
@@ -130,6 +139,7 @@ struct MQDATA_RENDER_MODEL
     char *name;
 };
 typedef struct MQDATA_RENDER_MODEL MQDATA_RENDER_MODEL;
+#define MQEmptyRenderModel(MQDATA_RENDER_MODEL){false,false,false,MQTrue,MQTrue,MQTrue,PINK,MQCreateEmptyVec3(),MQTrue," "};
 
 struct MQDATA_RENDER_TEXT
 {
@@ -143,6 +153,7 @@ struct MQDATA_RENDER_TEXT
     char *name;
 };
 typedef struct MQDATA_RENDER_TEXT MQDATA_RENDER_TEXT;
+#define MQEmptyRenderText(MQDATA_RENDER_TEXT){false,MQTrue,MQEmptyVec3,PINK," ",MQTrue,MQTrue," "};
 
 struct MQDATA_SESSION_RENDER
 {
@@ -165,23 +176,9 @@ typedef struct MQDATA_SESSION MQDATA_SESSION;
 //-----------------------------------
 
     //-----------------------------------
-    //DATA_MAP
+    //GAME_ITEM
     //-----------------------------------
 
-struct MQDATA_GAME_EVENT
-{
-    bool active;
-    bool persistent;
-    int function;
-    BoundingBox hitbox;
-    Vector3 position;
-    float rotation;
-    char *name;
-};
-typedef struct MQDATA_GAME_EVENT MQDATA_GAME_EVENT;
-
-//item types
-//0- calca, 1- camisa, 2- chapeu, 3- oculos, 4- sapatos, 5- arma, 6- anel, 7- medalha
 struct MQDATA_GAME_ITEM
 {
     char *name;
@@ -197,6 +194,23 @@ struct MQDATA_GAME_ITEM
     float rotation;
 };
 typedef struct MQDATA_GAME_ITEM MQDATA_GAME_ITEM;
+#define MQEmptyRenderItem(MQDATA_GAME_ITEM){" "," ",MQTrue,MQTrue,MQTrue,MQTrue,false,false,MQEmptyHitbox,MQEmptyVec3,MQTrue};
+
+    //-----------------------------------
+    //GAME_MAP
+    //-----------------------------------
+
+struct MQDATA_GAME_EVENT
+{
+    bool active;
+    bool persistent;
+    int function;
+    BoundingBox hitbox;
+    Vector3 position;
+    float rotation;
+    char *name;
+};
+typedef struct MQDATA_GAME_EVENT MQDATA_GAME_EVENT;
 
 struct MQDATA_GAME_MAP
 {
@@ -207,9 +221,6 @@ typedef struct MQDATA_GAME_MAP MQDATA_GAME_MAP;
     //-----------------------------------
     //DATA_PLAYER
     //-----------------------------------
-
-//item types
-//0- calca, 1- camisa, 2- chapeu, 3- oculos, 4- sapatos, 5- arma, 6- anel, 7- medalha
 
 struct MQDATA_PLAYER_INVENTORY
 {
@@ -262,5 +273,7 @@ struct MQDATA
     MQDATA_GAME game;
 };
 typedef struct MQDATA MQDATA;
+
+
 
 #include "maquina.c"

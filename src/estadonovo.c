@@ -25,7 +25,7 @@ int main(void)
     SetTargetFPS(60);
     MQPlayerCreateBodyBox(&data,0);
     data.files.musics[0].music = LoadMusicStream("data/audio/music/maintheme_by_kayoa.mp3");
-    MQEXIT = MQMenu(&data,0);
+    MQExit = MQMenu(&data,0);
     data.session.render.camera.target = (Vector3)
     {
         data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.x, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.y, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.z
@@ -39,10 +39,10 @@ int main(void)
     data.files.eventboxes[0].hitbox.max = (Vector3){0.5,2.3,0.5};
 
     MQCreateEventbox(&data, "playeruse",data.files.eventboxes[0].hitbox);
-    MQAddEventToQueue(&data,"playeruse0",MQTRUE,data.files.eventboxes[MQFindEventbox(data,"playeruse")].hitbox,(Vector3){0,0,0},0,true,false);
+    MQAddEventToQueue(&data,"playeruse0",MQTrue,data.files.eventboxes[MQFindEventbox(data,"playeruse")].hitbox,(Vector3){0,0,0},0,true,false);
 
     MQAddItemToMapQueue(&data,MQCreateItem("teste","calca",1,(Vector3){0,0,0},0,0,0,0,(BoundingBox){(Vector3){0,0,0},(Vector3){1,1,1}},false,true));
-    while(!WindowShouldClose() && !MQEXIT)
+    while(!WindowShouldClose() && !MQExit)
     {
         data.session.render.camera.target = (Vector3){data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.x, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.y, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.z};
         data.session.frame++;

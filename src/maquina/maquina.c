@@ -42,6 +42,15 @@ Vector3 MQDifferenceVec3(Vector3 vec1, Vector3 vec2)
 }
 
 //-----------------------------------
+//BASIC_SLOTS
+//-----------------------------------
+
+Vector3 MQCreateEmptyVec3()
+{
+    return((Vector3){0,0,0});
+}
+
+//-----------------------------------
 //WINDOW
 //-----------------------------------
 
@@ -216,7 +225,7 @@ MQDATA_GAME_ITEM MQCreateItem(char*name, char* type, int index,Vector3 position,
 
 MQDATA_GAME_ITEM MQCreateEmptyItem()
 {
-    return((MQDATA_GAME_ITEM){" "," ",MQTRUE,MQTRUE,MQTRUE,MQTRUE,false,false,(BoundingBox){(Vector3){MQTRUE,MQTRUE,MQTRUE},(Vector3){MQTRUE,MQTRUE,MQTRUE}},MQTRUE,MQTRUE});
+    return((MQDATA_GAME_ITEM){" "," ",MQTrue,MQTrue,MQTrue,MQTrue,false,false,(BoundingBox){(Vector3){MQTrue,MQTrue,MQTrue},(Vector3){MQTrue,MQTrue,MQTrue}},MQTrue,MQTrue});
 }
 
 void MQCleanAllItemSlots(MQDATA* data)
@@ -290,13 +299,13 @@ void MQDeleteMapItem(MQDATA* data, int index)
 {
     data->game.map.item[index].name = " ";
     data->game.map.item[index].type = " ";
-    data->game.map.item[index].index = MQTRUE;
-    data->game.map.item[index].content = MQTRUE;
+    data->game.map.item[index].index = MQTrue;
+    data->game.map.item[index].content = MQTrue;
     data->game.map.item[index].active = false;
-    data->game.map.item[index].hitbox = (BoundingBox){(Vector3){MQTRUE,MQTRUE,MQTRUE},(Vector3){MQTRUE,MQTRUE,MQTRUE}};
-    data->game.map.item[index].position = (Vector3){MQTRUE,MQTRUE,MQTRUE};
+    data->game.map.item[index].hitbox = (BoundingBox){(Vector3){MQTrue,MQTrue,MQTrue},(Vector3){MQTrue,MQTrue,MQTrue}};
+    data->game.map.item[index].position = (Vector3){MQTrue,MQTrue,MQTrue};
     data->game.map.item[index].rotation = 0;
-    data->game.map.item[index].function = MQTRUE;
+    data->game.map.item[index].function = MQTrue;
 }
 
 int MQVerifyMapItemColision(MQDATA data, BoundingBox collider)
@@ -367,7 +376,7 @@ void MQCleanAllEventSlots(MQDATA *data)
     { 
         data->game.event[i].name = " ";
         data->game.event[i].hitbox = (BoundingBox){(Vector3){0,0,0},(Vector3){0,0,0}};
-        data->game.event[i].function = MQTRUE;
+        data->game.event[i].function = MQTrue;
         data->game.event[i].position = (Vector3){0,0,0};
         data->game.event[i].rotation = 0;
         data->game.event[i].active = false;
@@ -480,7 +489,7 @@ float MQReturnYMaxCollisionPoint(MQDATA data, Vector3 posi)
             return data.files.hitboxes[i].hitbox.max.y;
         }
     }
-    return MQFALSE;
+    return MQFalse;
 }
 
 bool MQCheckCollisionPoint(Vector3 inPosi,BoundingBox target, int size)
@@ -581,13 +590,13 @@ Vector3 MQCheckWall(MQDATA data, char *eventname ,float LocalRotation, MQDATA_WA
                 {
                     object.index=i;
                     if(hitbox.max.z-0.5 < data.files.hitboxes[i].hitbox.min.z&&hitbox.max.x-0.5 < data.files.hitboxes[i].hitbox.min.x)
-                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTRUE,data.files.hitboxes[i].hitbox.min.z-0.10});
+                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTrue,data.files.hitboxes[i].hitbox.min.z-0.10});
                         
                     else if(hitbox.max.z-0.5 < data.files.hitboxes[i].hitbox.min.z)
-                        return ((Vector3){MQTRUE,MQTRUE,data.files.hitboxes[i].hitbox.min.z-0.10});
+                        return ((Vector3){MQTrue,MQTrue,data.files.hitboxes[i].hitbox.min.z-0.10});
 
                     else if(hitbox.max.x-0.5 < data.files.hitboxes[i].hitbox.min.x)
-                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTRUE,MQTRUE});
+                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTrue,MQTrue});
                 }
 
 
@@ -595,13 +604,13 @@ Vector3 MQCheckWall(MQDATA data, char *eventname ,float LocalRotation, MQDATA_WA
                 {
                     object.index=i;
                     if(hitbox.min.z+0.5 > data.files.hitboxes[i].hitbox.max.z&&hitbox.max.x-0.5 < data.files.hitboxes[i].hitbox.min.x)
-                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTRUE,data.files.hitboxes[i].hitbox.max.z+0.10});
+                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTrue,data.files.hitboxes[i].hitbox.max.z+0.10});
                         
                     else if(hitbox.min.z+0.5 > data.files.hitboxes[i].hitbox.max.z)
-                        return ((Vector3){MQTRUE,MQTRUE,data.files.hitboxes[i].hitbox.max.z+0.10});
+                        return ((Vector3){MQTrue,MQTrue,data.files.hitboxes[i].hitbox.max.z+0.10});
 
                     else if(hitbox.max.x-0.5 < data.files.hitboxes[i].hitbox.min.x)
-                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTRUE,MQTRUE});
+                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTrue,MQTrue});
                 }
 
 
@@ -609,13 +618,13 @@ Vector3 MQCheckWall(MQDATA data, char *eventname ,float LocalRotation, MQDATA_WA
                 {
                     object.index=i;
                     if(hitbox.min.z+0.5 > data.files.hitboxes[i].hitbox.max.z&&hitbox.min.x+0.5 > data.files.hitboxes[i].hitbox.max.x)
-                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTRUE,data.files.hitboxes[i].hitbox.max.z+0.10});
+                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTrue,data.files.hitboxes[i].hitbox.max.z+0.10});
                         
                     else if(hitbox.min.z+0.5 > data.files.hitboxes[i].hitbox.max.z)
-                        return ((Vector3){MQTRUE,MQTRUE,data.files.hitboxes[i].hitbox.max.z+0.10});
+                        return ((Vector3){MQTrue,MQTrue,data.files.hitboxes[i].hitbox.max.z+0.10});
 
                     else if(hitbox.min.x+0.5 > data.files.hitboxes[i].hitbox.max.x)
-                        return ((Vector3){data.files.hitboxes[i].hitbox.max.x+0.10,MQTRUE,MQTRUE});
+                        return ((Vector3){data.files.hitboxes[i].hitbox.max.x+0.10,MQTrue,MQTrue});
                 }
 
 
@@ -623,19 +632,19 @@ Vector3 MQCheckWall(MQDATA data, char *eventname ,float LocalRotation, MQDATA_WA
                 {
                     object.index=i;
                     if(hitbox.max.z-0.5 < data.files.hitboxes[i].hitbox.min.z&&hitbox.min.x+0.5 > data.files.hitboxes[i].hitbox.max.x)
-                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTRUE,data.files.hitboxes[i].hitbox.max.z+0.10});
+                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTrue,data.files.hitboxes[i].hitbox.max.z+0.10});
                         
                     else if(hitbox.max.z-0.5 < data.files.hitboxes[i].hitbox.min.z)
-                        return ((Vector3){MQTRUE,MQTRUE,data.files.hitboxes[i].hitbox.min.z-0.10});
+                        return ((Vector3){MQTrue,MQTrue,data.files.hitboxes[i].hitbox.min.z-0.10});
 
                     else if(hitbox.min.x+0.5 > data.files.hitboxes[i].hitbox.max.x)
-                        return ((Vector3){data.files.hitboxes[i].hitbox.max.x+0.10,MQTRUE,MQTRUE});
+                        return ((Vector3){data.files.hitboxes[i].hitbox.max.x+0.10,MQTrue,MQTrue});
                 }
             } 
-            object.index = MQTRUE;
+            object.index = MQTrue;
         }
-    object.index = MQTRUE;
-    return ((Vector3){MQTRUE,MQTRUE,MQTRUE});
+    object.index = MQTrue;
+    return ((Vector3){MQTrue,MQTrue,MQTrue});
 }
 
 
@@ -646,7 +655,7 @@ float MQGravity(Vector3 position, float gravidade, int tempo)
 
 void MQGravit(MQDATA* data, int quem)
 {
-    if(MQReturnYMaxCollisionPoint(*data,  data->game.player[quem].position) == MQFALSE)
+    if(MQReturnYMaxCollisionPoint(*data,  data->game.player[quem].position) == MQFalse)
     {
         data->game.player[quem].position.y = MQGravity(data->game.player[quem].position, 0.1, data->game.player[quem].fallTime);
         data->game.player[quem].fallTime++;
@@ -737,7 +746,7 @@ void TECLADO_MAIN(MQDATA *data)
 {
     if(IsKeyPressed(KEY_ESCAPE))
     {
-        MQEXIT = MQMenu(*&data, 1);
+        MQExit = MQMenu(*&data, 1);
     }
     if(IsKeyPressed(KEY_E) || IsKeyPressed(KEY_E))
     {
@@ -771,28 +780,28 @@ void TECLADO_MAIN(MQDATA *data)
             reverseRotation = data->game.player[0].rotation-180;
         
         Vector3 Vec3buff = MQCheckWall(*data,"player-barriga0",reverseRotation,data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")]);
-        if(Vec3buff.x != __INT_MAX__)
+        if(Vec3buff.x != MQTrue)
         {
             if(data->game.player[0].position.x+0.5 > Vec3buff.x&&data->game.player[0].position.x-0.5<Vec3buff.x)
                 data->game.player[0].position.x = Vec3buff.x;
         } 
-        if(Vec3buff.z != __INT_MAX__)
+        if(Vec3buff.z != MQTrue)
         {
             if(data->game.player[0].position.z+0.5 > Vec3buff.z&&data->game.player[0].position.z-0.5<Vec3buff.z)
                 data->game.player[0].position.z = Vec3buff.z;
         }
 
 
-        if(data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")].index != __INT_MAX__)
+        if(data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")].index != MQTrue)
         {
             data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")].exclude=true;
             Vec3buff = MQCheckWall(*data,"player-barriga0",reverseRotation,data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")]);
-            if(Vec3buff.x != __INT_MAX__)
+            if(Vec3buff.x != MQTrue)
             {
                 if(data->game.player[0].position.x+0.5 > Vec3buff.x&&data->game.player[0].position.x-0.5<Vec3buff.x)
                     data->game.player[0].position.x = Vec3buff.x;
             } 
-            if(Vec3buff.z != __INT_MAX__)
+            if(Vec3buff.z != MQTrue)
             {
                 if(data->game.player[0].position.z+0.5 > Vec3buff.z&&data->game.player[0].position.z-0.5<Vec3buff.z)
                     data->game.player[0].position.z = Vec3buff.z;
@@ -807,28 +816,28 @@ void TECLADO_MAIN(MQDATA *data)
     {
         data->game.player[0].position = MQPlayerMove(data->game.player[0].position, data->game.player[0].rotation, data->game.player[0].speed);
         Vector3 Vec3buff = MQCheckWall(*data,"player-barriga0",data->game.player[0].rotation,data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")]);
-        if(Vec3buff.x != __INT_MAX__)
+        if(Vec3buff.x != MQTrue)
         {
             if(data->game.player[0].position.x+0.5 > Vec3buff.x&&data->game.player[0].position.x-0.5<Vec3buff.x)
                 data->game.player[0].position.x = Vec3buff.x;
         } 
-        if(Vec3buff.z != __INT_MAX__)
+        if(Vec3buff.z != MQTrue)
         {
             if(data->game.player[0].position.z+0.5 > Vec3buff.z&&data->game.player[0].position.z-0.5<Vec3buff.z)
                 data->game.player[0].position.z = Vec3buff.z;
         }
 
 
-        if(data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")].index != __INT_MAX__)
+        if(data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")].index != MQTrue)
         {
             data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")].exclude=true;
             Vec3buff = MQCheckWall(*data,"player-barriga0",data->game.player[0].rotation,data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")]);
-            if(Vec3buff.x != __INT_MAX__)
+            if(Vec3buff.x != MQTrue)
             {
                 if(data->game.player[0].position.x+0.5 > Vec3buff.x&&data->game.player[0].position.x-0.5<Vec3buff.x)
                     data->game.player[0].position.x = Vec3buff.x;
             } 
-            if(Vec3buff.z != __INT_MAX__)
+            if(Vec3buff.z != MQTrue)
             {
                 if(data->game.player[0].position.z+0.5 > Vec3buff.z&&data->game.player[0].position.z-0.5<Vec3buff.z)
                     data->game.player[0].position.z = Vec3buff.z;

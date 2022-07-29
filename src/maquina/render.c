@@ -1,3 +1,8 @@
+MQDATA_RENDER_MODEL MQCreateRenderModel(bool visible, bool playing, bool reverse,int modelIndex,int anim,int frame,Color color,Vector3 position,float rotation,char*name)
+{
+    return((MQDATA_RENDER_MODEL){visible,playing,reverse,modelIndex,MQTrue,MQTrue,PINK,MQCreateEmptyVec3(),MQTrue," "});
+}
+
 void MQCleanAllRenderSlots(MQDATA *data)
 {
     for(int i = 0;i<MAXOBJ;i++)
@@ -6,9 +11,9 @@ void MQCleanAllRenderSlots(MQDATA *data)
         data->session.render.model[i].color.g = 0;
         data->session.render.model[i].color.b = 0;
         data->session.render.model[i].color.a = 0;
-        data->session.render.model[i].modelIndex = __INT_MAX__;
-        data->session.render.model[i].position = (Vector3){ __INT_MAX__,__INT_MAX__,__INT_MAX__ };
-        data->session.render.model[i].rotation = __INT_MAX__;
+        data->session.render.model[i].modelIndex = MQTrue;
+        data->session.render.model[i].position = (Vector3){ MQTrue,MQTrue,MQTrue };
+        data->session.render.model[i].rotation = MQTrue;
         data->session.render.model[i].visible = false;
         data->session.render.model[i].playing = false;
         data->session.render.model[i].reverse = false;
@@ -19,11 +24,11 @@ void MQCleanAllRenderSlots(MQDATA *data)
         data->session.render.text[i].color.g = 0;
         data->session.render.text[i].color.b = 0;
         data->session.render.text[i].color.a = 0;
-        data->session.render.text[i].textIndex = __INT_MAX__;
-        data->session.render.text[i].position = (Vector2){ __INT_MAX__,__INT_MAX__ };
+        data->session.render.text[i].textIndex = MQTrue;
+        data->session.render.text[i].position = (Vector2){ MQTrue,MQTrue };
         data->session.render.text[i].visible = false;
-        data->session.render.text[i].fontSize = __INT_MAX__;
-        data->session.render.text[i].fontIndex = __INT_MAX__;
+        data->session.render.text[i].fontSize = MQTrue;
+        data->session.render.text[i].fontIndex = MQTrue;
         data->session.render.text[i].string = " ";
         data->session.render.text[i].name = " ";
     }
@@ -37,9 +42,9 @@ void MQCleanAllRenderModelSlots(MQDATA *data)
         data->session.render.model[i].color.g = 0;
         data->session.render.model[i].color.b = 0;
         data->session.render.model[i].color.a = 0;
-        data->session.render.model[i].modelIndex = __INT_MAX__;
-        data->session.render.model[i].position = (Vector3){ __INT_MAX__,__INT_MAX__,__INT_MAX__ };
-        data->session.render.model[i].rotation = __INT_MAX__;
+        data->session.render.model[i].modelIndex = MQTrue;
+        data->session.render.model[i].position = (Vector3){ MQTrue,MQTrue,MQTrue };
+        data->session.render.model[i].rotation = MQTrue;
         data->session.render.model[i].visible = false;
         data->session.render.model[i].playing = false;
         data->session.render.model[i].reverse = false;
@@ -57,11 +62,11 @@ void MQCleanAllRenderTextSlots(MQDATA *data)
         data->session.render.text[i].color.g = 0;
         data->session.render.text[i].color.b = 0;
         data->session.render.text[i].color.a = 0;
-        data->session.render.text[i].textIndex = __INT_MAX__;
-        data->session.render.text[i].position = (Vector2){ __INT_MAX__,__INT_MAX__ };
+        data->session.render.text[i].textIndex = MQTrue;
+        data->session.render.text[i].position = (Vector2){ MQTrue,MQTrue };
         data->session.render.text[i].visible = false;
-        data->session.render.text[i].fontSize = __INT_MAX__;
-        data->session.render.text[i].fontIndex = __INT_MAX__;
+        data->session.render.text[i].fontSize = MQTrue;
+        data->session.render.text[i].fontIndex = MQTrue;
         data->session.render.text[i].string = " ";
         data->session.render.text[i].name = " ";
     }
@@ -72,7 +77,7 @@ void MQRenderAddModelToQueue(MQDATA *data, char* name, int modelIndex, Color col
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
     {
-        if(data->session.render.model[i].modelIndex == __INT_MAX__)
+        if(data->session.render.model[i].modelIndex == MQTrue)
         {
             LocalIndex = i;
             break;
@@ -98,7 +103,7 @@ void MQRenderAddTextToQueue(MQDATA *data,char* name, int textIndex, Color color,
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
     {
-        if(data->session.render.text[i].textIndex == __INT_MAX__)
+        if(data->session.render.text[i].textIndex == MQTrue)
         {
             LocalIndex = i;
             break;
@@ -127,7 +132,7 @@ void MQRenderQueue(MQDATA* data)
         DrawBoundingBox(data->files.hitboxes[i].hitbox,BLACK);
         DrawBoundingBox(MQHitboxUpdateXYZ(data->game.event[i].hitbox, data->game.event[i].position),GREEN);
         DrawBoundingBox(MQHitboxUpdateXYZ(data->game.map.item[i].hitbox, data->game.map.item[i].position),RED);
-        if(data->session.render.model[i].modelIndex != __INT_MAX__)
+        if(data->session.render.model[i].modelIndex != MQTrue)
         {
             if(data->session.render.model[i].playing == true)
             {
@@ -145,7 +150,7 @@ void MQRenderQueue(MQDATA* data)
             }
             DrawModelEx(data->files.models[data->session.render.model[i].modelIndex].model, data->session.render.model[i].position, (Vector3){0.0f, 1.0f, 0.0f}, data->session.render.model[i].rotation , (Vector3){1.0f, 1.0f, 1.0f}, data->session.render.model[i].color);
         }
-        if(data->session.render.text[i].textIndex != __INT_MAX__)
+        if(data->session.render.text[i].textIndex != MQTrue)
         {
             DrawTextEx(data->files.fonts[data->session.render.text[i].fontIndex].font, data->session.render.text[i].string,data->session.render.text[i].position , data->session.render.text[i].fontSize, 0, data->session.render.text[i].color);
         }

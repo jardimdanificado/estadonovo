@@ -16,7 +16,7 @@ void MQPlayerConfigStart(MQDATA *data, int quem, Vector3 posi)
     char bufferLocal[64];
     snprintf(bufferLocal,64,"playerexclude%d",quem);
 
-    MQAddWallexcludeToQueue(*&data,MQCreateWallexclude(bufferLocal,false,MQTRUE));
+    MQAddWallexcludeToQueue(*&data,MQCreateWallexclude(bufferLocal,false,MQTrue));
 }
 
 Vector3 MQPlayerMove(Vector3 position, float rotation, float speed)

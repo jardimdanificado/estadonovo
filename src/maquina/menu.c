@@ -7,12 +7,12 @@ int MQMenuQuestions(MQDATA *data, int menu, int opcao )
             {
                 case 0:
                 {
-                    return MQFALSE;
+                    return MQFalse;
                 }
                 break;
                 case 1:
                 {
-                    return MQTRUE;
+                    return MQTrue;
                 }
                 break;
             }
@@ -22,7 +22,7 @@ int MQMenuQuestions(MQDATA *data, int menu, int opcao )
             {
                 case 0:
                 {
-                    return MQFALSE;
+                    return MQFalse;
                 }
                 break;
                 case 1:
@@ -32,7 +32,7 @@ int MQMenuQuestions(MQDATA *data, int menu, int opcao )
                 break;
                 case 2:
                 {
-                    return MQTRUE;
+                    return MQTrue;
                 }
                 break;
             }
@@ -42,19 +42,19 @@ int MQMenuQuestions(MQDATA *data, int menu, int opcao )
             {
                 case 0:
                 {
-                    return MQFALSE;
+                    return MQFalse;
                 }
                 break;
                 case 1:
                 {
                     MQSaveGame(*data);
-                    return MQFALSE;
+                    return MQFalse;
                 }
                 break;
                 case 2:
                 {
                     MQLoadGame(*&data);
-                    return MQFALSE;
+                    return MQFalse;
                 }
                 break;
             }
@@ -108,7 +108,7 @@ bool MQMenu(MQDATA *data, int menuIndex)
     {
         strcpy(quotes[i],data->files.langs[langIndex[menuIndex][i]].text);
     }
-    while(menuIndex < MQTRUE&& menuIndex > MQFALSE)
+    while(menuIndex < MQTrue&& menuIndex > MQFalse)
     {
         UpdateMusicStream(data->files.musics[0].music);
         //RENDER
@@ -140,7 +140,7 @@ bool MQMenu(MQDATA *data, int menuIndex)
         if(IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_E))
         {
             menuIndex = MQMenuQuestions(*&data,menuIndex,optIndex);
-            if (menuIndex>MQFALSE&&menuIndex<MQTRUE)
+            if (menuIndex>MQFalse&&menuIndex<MQTrue)
             {
                 for(short int i = 0 ;i<allmax[menuIndex];i++)
                 {
@@ -150,7 +150,7 @@ bool MQMenu(MQDATA *data, int menuIndex)
         }
         localframe++;
     }
-    if(menuIndex==MQTRUE)
+    if(menuIndex==MQTrue)
         return true;
     else
         return false;
