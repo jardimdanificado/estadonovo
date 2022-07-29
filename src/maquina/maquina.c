@@ -207,8 +207,58 @@ Vector3 MQRotateVertice(Vector3 pivot, float angle, Vector3 vertice)
     return NewVertice;
 }
 
+//---------------------------------------
+//HITBOX
+//---------------------------------------
+
+BoundingBox MQHitboxUpdateX(BoundingBox hitboxbase, Vector3 targetPosi)
+{
+    hitboxbase.min.x += targetPosi.x;
+    hitboxbase.max.x += targetPosi.x;
+    return hitboxbase;
+}
+
+BoundingBox MQHitboxUpdateY(BoundingBox hitboxbase, Vector3 targetPosi)
+{
+    hitboxbase.min.y += targetPosi.y;
+    hitboxbase.max.y += targetPosi.y;
+    return hitboxbase;
+}
+
+BoundingBox MQHitboxUpdateZ(BoundingBox hitboxbase, Vector3 targetPosi)
+{
+    hitboxbase.min.z += targetPosi.z;
+    hitboxbase.max.z += targetPosi.z;
+    return hitboxbase;
+}
+
+BoundingBox MQHitboxUpdateXYZ(BoundingBox hitboxbase, Vector3 targetPosi)
+{
+    BoundingBox hitbox;
+    hitbox = hitboxbase;
+    hitbox.max = Vector3Add(hitboxbase.max,targetPosi);
+    hitbox.min = Vector3Add(hitboxbase.min, targetPosi);
+    return hitbox;
+}
+
+void MQCreateHitbox(MQDATA *data, char *name, BoundingBox Hitbox)
+{
+    int LocalIndex;
+    for(int i = 0;i<MAXOBJ;i++)
+    {
+        if(strcmp(data->files.hitboxes[i].name," ")==0)
+        {
+            LocalIndex = i;
+            break;
+        }
+    }
+    data->files.hitboxes[LocalIndex].hitbox = Hitbox;
+    strcpy(data->files.hitboxes[LocalIndex].name,name);
+    LocalIndex++;
+}
+
 //-----------------------------------
-//MODELS&HITBOXES
+//MODEL
 //-----------------------------------
 
 #include "models.c"
@@ -672,7 +722,6 @@ void MQGravit(MQDATA* data, int quem)
 //-----------------------------------
 
 #include "player.c"
-
 
 //-----------------------------------
 //CAMERA
