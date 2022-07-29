@@ -418,6 +418,47 @@ int MQFindEvent(MQDATA data, char* name)
 //COLISION
 //-----------------------------------
 
+MQDATA_WALLEXCLUDE MQCreateEmptyWallexclude()
+{
+    return((MQDATA_WALLEXCLUDE){" ",false,-1});
+}
+
+MQDATA_WALLEXCLUDE MQCreateWallexclude(char*name,bool exclude, int index)
+{
+    return((MQDATA_WALLEXCLUDE){name,exclude,index});
+}
+
+void MQCleanAllWallExcludeSlots(MQDATA*data)
+{
+    for(int i = 0;i<MAXOBJ;i++)
+        data->game.other.wallexclude[i] = MQCreateEmptyWallexclude();
+}
+
+int MQFindWallexclude(MQDATA data,char* name)
+{
+    int emptyslot;
+    for(int i = MAXOBJ-1;i>0;i--)
+    {
+        if(strcmp(data.game.other.wallexclude[i].name,name)==0)
+        {
+            return(i);
+        }
+    }
+}
+
+void MQAddWallexcludeToQueue(MQDATA*data,MQDATA_WALLEXCLUDE object)
+{
+    int emptyslot;
+    for(int i = MAXOBJ-1;i>0;i--)
+    {
+        if(strcmp(data->game.other.wallexclude[i].name," ")==0)
+        {
+            data->game.other.wallexclude[i] = object;
+            break;
+        }
+    }
+}
+
 float MQReturnYMaxCollisionPoint(MQDATA data, Vector3 posi)
 {
     int hitboxMax;
@@ -501,6 +542,102 @@ bool* MQReturnCollisionCube(BoundingBox input, BoundingBox target)
         MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.max.z}, target, 0.02)
     });
 }
+
+Vector3 MQCheckWall(MQDATA data, char *eventname ,float LocalRotation, MQDATA_WALLEXCLUDE object)
+{
+    int hitboxMax;
+    for(int i = MAXOBJ-1;i>0;i--)
+    {
+        if(strcmp(data.game.event[i].name," ")==0)
+        {
+            hitboxMax = i;
+            break;
+        }
+    }
+    int hitboxIndex = MQFindHitbox(data, eventname);
+    BoundingBox hitbox = data.files.hitboxes[hitboxIndex].hitbox;
+    
+    for(int i = 0; i < hitboxMax; i++)
+        if(CheckCollisionBoxes(data.files.hitboxes[i].hitbox, hitbox)==true && i != hitboxIndex)
+        {
+            bool *point;
+            point = malloc(sizeof(bool)*27);
+            point = MQReturnCollisionCube( hitbox, data.files.hitboxes[i].hitbox);
+            int somatorio=0;
+
+            for(int i = 0;i<27;i++)
+            {
+                somatorio += point[i];
+            }
+                
+            if( object.exclude == true&&object.index == i)
+            {
+                object.exclude = false;
+            }
+            else if(somatorio != 0&&i != hitboxMax)
+            {
+                
+                if(LocalRotation>=0&&LocalRotation<90&&point[21]+point[18]+point[25]+point[20]+point[19]+point[26]+point[10]+point[11]+point[17]!=0)
+                {
+                    object.index=i;
+                    if(hitbox.max.z-0.5 < data.files.hitboxes[i].hitbox.min.z&&hitbox.max.x-0.5 < data.files.hitboxes[i].hitbox.min.x)
+                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTRUE,data.files.hitboxes[i].hitbox.min.z-0.10});
+                        
+                    else if(hitbox.max.z-0.5 < data.files.hitboxes[i].hitbox.min.z)
+                        return ((Vector3){MQTRUE,MQTRUE,data.files.hitboxes[i].hitbox.min.z-0.10});
+
+                    else if(hitbox.max.x-0.5 < data.files.hitboxes[i].hitbox.min.x)
+                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTRUE,MQTRUE});
+                }
+
+
+                if(LocalRotation>=90&&LocalRotation<180&&point[11]+point[10]+point[17]+point[2]+point[1]+point[8]+point[3]+point[0]+point[7]!=0)
+                {
+                    object.index=i;
+                    if(hitbox.min.z+0.5 > data.files.hitboxes[i].hitbox.max.z&&hitbox.max.x-0.5 < data.files.hitboxes[i].hitbox.min.x)
+                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTRUE,data.files.hitboxes[i].hitbox.max.z+0.10});
+                        
+                    else if(hitbox.min.z+0.5 > data.files.hitboxes[i].hitbox.max.z)
+                        return ((Vector3){MQTRUE,MQTRUE,data.files.hitboxes[i].hitbox.max.z+0.10});
+
+                    else if(hitbox.max.x-0.5 < data.files.hitboxes[i].hitbox.min.x)
+                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTRUE,MQTRUE});
+                }
+
+
+                if(LocalRotation>=180&&LocalRotation<270&&point[3]+point[0]+point[7]+point[4]+point[5]+point[6]+point[13]+point[14]+point[15]!=0)
+                {
+                    object.index=i;
+                    if(hitbox.min.z+0.5 > data.files.hitboxes[i].hitbox.max.z&&hitbox.min.x+0.5 > data.files.hitboxes[i].hitbox.max.x)
+                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTRUE,data.files.hitboxes[i].hitbox.max.z+0.10});
+                        
+                    else if(hitbox.min.z+0.5 > data.files.hitboxes[i].hitbox.max.z)
+                        return ((Vector3){MQTRUE,MQTRUE,data.files.hitboxes[i].hitbox.max.z+0.10});
+
+                    else if(hitbox.min.x+0.5 > data.files.hitboxes[i].hitbox.max.x)
+                        return ((Vector3){data.files.hitboxes[i].hitbox.max.x+0.10,MQTRUE,MQTRUE});
+                }
+
+
+                if(LocalRotation>=270&&LocalRotation<=360&&point[13]+point[14]+point[15]+point[22]+point[23]+point[24]+point[21]+point[18]+point[25]!=0)
+                {
+                    object.index=i;
+                    if(hitbox.max.z-0.5 < data.files.hitboxes[i].hitbox.min.z&&hitbox.min.x+0.5 > data.files.hitboxes[i].hitbox.max.x)
+                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTRUE,data.files.hitboxes[i].hitbox.max.z+0.10});
+                        
+                    else if(hitbox.max.z-0.5 < data.files.hitboxes[i].hitbox.min.z)
+                        return ((Vector3){MQTRUE,MQTRUE,data.files.hitboxes[i].hitbox.min.z-0.10});
+
+                    else if(hitbox.min.x+0.5 > data.files.hitboxes[i].hitbox.max.x)
+                        return ((Vector3){data.files.hitboxes[i].hitbox.max.x+0.10,MQTRUE,MQTRUE});
+                }
+            } 
+            object.index = MQTRUE;
+        }
+    object.index = MQTRUE;
+    return ((Vector3){MQTRUE,MQTRUE,MQTRUE});
+}
+
 
 float MQGravity(Vector3 position, float gravidade, int tempo)
 {
