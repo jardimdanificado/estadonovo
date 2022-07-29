@@ -1,7 +1,45 @@
-bool MQWALLEXCLUDE = false;
-int MQWALLEXCLUDEINDEX=0;
+MQDATA_WALLEXCLUDE MQCreateEmptyWallexclude()
+{
+    return((MQDATA_WALLEXCLUDE){" ",false,-1});
+}
 
-Vector3 MQCheckWall(MQDATA data, char *hitboxID,float LocalRotation)
+MQDATA_WALLEXCLUDE MQCreateWallexclude(char*name,bool exclude, int index)
+{
+    return((MQDATA_WALLEXCLUDE){name,exclude,index});
+}
+
+void MQCleanAllWallExcludeSlots(MQDATA*data)
+{
+    for(int i = 0;i<MAXOBJ;i++)
+        data->game.other.wallexclude[i] = MQCreateEmptyWallexclude();
+}
+
+int MQFindWallexclude(MQDATA data,char* name)
+{
+    int emptyslot;
+    for(int i = MAXOBJ-1;i>0;i--)
+    {
+        if(strcmp(data.game.other.wallexclude[i].name,name)==0)
+        {
+            return(i);
+        }
+    }
+}
+
+void MQAddWallexcludeToQueue(MQDATA*data,MQDATA_WALLEXCLUDE object)
+{
+    int emptyslot;
+    for(int i = MAXOBJ-1;i>0;i--)
+    {
+        if(strcmp(data->game.other.wallexclude[i].name," ")==0)
+        {
+            data->game.other.wallexclude[i] = object;
+            break;
+        }
+    }
+}
+
+Vector3 MQCheckWall(MQDATA data, char *eventname ,float LocalRotation, MQDATA_WALLEXCLUDE object)
 {
     int hitboxMax;
     for(int i = MAXOBJ-1;i>0;i--)
@@ -12,7 +50,7 @@ Vector3 MQCheckWall(MQDATA data, char *hitboxID,float LocalRotation)
             break;
         }
     }
-    int hitboxIndex = MQFindHitbox(data, hitboxID);
+    int hitboxIndex = MQFindHitbox(data, eventname);
     BoundingBox hitboxLocal = data.files.hitboxes[hitboxIndex].hitbox;
     
     for(int i = 0; i < hitboxMax; i++)
@@ -28,16 +66,16 @@ Vector3 MQCheckWall(MQDATA data, char *hitboxID,float LocalRotation)
                 localint += LocalBool[i];
             }
                 
-            if( MQWALLEXCLUDE == true&&MQWALLEXCLUDEINDEX == i)
+            if( object.exclude == true&&object.index == i)
             {
-                MQWALLEXCLUDE = false;
+                object.exclude = false;
             }
             else if(localint != 0&&i != hitboxMax)
             {
                 
                 if(LocalRotation>=0&&LocalRotation<90&&LocalBool[21]+LocalBool[18]+LocalBool[25]+LocalBool[20]+LocalBool[19]+LocalBool[26]+LocalBool[10]+LocalBool[11]+LocalBool[17]!=0)
                 {
-                    MQWALLEXCLUDEINDEX=i;
+                    object.index=i;
                     if(hitboxLocal.max.z-0.5 < data.files.hitboxes[i].hitbox.min.z&&hitboxLocal.max.x-0.5 < data.files.hitboxes[i].hitbox.min.x)
                         return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,__INT_MAX__,data.files.hitboxes[i].hitbox.min.z-0.10});
                         
@@ -51,7 +89,7 @@ Vector3 MQCheckWall(MQDATA data, char *hitboxID,float LocalRotation)
 
                 if(LocalRotation>=90&&LocalRotation<180&&LocalBool[11]+LocalBool[10]+LocalBool[17]+LocalBool[2]+LocalBool[1]+LocalBool[8]+LocalBool[3]+LocalBool[0]+LocalBool[7]!=0)
                 {
-                    MQWALLEXCLUDEINDEX=i;
+                    object.index=i;
                     if(hitboxLocal.min.z+0.5 > data.files.hitboxes[i].hitbox.max.z&&hitboxLocal.max.x-0.5 < data.files.hitboxes[i].hitbox.min.x)
                         return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,__INT_MAX__,data.files.hitboxes[i].hitbox.max.z+0.10});
                         
@@ -65,7 +103,7 @@ Vector3 MQCheckWall(MQDATA data, char *hitboxID,float LocalRotation)
 
                 if(LocalRotation>=180&&LocalRotation<270&&LocalBool[3]+LocalBool[0]+LocalBool[7]+LocalBool[4]+LocalBool[5]+LocalBool[6]+LocalBool[13]+LocalBool[14]+LocalBool[15]!=0)
                 {
-                    MQWALLEXCLUDEINDEX=i;
+                    object.index=i;
                     if(hitboxLocal.min.z+0.5 > data.files.hitboxes[i].hitbox.max.z&&hitboxLocal.min.x+0.5 > data.files.hitboxes[i].hitbox.max.x)
                         return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,__INT_MAX__,data.files.hitboxes[i].hitbox.max.z+0.10});
                         
@@ -79,7 +117,7 @@ Vector3 MQCheckWall(MQDATA data, char *hitboxID,float LocalRotation)
 
                 if(LocalRotation>=270&&LocalRotation<=360&&LocalBool[13]+LocalBool[14]+LocalBool[15]+LocalBool[22]+LocalBool[23]+LocalBool[24]+LocalBool[21]+LocalBool[18]+LocalBool[25]!=0)
                 {
-                    MQWALLEXCLUDEINDEX=i;
+                    object.index=i;
                     if(hitboxLocal.max.z-0.5 < data.files.hitboxes[i].hitbox.min.z&&hitboxLocal.min.x+0.5 > data.files.hitboxes[i].hitbox.max.x)
                         return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,__INT_MAX__,data.files.hitboxes[i].hitbox.max.z+0.10});
                         
@@ -90,13 +128,11 @@ Vector3 MQCheckWall(MQDATA data, char *hitboxID,float LocalRotation)
                         return ((Vector3){data.files.hitboxes[i].hitbox.max.x+0.10,__INT_MAX__,__INT_MAX__});
                 }
             } 
-            MQWALLEXCLUDEINDEX = __INT_MAX__;
+            object.index = __INT_MAX__;
         }
-    MQWALLEXCLUDEINDEX = __INT_MAX__;
+    object.index = __INT_MAX__;
     return ((Vector3){__INT_MAX__,__INT_MAX__,__INT_MAX__});
 }
-
-
 
 void MQPlayerConfigStart(MQDATA *data, int quem, Vector3 posi)
 {
@@ -113,6 +149,10 @@ void MQPlayerConfigStart(MQDATA *data, int quem, Vector3 posi)
     data->game.player[quem].position.x = posi.x;
     data->game.player[quem].position.z = posi.z;
     data->game.player[quem].speed = 0.1f;
+    char bufferLocal[64];
+    snprintf(bufferLocal,64,"playerexclude%d",quem);
+
+    MQAddWallexcludeToQueue(*&data,MQCreateWallexclude(bufferLocal,false,MQTRUE));
 }
 
 Vector3 MQPlayerMove(Vector3 position, float rotation, float speed)

@@ -35,7 +35,7 @@ void TECLADO_MAIN(MQDATA *data)
         else
             reverseRotation = data->game.player[0].rotation-180;
         
-        Vector3 Vec3buff = MQCheckWall(*data,"player-barriga0",reverseRotation);
+        Vector3 Vec3buff = MQCheckWall(*data,"player-barriga0",reverseRotation,data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")]);
         if(Vec3buff.x != __INT_MAX__)
         {
             if(data->game.player[0].position.x+0.5 > Vec3buff.x&&data->game.player[0].position.x-0.5<Vec3buff.x)
@@ -48,10 +48,10 @@ void TECLADO_MAIN(MQDATA *data)
         }
 
 
-        if(MQWALLEXCLUDEINDEX != __INT_MAX__)
+        if(data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")].index != __INT_MAX__)
         {
-            MQWALLEXCLUDE=true;
-            Vec3buff = MQCheckWall(*data,"player-barriga0",reverseRotation);
+            data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")].exclude=true;
+            Vec3buff = MQCheckWall(*data,"player-barriga0",reverseRotation,data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")]);
             if(Vec3buff.x != __INT_MAX__)
             {
                 if(data->game.player[0].position.x+0.5 > Vec3buff.x&&data->game.player[0].position.x-0.5<Vec3buff.x)
@@ -71,7 +71,7 @@ void TECLADO_MAIN(MQDATA *data)
     if(IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
     {
         data->game.player[0].position = MQPlayerMove(data->game.player[0].position, data->game.player[0].rotation, data->game.player[0].speed);
-        Vector3 Vec3buff = MQCheckWall(*data,"player-barriga0",data->game.player[0].rotation);
+        Vector3 Vec3buff = MQCheckWall(*data,"player-barriga0",data->game.player[0].rotation,data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")]);
         if(Vec3buff.x != __INT_MAX__)
         {
             if(data->game.player[0].position.x+0.5 > Vec3buff.x&&data->game.player[0].position.x-0.5<Vec3buff.x)
@@ -84,10 +84,10 @@ void TECLADO_MAIN(MQDATA *data)
         }
 
 
-        if(MQWALLEXCLUDEINDEX != __INT_MAX__)
+        if(data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")].index != __INT_MAX__)
         {
-            MQWALLEXCLUDE=true;
-            Vec3buff = MQCheckWall(*data,"player-barriga0",data->game.player[0].rotation);
+            data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")].exclude=true;
+            Vec3buff = MQCheckWall(*data,"player-barriga0",data->game.player[0].rotation,data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")]);
             if(Vec3buff.x != __INT_MAX__)
             {
                 if(data->game.player[0].position.x+0.5 > Vec3buff.x&&data->game.player[0].position.x-0.5<Vec3buff.x)

@@ -11,7 +11,7 @@ int main(void)
     MQResetAllFileSlots(&data);
     MQCleanAllRenderSlots(&data);
     MQCleanAllEventSlots(&data);
-    //MQCleanAllPlayersInventories(&data);
+    MQCleanAllWallExcludeSlots(&data);
     MQLoadAll(&data);
     
     data.session.render.camera = MQCameraStart(&data.session.render.camera);

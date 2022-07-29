@@ -228,17 +228,26 @@ struct MQDATA_PLAYER
 };
 typedef struct MQDATA_PLAYER MQDATA_PLAYER;
 
-struct MQDATA_PLAYER_MISC
+struct MQDATA_WALLEXCLUDE
 {
-    MQDATA_GAME_ITEM dummyItem[MAXOBJ];
+    char*name;
+    bool exclude;
+    int index;
 };
-typedef struct MQDATA_PLAYER_MISC MQDATA_PLAYER_MISC;
+typedef struct MQDATA_WALLEXCLUDE MQDATA_WALLEXCLUDE;
+
+struct MQDATA_GAME_OTHER
+{
+    MQDATA_WALLEXCLUDE wallexclude[MAXOBJ];
+};
+typedef struct MQDATA_GAME_OTHER MQDATA_GAME_OTHER;
 
 struct MQDATA_GAME
 {
     MQDATA_GAME_EVENT event[MAXOBJ];
     MQDATA_GAME_MAP map;
     MQDATA_PLAYER player[MAXOBJ];
+    MQDATA_GAME_OTHER other;
 };
 typedef struct MQDATA_GAME MQDATA_GAME;
 
