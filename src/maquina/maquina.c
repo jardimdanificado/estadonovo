@@ -414,16 +414,93 @@ int MQFindEvent(MQDATA data, char* name)
     return -1;
 }
 
-
-//-----------------------------------
-//PLAYER
-//-----------------------------------
-
-#include "player.c"
-
 //-----------------------------------
 //COLISION
 //-----------------------------------
+
+float MQReturnYMaxCollisionPoint(MQDATA data, Vector3 posi)
+{
+    int hitboxMax;
+    for(int i = MAXOBJ-1;i>0;i--)
+    {
+        if(strcmp(data.game.event[i].name," ")==0)
+        {
+            hitboxMax = i;
+            break;
+        }
+    }
+    BoundingBox hitboxLocal;
+    hitboxLocal.max = (Vector3){posi.x+0.005,posi.y-0.05,posi.z+0.005};
+    hitboxLocal.min = (Vector3){posi.x-0.005,posi.y-0.1,posi.z-0.005};
+    for(int i = 0; i < hitboxMax; i++)
+    {
+        if(CheckCollisionBoxes(data.files.hitboxes[i].hitbox,hitboxLocal))
+        {
+            return data.files.hitboxes[i].hitbox.max.y;
+        }
+    }
+    return MQFALSE;
+}
+
+bool MQCheckCollisionPoint(Vector3 inPosi,BoundingBox target, int size)
+{
+    BoundingBox localhitbox;
+    localhitbox.min = (Vector3) {inPosi.x - (size/2), inPosi.y - (size/2), inPosi.z - (size/2)};
+    localhitbox.max = (Vector3) {inPosi.x + (size/2), inPosi.y + (size/2), inPosi.z + (size/2)};
+    return(CheckCollisionBoxes(target, localhitbox));
+}
+
+bool* MQReturnCollisionCube(BoundingBox input, BoundingBox target)
+{
+    //imagine a cube
+    
+    //facemin
+    //2  3  4
+    //1  0  5
+    //8  7  6
+
+    //facemeio
+    //11 12 13
+    //10 9  14
+    //17 16 15
+
+    //facemax
+    //20 21 22
+    //19 18 23
+    //26 25 24
+
+    return ((bool[]){
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.min.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.min.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.min.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.min.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.min.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.min.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.min.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.min.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.min.z}, target, 0.02),
+        
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.max.z/2}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.max.z/2}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.max.z/2}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.max.z/2}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.max.z/2}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.max.z/2}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.max.z/2}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.max.z/2}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.max.z/2}, target, 0.02),
+        
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.max.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.max.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.max.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y, input.max.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y, input.max.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.max.y/2, input.max.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.min.x, input.min.y, input.max.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x/2, input.min.y, input.max.z}, target, 0.02),
+        MQCheckCollisionPoint((Vector3) {input.max.x, input.min.y, input.max.z}, target, 0.02)
+    });
+}
 
 float MQGravity(Vector3 position, float gravidade, int tempo)
 {
@@ -443,6 +520,13 @@ void MQGravit(MQDATA* data, int quem)
         data->game.player[quem].fallTime = 0;
     }
 }
+
+//-----------------------------------
+//PLAYER
+//-----------------------------------
+
+#include "player.c"
+
 
 //-----------------------------------
 //CAMERA
