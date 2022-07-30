@@ -31,9 +31,8 @@ int main(void)
     {
         data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.x, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.y, data.files.hitboxes[MQFindHitbox(data, "player-cabeca0")].hitbox.min.z
     };
-    
     data.session.render.camera.position = (Vector3){0.4375, 3.5, 11.0625};
-    MQCreateRenderModel(false,false,true,MQFindModelByName(data,"map0"),0,0,WHITE,(Vector3){0,0,0},0,"map0");
+
     MQAddRenderModelToQueue(&data, MQCreateRenderModel(false,false,true,MQFindModelByName(data,"map0"),0,0,WHITE,(Vector3){0,0,0},0,"map0"));
     MQAddRenderModelToQueue(&data, MQCreateRenderModel(true,true,false,MQFindModelByName(data,"player"),0,0,COR_PELE0,data.game.player[0].position,data.game.player[0].rotation,"player0"));    
     data.files.eventboxes[0].hitbox = (BoundingBox){(Vector3){-0.5,0,-0.5},(Vector3){0.5,2.3,0.5}};
