@@ -161,12 +161,14 @@ struct MQDATA_SESSION_RENDER
     Color background;
     Camera camera;
     RenderTexture rendertexture;
+    short upscale;
 };
 typedef struct MQDATA_SESSION_RENDER MQDATA_SESSION_RENDER;
 
 struct MQDATA_SESSION
 {
     long int frame;
+    bool resizebleWindow;
     MQDATA_SESSION_RENDER render;
     bool exit;
 };

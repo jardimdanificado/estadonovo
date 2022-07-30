@@ -98,6 +98,6 @@ void MQRenderQueue(MQDATA* data)
     EndMode3D();
     EndDrawing();
     EndTextureMode();
-    DrawTexturePro(data->session.render.rendertexture.texture,(Rectangle){.x = 0, .y=0, .width = MQScreenX/2, .height = (MQScreenY/2)*-1},(Rectangle){.x = 0, .y=0, .width = MQScreenX, .height = MQScreenY},(Vector2){0,0},0,WHITE);
+    DrawTexturePro(data->session.render.rendertexture.texture,(Rectangle){.x = 0, .y=0, .width = MQScreenX/data->session.render.upscale, .height = (MQScreenY/data->session.render.upscale)*-1},(Rectangle){.x = 0, .y=0, .width = MQScreenX, .height = MQScreenY},(Vector2){0,0},0,WHITE);
 }
 

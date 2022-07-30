@@ -1054,9 +1054,8 @@ void TECLADO_MAIN(MQDATA *data)
 
 void MQStart(MQDATA *data)
 {
-    if(MQMSAAX4 == true)
-        SetConfigFlags(FLAG_MSAA_4X_HINT);
-    if(MQResizeble == true)
+    data->session.resizebleWindow = true;
+    if(data->session.resizebleWindow == true)
         SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitAudioDevice();
     InitWindow(MQScreenX, MQScreenY, MQTitle);
@@ -1071,9 +1070,11 @@ void MQStart(MQDATA *data)
     //load.c
     MQLoadAll(*&data);
     //SESSION_RENDER
-    data->session.render.rendertexture = LoadRenderTexture(MQScreenX/2, MQScreenY/2);
+    data->session.render.upscale = 1;
+    data->session.render.rendertexture = LoadRenderTexture(MQScreenX/data->session.render.upscale, MQScreenY/data->session.render.upscale);
     data->session.render.camera = MQCameraStart(&data->session.render.camera);
     data->session.render.background = (Color){115, 105, 97, 255};
+    
     data->session.frame = 0;
     //FONTS
     data->files.fonts[0].font= MQFontStart("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16);
