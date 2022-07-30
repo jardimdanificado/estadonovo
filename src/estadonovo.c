@@ -6,7 +6,7 @@ int main(void)
     MQWindowStart();
     SetTargetFPS(60);
     SetExitKey(KEY_END);
-    
+
     MQDATA data;
     MQCleanAllFileSlots(&data);
     MQCleanAllItemSlots(&data);

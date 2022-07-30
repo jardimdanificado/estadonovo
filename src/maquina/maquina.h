@@ -13,6 +13,7 @@
 #include <string.h>
 #include <assert.h>
 #include <math.h>
+#include <limits.h>
 
 //RAYLIB
 #include "raylib/raylib.h"
@@ -38,7 +39,7 @@
 #define COR_ROUPA0 CLITERAL(Color){103, 122, 137,255}
 #define COR_ROUPA1 CLITERAL(Color){110, 125, 103,255}
 
-#define MQTrue __INT_MAX__
+#define MQTrue INT_MAX
 #define MQFalse MQTrue*(-1)
 
 #define MAXOBJ 64
