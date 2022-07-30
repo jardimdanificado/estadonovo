@@ -63,6 +63,7 @@ void MQAddRenderTextToQueue(MQDATA *data,MQDATA_RENDER_TEXT rendertext)
 
 void MQRenderQueue(MQDATA* data)
 {
+    BeginTextureMode(data->session.render.rendertexture);
     BeginDrawing();
     ClearBackground(data->session.render.background);
     BeginMode3D(data->session.render.camera);
@@ -96,5 +97,7 @@ void MQRenderQueue(MQDATA* data)
     }
     EndMode3D();
     EndDrawing();
+    EndTextureMode();
+    DrawTexturePro(data->session.render.rendertexture.texture,(Rectangle){.x = 0, .y=0, .width = MQScreenX/2, .height = (MQScreenY/2)*-1},(Rectangle){.x = 0, .y=0, .width = MQScreenX, .height = MQScreenY},(Vector2){0,0},0,WHITE);
 }
 

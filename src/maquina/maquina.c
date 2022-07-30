@@ -51,20 +51,6 @@ Vector3 MQCreateEmptyVec3()
 }
 
 //-----------------------------------
-//WINDOW
-//-----------------------------------
-
-void MQWindowStart()
-{
-    if(MQMSAAX4 == true)
-        SetConfigFlags(FLAG_MSAA_4X_HINT);
-    if(MQResizeble == true)
-        SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitAudioDevice();
-    InitWindow(MQScreenX, MQScreenY, MQTitle);
-}
-
-//-----------------------------------
 //FONT&STRING
 //-----------------------------------
 
@@ -256,10 +242,6 @@ void MQCreateHitbox(MQDATA *data, char *name, BoundingBox Hitbox)
     strcpy(data->files.hitboxes[LocalIndex].name,name);
     LocalIndex++;
 }
-
-//-----------------------------------
-//MODEL
-//-----------------------------------
 
 //---------------------------------------
 //MODEL
@@ -937,7 +919,6 @@ void MQSaveGame(MQDATA data)
 
 #include "menu.c"
 
-
 //-----------------------------------
 //KEYBOARD
 //-----------------------------------
@@ -946,7 +927,7 @@ void TECLADO_MAIN(MQDATA *data)
 {
     if(IsKeyPressed(KEY_ESCAPE))
     {
-        MQExit = MQMenu(*&data, 1);
+        MQMenu(*&data, 1);
     }
     if(IsKeyPressed(KEY_E) || IsKeyPressed(KEY_E))
     {
@@ -1065,4 +1046,39 @@ void TECLADO_MAIN(MQDATA *data)
     {
         data->game.player[0].position.y +=0.14;
     }
+}
+
+//-----------------------------------
+//WINDOW&ECOSYSTEM
+//-----------------------------------
+
+void MQStart(MQDATA *data)
+{
+    if(MQMSAAX4 == true)
+        SetConfigFlags(FLAG_MSAA_4X_HINT);
+    if(MQResizeble == true)
+        SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    InitAudioDevice();
+    InitWindow(MQScreenX, MQScreenY, MQTitle);
+    SetTargetFPS(60);
+    SetExitKey(KEY_END);
+    //cleaning scripts
+    MQCleanAllFileSlots(*&data);
+    MQCleanAllItemSlots(*&data);
+    MQCleanAllRenderSlots(*&data);
+    MQCleanAllEventSlots(*&data);
+    MQCleanAllWallExcludeSlots(*&data);
+    //load.c
+    MQLoadAll(*&data);
+    //SESSION_RENDER
+    data->session.render.rendertexture = LoadRenderTexture(MQScreenX/2, MQScreenY/2);
+    data->session.render.camera = MQCameraStart(&data->session.render.camera);
+    data->session.render.background = (Color){115, 105, 97, 255};
+    data->session.frame = 0;
+    //FONTS
+    data->files.fonts[0].font= MQFontStart("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16);
+    data->files.fonts[1].font= MQFontStart("data/font/Mockery.ttf", 48);
+    data->files.fonts[2].font= MQFontStart("data/font/Mockery.ttf", 24);
+    //MUSIC
+    data->files.musics[0].music = LoadMusicStream("data/audio/music/maintheme_by_kayoa.mp3");
 }

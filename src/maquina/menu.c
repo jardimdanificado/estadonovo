@@ -91,8 +91,7 @@ void MQMenuRender(MQDATA data, int max, int opt ,char quotes[][255])
     EndDrawing();
 }
 
-
-bool MQMenu(MQDATA *data, int menuIndex)
+void MQMenu(MQDATA *data, int menuIndex)
 {
     PlayMusicStream(data->files.musics[0].music);
     int allmax[] = {2,3,3,0,0};
@@ -151,9 +150,7 @@ bool MQMenu(MQDATA *data, int menuIndex)
         localframe++;
     }
     if(menuIndex==MQTrue)
-        return true;
-    else
-        return false;
+        data->session.exit = true;
 }
 
 

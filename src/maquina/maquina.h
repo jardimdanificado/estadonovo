@@ -50,10 +50,6 @@ unsigned int MAXANIM = 1;
 #define MQEmptyVec2 (Vector2){MQTrue,MQTrue}
 #define MQEmptyHitbox (BoundingBox){MQEmptyVec3,MQEmptyVec3}
 
-//Necessary to MQMenu()
-//If set it to true the loop will end and game will close
-bool MQExit = false;
-
 //-----------------------------------
 //CONFIG
 //-----------------------------------
@@ -64,6 +60,7 @@ int MQScreenX = 600;
 int MQScreenY = 400;
 bool MQMSAAX4 = false;
 bool MQResizeble = false;
+bool MQUpscale2X = true;
 
 //-----------------------------------
 //DATA_FILE
@@ -163,6 +160,7 @@ struct MQDATA_SESSION_RENDER
     MQDATA_RENDER_TEXT text[MAXOBJ];
     Color background;
     Camera camera;
+    RenderTexture rendertexture;
 };
 typedef struct MQDATA_SESSION_RENDER MQDATA_SESSION_RENDER;
 
@@ -170,6 +168,7 @@ struct MQDATA_SESSION
 {
     long int frame;
     MQDATA_SESSION_RENDER render;
+    bool exit;
 };
 typedef struct MQDATA_SESSION MQDATA_SESSION;
 

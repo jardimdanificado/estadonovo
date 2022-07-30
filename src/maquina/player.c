@@ -1,4 +1,4 @@
-void MQPlayerConfigStart(MQDATA *data, int quem, Vector3 posi)
+void MQNewPlayer(MQDATA *data, int quem, Vector3 posi)
 {
     //tipos
     //0 - calca
@@ -15,7 +15,7 @@ void MQPlayerConfigStart(MQDATA *data, int quem, Vector3 posi)
     data->game.player[quem].speed = 0.1f;
     char bufferLocal[64];
     snprintf(bufferLocal,64,"playerexclude%d",quem);
-
+    MQPlayerCreateBodyBox(*&data,quem);
     MQAddWallexcludeToQueue(*&data,MQCreateWallexclude(bufferLocal,false,MQTrue));
 }
 
