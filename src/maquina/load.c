@@ -60,5 +60,4 @@ void MQLoadAll(MQDATA* data)
     MQLoadModel(*&data, "area4","data/models/map/level0/area/4.glb",false,false);
     MQLoadModel(*&data, "area5","data/models/map/level0/area/5.glb",false,false);
     MQLoadModel(*&data, "chao0","data/models/map/level0/hitbox/chao.glb",false,true);
-
 }

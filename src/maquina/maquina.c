@@ -830,7 +830,6 @@ Vector3 MQCheckWall(MQDATA data, char *eventname ,float LocalRotation, MQDATA_WA
     return ((Vector3){MQTrue,MQTrue,MQTrue});
 }
 
-
 float MQGravity(Vector3 position, float gravidade, int tempo)
 {
     return(position.y - gravidade*((tempo*(tempo/5)))/60);
@@ -838,14 +837,36 @@ float MQGravity(Vector3 position, float gravidade, int tempo)
 
 void MQGravit(MQDATA* data, int quem)
 {
-    if(MQReturnYMaxCollisionPoint(*data,  data->game.player[quem].position) == MQFalse)
+    Ray raiolocal = (Ray){.position = data->game.player[quem].position, .direction = (Vector3){data->game.player[quem].position.x, data->game.player[quem].position.y-0.01,data->game.player[quem].position.z}};
+    int collisionIndex = MQTrue;
+    RayCollision raiocolisao;
+    char iniciais[4];
+
+    for(short i=0;i<MAXOBJ;i++)
+    {
+        raiocolisao = GetRayCollisionBox(raiolocal,data->files.hitboxes[i].hitbox);
+        if(raiocolisao.hit == true)
+        {
+            iniciais[0] = data->files.hitboxes[i].name[0];
+            iniciais[1] = data->files.hitboxes[i].name[1];
+            iniciais[2] = data->files.hitboxes[i].name[2];
+            iniciais[3] = data->files.hitboxes[i].name[3];
+            if(strcmp(iniciais,"area")!=0)
+            {
+                collisionIndex = i;
+                break;
+            }
+        }
+    }
+    
+    if(collisionIndex == MQTrue)
     {
         data->game.player[quem].position.y = MQGravity(data->game.player[quem].position, 0.1, data->game.player[quem].fallTime);
         data->game.player[quem].fallTime++;
     }
-    else 
+    else
     {
-        data->game.player[quem].position.y = MQReturnYMaxCollisionPoint(*data, data->game.player[quem].position);
+        data->game.player[quem].position.y = raiocolisao.point.y;
         data->game.player[quem].fallTime = 0;
     }
 }
