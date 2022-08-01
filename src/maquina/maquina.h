@@ -109,6 +109,13 @@ struct MQDATA_FILE_SOUND
 };
 typedef struct MQDATA_FILE_SOUND MQDATA_FILE_SOUND;
 
+struct MQDATA_FILE_RAY
+{
+    Ray ray;
+    char name[255];
+};
+typedef struct MQDATA_FILE_RAY MQDATA_FILE_RAY;
+
 struct MQDATA_FILES
 {
     MQDATA_FILE_MODEL models[MAXOBJ];
@@ -119,6 +126,7 @@ struct MQDATA_FILES
     MQDATA_FILE_TEXT langs[MAXOBJ];
     MQDATA_FILE_MUSIC musics[MAXOBJ];
     MQDATA_FILE_SOUND sounds[MAXOBJ];
+    MQDATA_FILE_RAY rays[MAXOBJ];
 };
 typedef struct MQDATA_FILES MQDATA_FILES;
 

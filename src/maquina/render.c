@@ -72,6 +72,7 @@ void MQRenderQueue(MQDATA* data)
         DrawBoundingBox(data->files.hitboxes[i].hitbox,BLACK);
         DrawBoundingBox(MQHitboxUpdateXYZ(data->game.event[i].hitbox, data->game.event[i].position),GREEN);
         DrawBoundingBox(MQHitboxUpdateXYZ(data->game.map.item[i].hitbox, data->game.map.item[i].position),RED);
+        DrawRay(data->files.rays[0].ray,PINK);
         if(data->session.render.model[i].modelIndex != MQTrue)
         {
             if(data->session.render.model[i].playing == true)
