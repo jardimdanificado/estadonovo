@@ -17,6 +17,8 @@ void MQNewPlayer(MQDATA *data, int quem, Vector3 posi)
     snprintf(bufferLocal,64,"playerexclude%d",quem);
     MQPlayerCreateBodyBox(*&data,quem);
     MQAddWallexcludeToQueue(*&data,MQCreateWallexclude(bufferLocal,false,MQTrue));
+    snprintf(bufferLocal,64,"playerray%d",quem);
+    MQAddRayToFiles(*&data,(Ray){.position = (Vector3){data->game.player[quem].position.x,data->game.player[quem].position.y-(0.005*(data->game.player[quem].fallTime+1)),data->game.player[quem].position.z}, .direction = (Vector3){0,1,0}},bufferLocal);
 }
 
 Vector3 MQPlayerMove(Vector3 position, float rotation, float speed)
@@ -77,7 +79,7 @@ void MQPlayerPickupItem(MQDATA*data,int quem)
             }
         }
 
-        MQDATA_GAME_ITEM item = MQCreateItem(data->game.map.item[mapboxindex].name,data->game.map.item[mapboxindex].type,data->game.map.item[mapboxindex].index,data->game.map.item[mapboxindex].position,data->game.map.item[mapboxindex].rotation,data->game.map.item[mapboxindex].condition,data->game.map.item[mapboxindex].content,data->game.map.item[mapboxindex].function,data->game.map.item[mapboxindex].hitbox,data->game.map.item[mapboxindex].locked,data->game.map.item[mapboxindex].active);
+        MQDATA_GAME_ITEM item = data->game.map.item[mapboxindex];
 
         if(localIndex!=-1&&data->game.map.item[mapboxindex].active==true&&strcmp(data->game.map.item[mapboxindex].name," ")==0)
         {

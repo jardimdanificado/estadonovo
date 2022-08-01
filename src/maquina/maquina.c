@@ -42,15 +42,6 @@ Vector3 MQDifferenceVec3(Vector3 vec1, Vector3 vec2)
 }
 
 //-----------------------------------
-//BASIC_SLOTS
-//-----------------------------------
-
-Vector3 MQCreateEmptyVec3()
-{
-    return((Vector3){0,0,0});
-}
-
-//-----------------------------------
 //FONT&STRING
 //-----------------------------------
 
@@ -120,6 +111,7 @@ void MQCleanAllFileSlots(MQDATA* data)
         strcpy(data->files.musics[i].name," ");
         strcpy(data->files.sounds[i].name," ");
         strcpy(data->files.texts[i].name," ");
+        strcpy(data->files.rays[i].name," ");
     }
 }
 
@@ -241,6 +233,35 @@ void MQCreateHitbox(MQDATA *data, char *name, BoundingBox Hitbox)
     data->files.hitboxes[LocalIndex].hitbox = Hitbox;
     strcpy(data->files.hitboxes[LocalIndex].name,name);
     LocalIndex++;
+}
+
+//---------------------------------------
+//RAY
+//---------------------------------------
+
+void MQAddRayToFiles(MQDATA*data,Ray ray, char*name)
+{
+    for(int i = 0;i<MAXOBJ;i++)
+    {
+        if(strcmp(data->files.rays[i].name," ")==0)
+        {
+            data->files.rays[i].ray = ray;
+            strcpy(data->files.rays[i].name,name);
+            break;
+        }
+    }
+}
+
+int MQFindRay(MQDATA data,char*name)
+{
+    for(int i = 0;i<MAXOBJ;i++)
+    {
+        if(strcmp(data.files.rays[i].name,name)==0)
+        {
+            return i;
+        }
+    }
+    return MQTrue;
 }
 
 //---------------------------------------
@@ -830,6 +851,12 @@ Vector3 MQCheckWall(MQDATA data, char *eventname ,float LocalRotation, MQDATA_WA
     return ((Vector3){MQTrue,MQTrue,MQTrue});
 }
 
+void MQUpdatePlayerGravityRay(MQDATA *data,int rayIndex, int time, Vector3 position)
+{
+    data->files.rays[rayIndex].ray.position = (Vector3){position.x,position.y-(0.005*(time)),position.z};
+    data->files.rays[rayIndex].ray.direction = (Vector3){0,1,0};
+}
+
 float MQGravity(Vector3 position, float gravidade, int tempo)
 {
     return(position.y - gravidade*((tempo*(tempo/5)))/60);
@@ -837,43 +864,49 @@ float MQGravity(Vector3 position, float gravidade, int tempo)
 
 void MQGravit(MQDATA* data, int quem)
 {
-    data->files.rays[0].ray = (Ray){.position = (Vector3){data->game.player[quem].position.x,data->game.player[quem].position.y-(0.005*(data->game.player[quem].fallTime+1)),data->game.player[quem].position.z}, .direction = (Vector3){0,1,0}};
-    int collisionIndex = MQTrue, headindex = MQTrue;
+    int headIndex = MQTrue;
     RayCollision raiocolisao;
-    char *iniciais=malloc(sizeof(char)*32);
-    snprintf(iniciais,32,"player-cabeca%d",quem);
-    headindex = MQFindHitbox(*data, iniciais);
-    free(iniciais);
-    iniciais=malloc(sizeof(char)*4);
+    char *buffer= malloc(32);
+    snprintf(buffer,32,"player-cabeca%d",quem);
+    headIndex = MQFindHitbox(*data, buffer);
+    snprintf(buffer,32,"playerray%d",quem);
+    int rayindex = MQFindRay(*data,buffer);
+    buffer = realloc(buffer,4);
+    MQUpdatePlayerGravityRay(*&data,rayindex,data->game.player[quem].fallTime+1,data->game.player[quem].position);
+    
     for(short i=0;i<MAXOBJ;i++)
     {
-        if(i<headindex||i>headindex+14)
+        if(i<headIndex||i>headIndex+14)
         {
-            raiocolisao = GetRayCollisionBox(data->files.rays[0].ray,data->files.hitboxes[i].hitbox);
+            raiocolisao = GetRayCollisionBox(data->files.rays[rayindex].ray,data->files.hitboxes[i].hitbox);
             if(raiocolisao.hit == true)
             {
-                iniciais[0] = data->files.hitboxes[i].name[0];
-                iniciais[1] = data->files.hitboxes[i].name[1];
-                iniciais[2] = data->files.hitboxes[i].name[2];
-                iniciais[3] = data->files.hitboxes[i].name[3];
-                if(strcmp(iniciais,"area")!=0)
+                buffer[0] = data->files.hitboxes[i].name[0];
+                buffer[1] = data->files.hitboxes[i].name[1];
+                buffer[2] = data->files.hitboxes[i].name[2];
+                buffer[3] = data->files.hitboxes[i].name[3];
+                if(strcmp(buffer,"area")!=0)
                 {
-                    collisionIndex = i;
                     break;
                 }
+                else
+                    raiocolisao.hit = false;
             }
         }
     }
-    free(iniciais);
-    if(collisionIndex == MQTrue)
+
+    if(raiocolisao.hit == false)
     {
         data->game.player[quem].position.y = MQGravity(data->game.player[quem].position, 0.1, data->game.player[quem].fallTime);
         data->game.player[quem].fallTime++;
     }
     else
     {
-        data->game.player[quem].position.y = raiocolisao.point.y;
-        data->game.player[quem].fallTime = 0;
+        if(raiocolisao.distance<0.5)
+        {   
+            data->game.player[quem].position.y = raiocolisao.point.y;
+            data->game.player[quem].fallTime = 0;
+        }
     }
     
 }

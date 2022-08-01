@@ -146,7 +146,7 @@ struct MQDATA_RENDER_MODEL
     char *name;
 };
 typedef struct MQDATA_RENDER_MODEL MQDATA_RENDER_MODEL;
-#define MQEmptyRenderModel (MQDATA_RENDER_MODEL){false,false,false,MQTrue,MQTrue,MQTrue,PINK,MQCreateEmptyVec3(),MQTrue," "};
+#define MQEmptyRenderModel (MQDATA_RENDER_MODEL){false,false,false,MQTrue,MQTrue,MQTrue,PINK,MQEmptyVec3,MQTrue," "};
 
 struct MQDATA_RENDER_TEXT
 {
@@ -286,7 +286,5 @@ struct MQDATA
     MQDATA_GAME game;
 };
 typedef struct MQDATA MQDATA;
-
-
 
 #include "maquina.c"
