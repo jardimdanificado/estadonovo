@@ -17,8 +17,10 @@ void MQNewPlayer(MQDATA *data, int quem, Vector3 posi)
     snprintf(bufferLocal,64,"playerexclude%d",quem);
     MQPlayerCreateBodyBox(*&data,quem);
     MQAddWallexcludeToQueue(*&data,MQCreateWallexclude(bufferLocal,false,MQTrue));
-    snprintf(bufferLocal,64,"playerray%d",quem);
+    snprintf(bufferLocal,64,"playergravityray%d",quem);
     MQAddRayToFiles(*&data,(Ray){.position = (Vector3){data->game.player[quem].position.x,data->game.player[quem].position.y-(0.005*(data->game.player[quem].fallTime+1)),data->game.player[quem].position.z}, .direction = (Vector3){0,1,0}},bufferLocal);
+    snprintf(bufferLocal,64,"playerdirectionray%d",quem);
+    MQAddRayToFiles(*&data,(Ray){.position = (Vector3){data->game.player[quem].position.x,data->game.player[quem].position.y,data->game.player[quem].position.z}, .direction = (Vector3){0,1,0}},bufferLocal);
 }
 
 Vector3 MQPlayerMove(Vector3 position, float rotation, float speed)

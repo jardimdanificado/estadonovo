@@ -672,30 +672,6 @@ void MQAddWallexcludeToQueue(MQDATA*data,MQDATA_WALLEXCLUDE object)
     }
 }
 
-float MQReturnYMaxCollisionPoint(MQDATA data, Vector3 posi)
-{
-    int hitboxMax;
-    for(int i = MAXOBJ-1;i>0;i--)
-    {
-        if(strcmp(data.game.event[i].name," ")==0)
-        {
-            hitboxMax = i;
-            break;
-        }
-    }
-    BoundingBox hitboxLocal;
-    hitboxLocal.max = (Vector3){posi.x+0.005,posi.y-0.05,posi.z+0.005};
-    hitboxLocal.min = (Vector3){posi.x-0.005,posi.y-0.1,posi.z-0.005};
-    for(int i = 0; i < hitboxMax; i++)
-    {
-        if(CheckCollisionBoxes(data.files.hitboxes[i].hitbox,hitboxLocal))
-        {
-            return data.files.hitboxes[i].hitbox.max.y;
-        }
-    }
-    return MQFalse;
-}
-
 bool MQCheckCollisionPoint(Vector3 inPosi,BoundingBox target, int size)
 {
     BoundingBox localhitbox;
@@ -857,6 +833,36 @@ void MQUpdatePlayerGravityRay(MQDATA *data,int rayIndex, int time, Vector3 posit
     data->files.rays[rayIndex].ray.direction = (Vector3){0,1,0};
 }
 
+void MQUpdatePlayerDirectionRay(MQDATA *data,int rayIndex, float rotation, Vector3 position)
+{
+    //z+ frente
+    //x+ esquerda
+    float valorZ;
+    float valorX;
+    if(rotation<=90.0)
+    {
+        valorZ = 1.0-((1.0/90.0)*rotation);
+        valorX = 0.0+(1.0/90.0)*rotation;
+    }
+    else if(rotation<=180)
+    {
+        valorZ = 0.0-((1.0/90.0)*(rotation-90.0));
+        valorX = 1.0-((1.0/90.0)*(rotation-90.0));
+    }
+    else if(rotation<=270)
+    {
+        valorZ = -1.0+((1.0/90.0)*(rotation-180.0));
+        valorX = 0.0-((1.0/90.0)*(rotation-180.0));
+    }
+    else 
+    {
+        valorZ = 0.0+((1.0/90.0)*(rotation-270.0));
+        valorX = -1.0+((1.0/90.0)*(rotation-270.0));
+    }
+    data->files.rays[rayIndex].ray.position = (Vector3){position.x,position.y+1,position.z};
+    data->files.rays[rayIndex].ray.direction = (Vector3){valorX,0,valorZ};
+}
+
 float MQGravity(Vector3 position, float gravidade, int tempo)
 {
     return(position.y - gravidade*((tempo*(tempo/5)))/60);
@@ -869,11 +875,13 @@ void MQGravit(MQDATA* data, int quem)
     char *buffer= malloc(32);
     snprintf(buffer,32,"player-cabeca%d",quem);
     headIndex = MQFindHitbox(*data, buffer);
-    snprintf(buffer,32,"playerray%d",quem);
+    snprintf(buffer,32,"playergravityray%d",quem);
     int rayindex = MQFindRay(*data,buffer);
-    buffer = realloc(buffer,4);
-    MQUpdatePlayerGravityRay(*&data,rayindex,data->game.player[quem].fallTime+1,data->game.player[quem].position);
     
+    MQUpdatePlayerGravityRay(*&data,rayindex,data->game.player[quem].fallTime+1,data->game.player[quem].position);
+    snprintf(buffer,32,"playerdirectionray%d",quem);
+    MQUpdatePlayerDirectionRay(*&data,MQFindRay(*data,buffer),data->game.player[quem].rotation,data->game.player[quem].position);
+    buffer = realloc(buffer,4);
     for(short i=0;i<MAXOBJ;i++)
     {
         if(i<headIndex||i>headIndex+14)
