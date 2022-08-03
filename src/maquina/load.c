@@ -53,11 +53,11 @@ void MQLoadAll(MQDATA* data)
     MQLoadModel(*&data, "map0item1","data/models/map/level0/item/1.glb",false,true);
     MQLoadModel(*&data, "map0item2","data/models/map/level0/item/2.glb",false,true);
     MQLoadModel(*&data, "map0item3","data/models/map/level0/item/3.glb",false,true);
-    MQLoadModel(*&data, "area0","data/models/map/level0/area/0.glb",false,false);
-    MQLoadModel(*&data, "area1","data/models/map/level0/area/1.glb",false,false);
-    MQLoadModel(*&data, "area2","data/models/map/level0/area/2.glb",false,false);
-    MQLoadModel(*&data, "area3","data/models/map/level0/area/3.glb",false,false);
-    MQLoadModel(*&data, "area4","data/models/map/level0/area/4.glb",false,false);
-    MQLoadModel(*&data, "area5","data/models/map/level0/area/5.glb",false,false);
+    MQLoadModel(*&data, "area0","data/models/map/level0/area/0.glb",false,true);
+    MQLoadModel(*&data, "area1","data/models/map/level0/area/1.glb",false,true);
+    MQLoadModel(*&data, "area2","data/models/map/level0/area/2.glb",false,true);
+    MQLoadModel(*&data, "area3","data/models/map/level0/area/3.glb",false,true);
+    MQLoadModel(*&data, "area4","data/models/map/level0/area/4.glb",false,true);
+    MQLoadModel(*&data, "area5","data/models/map/level0/area/5.glb",false,true);
     MQLoadModel(*&data, "chao0","data/models/map/level0/hitbox/chao.glb",false,true);
 }

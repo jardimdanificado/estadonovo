@@ -732,108 +732,7 @@ bool* MQReturnCollisionCube(BoundingBox input, BoundingBox target)
     });
 }
 
-Vector3 MQCheckWall(MQDATA data, char *eventname ,float LocalRotation, MQDATA_WALLEXCLUDE object)
-{
-    int hitboxMax;
-    for(int i = MAXOBJ-1;i>0;i--)
-    {
-        if(strcmp(data.game.event[i].name," ")==0)
-        {
-            hitboxMax = i;
-            break;
-        }
-    }
-    int hitboxIndex = MQFindHitbox(data, eventname);
-    BoundingBox hitbox = data.files.hitboxes[hitboxIndex].hitbox;
-    
-    for(int i = 0; i < hitboxMax; i++)
-        if(CheckCollisionBoxes(data.files.hitboxes[i].hitbox, hitbox)==true && i != hitboxIndex)
-        {
-            bool *point;
-            point = malloc(sizeof(bool)*27);
-            point = MQReturnCollisionCube( hitbox, data.files.hitboxes[i].hitbox);
-            int somatorio=0;
-
-            for(int i = 0;i<27;i++)
-            {
-                somatorio += point[i];
-            }
-                
-            if( object.exclude == true&&object.index == i)
-            {
-                object.exclude = false;
-            }
-            else if(somatorio != 0&&i != hitboxMax)
-            {
-                
-                if(LocalRotation>=0&&LocalRotation<90&&point[21]+point[18]+point[25]+point[20]+point[19]+point[26]+point[10]+point[11]+point[17]!=0)
-                {
-                    object.index=i;
-                    if(hitbox.max.z-0.5 < data.files.hitboxes[i].hitbox.min.z&&hitbox.max.x-0.5 < data.files.hitboxes[i].hitbox.min.x)
-                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTrue,data.files.hitboxes[i].hitbox.min.z-0.10});
-                        
-                    else if(hitbox.max.z-0.5 < data.files.hitboxes[i].hitbox.min.z)
-                        return ((Vector3){MQTrue,MQTrue,data.files.hitboxes[i].hitbox.min.z-0.10});
-
-                    else if(hitbox.max.x-0.5 < data.files.hitboxes[i].hitbox.min.x)
-                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTrue,MQTrue});
-                }
-
-
-                if(LocalRotation>=90&&LocalRotation<180&&point[11]+point[10]+point[17]+point[2]+point[1]+point[8]+point[3]+point[0]+point[7]!=0)
-                {
-                    object.index=i;
-                    if(hitbox.min.z+0.5 > data.files.hitboxes[i].hitbox.max.z&&hitbox.max.x-0.5 < data.files.hitboxes[i].hitbox.min.x)
-                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTrue,data.files.hitboxes[i].hitbox.max.z+0.10});
-                        
-                    else if(hitbox.min.z+0.5 > data.files.hitboxes[i].hitbox.max.z)
-                        return ((Vector3){MQTrue,MQTrue,data.files.hitboxes[i].hitbox.max.z+0.10});
-
-                    else if(hitbox.max.x-0.5 < data.files.hitboxes[i].hitbox.min.x)
-                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTrue,MQTrue});
-                }
-
-
-                if(LocalRotation>=180&&LocalRotation<270&&point[3]+point[0]+point[7]+point[4]+point[5]+point[6]+point[13]+point[14]+point[15]!=0)
-                {
-                    object.index=i;
-                    if(hitbox.min.z+0.5 > data.files.hitboxes[i].hitbox.max.z&&hitbox.min.x+0.5 > data.files.hitboxes[i].hitbox.max.x)
-                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTrue,data.files.hitboxes[i].hitbox.max.z+0.10});
-                        
-                    else if(hitbox.min.z+0.5 > data.files.hitboxes[i].hitbox.max.z)
-                        return ((Vector3){MQTrue,MQTrue,data.files.hitboxes[i].hitbox.max.z+0.10});
-
-                    else if(hitbox.min.x+0.5 > data.files.hitboxes[i].hitbox.max.x)
-                        return ((Vector3){data.files.hitboxes[i].hitbox.max.x+0.10,MQTrue,MQTrue});
-                }
-
-
-                if(LocalRotation>=270&&LocalRotation<=360&&point[13]+point[14]+point[15]+point[22]+point[23]+point[24]+point[21]+point[18]+point[25]!=0)
-                {
-                    object.index=i;
-                    if(hitbox.max.z-0.5 < data.files.hitboxes[i].hitbox.min.z&&hitbox.min.x+0.5 > data.files.hitboxes[i].hitbox.max.x)
-                        return ((Vector3){data.files.hitboxes[i].hitbox.min.x-0.10,MQTrue,data.files.hitboxes[i].hitbox.max.z+0.10});
-                        
-                    else if(hitbox.max.z-0.5 < data.files.hitboxes[i].hitbox.min.z)
-                        return ((Vector3){MQTrue,MQTrue,data.files.hitboxes[i].hitbox.min.z-0.10});
-
-                    else if(hitbox.min.x+0.5 > data.files.hitboxes[i].hitbox.max.x)
-                        return ((Vector3){data.files.hitboxes[i].hitbox.max.x+0.10,MQTrue,MQTrue});
-                }
-            } 
-            object.index = MQTrue;
-        }
-    object.index = MQTrue;
-    return ((Vector3){MQTrue,MQTrue,MQTrue});
-}
-
-void MQUpdatePlayerGravityRay(MQDATA *data,int rayIndex, int time, Vector3 position)
-{
-    data->files.rays[rayIndex].ray.position = (Vector3){position.x,position.y-(0.005*(time)),position.z};
-    data->files.rays[rayIndex].ray.direction = (Vector3){0,1,0};
-}
-
-void MQUpdatePlayerDirectionRay(MQDATA *data,int rayIndex, float rotation, Vector3 position)
+void MQUpdatePlayerDirectionRay(MQDATA *data,int rayIndex, float rotation, Vector3 position,bool backwards)
 {
     //z+ frente
     //x+ esquerda
@@ -843,24 +742,50 @@ void MQUpdatePlayerDirectionRay(MQDATA *data,int rayIndex, float rotation, Vecto
     {
         valorZ = 1.0-((1.0/90.0)*rotation);
         valorX = 0.0+(1.0/90.0)*rotation;
+        if(backwards)
+        {
+            valorZ = -1.0+((1.0/90.0)*rotation);
+            valorX = 0.0-(1.0/90.0)*rotation;
+        }
     }
     else if(rotation<=180)
     {
         valorZ = 0.0-((1.0/90.0)*(rotation-90.0));
         valorX = 1.0-((1.0/90.0)*(rotation-90.0));
+        if(backwards)
+        {
+            valorZ = 0.0+((1.0/90.0)*(rotation-90.0));
+            valorX = -1.0+((1.0/90.0)*(rotation-90.0));
+        }
     }
     else if(rotation<=270)
     {
         valorZ = -1.0+((1.0/90.0)*(rotation-180.0));
         valorX = 0.0-((1.0/90.0)*(rotation-180.0));
+        if(backwards)
+        {
+            valorZ = 1.0-((1.0/90.0)*(rotation-180.0));
+            valorX = 0.0+((1.0/90.0)*(rotation-180.0));
+        }
     }
     else 
     {
         valorZ = 0.0+((1.0/90.0)*(rotation-270.0));
         valorX = -1.0+((1.0/90.0)*(rotation-270.0));
+        if(backwards)
+        {
+            valorZ = 0.0-((1.0/90.0)*(rotation-270.0));
+            valorX = 1.0-((1.0/90.0)*(rotation-270.0));
+        }
     }
     data->files.rays[rayIndex].ray.position = (Vector3){position.x,position.y+1,position.z};
     data->files.rays[rayIndex].ray.direction = (Vector3){valorX,0,valorZ};
+}
+
+void MQUpdatePlayerGravityRay(MQDATA *data,int rayIndex, int time, Vector3 position)
+{
+    data->files.rays[rayIndex].ray.position = (Vector3){position.x,position.y-(0.005*(time)),position.z};
+    data->files.rays[rayIndex].ray.direction = (Vector3){0,1,0};
 }
 
 float MQGravity(Vector3 position, float gravidade, int tempo)
@@ -871,59 +796,106 @@ float MQGravity(Vector3 position, float gravidade, int tempo)
 void MQGravit(MQDATA* data, int quem)
 {
     int headIndex = MQTrue;
-    RayCollision raiocolisao;
+    RayCollision gravityraiocolisao;
     char *buffer= malloc(32);
     snprintf(buffer,32,"player-cabeca%d",quem);
     headIndex = MQFindHitbox(*data, buffer);
+
     snprintf(buffer,32,"playergravityray%d",quem);
-    int rayindex = MQFindRay(*data,buffer);
-    
-    MQUpdatePlayerGravityRay(*&data,rayindex,data->game.player[quem].fallTime+1,data->game.player[quem].position);
-    snprintf(buffer,32,"playerdirectionray%d",quem);
-    MQUpdatePlayerDirectionRay(*&data,MQFindRay(*data,buffer),data->game.player[quem].rotation,data->game.player[quem].position);
-    buffer = realloc(buffer,4);
+    int gravityrayindex = MQFindRay(*data,buffer);
+    free(buffer);
+    MQUpdatePlayerGravityRay(*&data,gravityrayindex,data->game.player[quem].fallTime+1,data->game.player[quem].position);
     for(short i=0;i<MAXOBJ;i++)
     {
-        if(i<headIndex||i>headIndex+14)
-        {
-            raiocolisao = GetRayCollisionBox(data->files.rays[rayindex].ray,data->files.hitboxes[i].hitbox);
-            if(raiocolisao.hit == true)
+        if(strncmp(data->files.hitboxes[i].name,"area",4)!=0&&strncmp(data->files.hitboxes[i].name," ",4)!=0)
+            if(i<headIndex||i>headIndex+14)
             {
-                buffer[0] = data->files.hitboxes[i].name[0];
-                buffer[1] = data->files.hitboxes[i].name[1];
-                buffer[2] = data->files.hitboxes[i].name[2];
-                buffer[3] = data->files.hitboxes[i].name[3];
-                if(strcmp(buffer,"area")!=0)
-                {
+                gravityraiocolisao = GetRayCollisionBox(data->files.rays[gravityrayindex].ray,data->files.hitboxes[i].hitbox);
+                if(gravityraiocolisao.hit == true)
                     break;
-                }
-                else
-                    raiocolisao.hit = false;
+                gravityraiocolisao.hit = false;
             }
-        }
     }
-
-    if(raiocolisao.hit == false)
+    if(gravityraiocolisao.hit == false)
     {
         data->game.player[quem].position.y = MQGravity(data->game.player[quem].position, 0.1, data->game.player[quem].fallTime);
         data->game.player[quem].fallTime++;
     }
     else
     {
-        if(raiocolisao.distance<0.5)
+        if(gravityraiocolisao.distance<0.7)
         {   
-            data->game.player[quem].position.y = raiocolisao.point.y;
+            data->game.player[quem].position.y = gravityraiocolisao.point.y;
             data->game.player[quem].fallTime = 0;
         }
     }
-    
 }
+
+
 
 //-----------------------------------
 //PLAYER
 //-----------------------------------
 
 #include "player.c"
+
+bool MQPlayerCollider(MQDATA*data, int quem, bool backwards)
+{
+    char *buffer= malloc(32);
+    int headIndex;
+    snprintf(buffer,32,"player-cabeca%d",quem);
+    headIndex = MQFindHitbox(*data, buffer);
+
+    RayCollision directionraiocolisao;
+    int directionrayindex;
+    snprintf(buffer,32,"playerdirectionray%d",quem);
+    directionrayindex = MQFindRay(*data,buffer);
+    MQUpdatePlayerDirectionRay(*&data,directionrayindex,data->game.player[quem].rotation,data->game.player[quem].position,backwards);
+    free(buffer);
+    for(short i=0;i<MAXOBJ;i++)
+        if(strncmp(data->files.hitboxes[i].name,"area",4)!=0&&strncmp(data->files.hitboxes[i].name," ",4)!=0)
+            if(i<headIndex||i>headIndex+14)
+            {
+                directionraiocolisao = GetRayCollisionBox(data->files.rays[directionrayindex].ray,data->files.hitboxes[i].hitbox);
+                if(directionraiocolisao.hit == true)
+                    break;
+                directionraiocolisao.hit = false;
+            }
+    if(directionraiocolisao.hit == true)
+    {
+        if(directionraiocolisao.distance<0.5)
+            return true;
+        else
+        {
+            BoundingBox caixa = (BoundingBox){.max = data->game.player[quem].position,.min = data->game.player[quem].position};
+            caixa.max.x += 0.2;
+            caixa.max.y += 1.2;
+            caixa.max.z += 0.2;
+            caixa.min.x += -0.2;
+            caixa.min.y += 0.8;
+            caixa.min.z += -0.2;
+            if(backwards)
+            {
+                caixa.max = MQPlayerMove(caixa.max,data->game.player[quem].rotation,-0.1);
+                caixa.min = MQPlayerMove(caixa.min,data->game.player[quem].rotation,-0.1);
+            }
+            else
+            {
+                caixa.max = MQPlayerMove(caixa.max,data->game.player[quem].rotation,0.1);
+                caixa.min = MQPlayerMove(caixa.min,data->game.player[quem].rotation,0.1);
+            }
+            data->files.hitboxes[MAXOBJ-2].hitbox = caixa;
+            for(int i = 0;i<MAXOBJ;i++)
+                if(i<headIndex||i>headIndex+14)
+                    if(strcmp(data->files.hitboxes[i].name," ")!=0)
+                        if(CheckCollisionBoxes(caixa,data->files.hitboxes[i].hitbox)==true)
+                            if(strncmp(data->files.hitboxes[i].name,"area",4)!=0)
+                                return true;
+        }
+    }
+    
+    return false;
+}
 
 //-----------------------------------
 //CAMERA
@@ -1004,12 +976,14 @@ void TECLADO_MAIN(MQDATA *data)
     } 
     if(IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
     {
+        MQPlayerCollider(*&data,0,false);
         if(data->game.player[0].rotation == 0)
             data->game.player[0].rotation = 360;
         data->game.player[0].rotation -= 6;
     }
     if(IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
     {
+        MQPlayerCollider(*&data,0,false);
         if(data->game.player[0].rotation == 360)
             data->game.player[0].rotation = 0;
         data->game.player[0].rotation += 6;
@@ -1021,42 +995,8 @@ void TECLADO_MAIN(MQDATA *data)
     }
     if(IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
     {
-
-        data->game.player[0].position = MQPlayerMove(data->game.player[0].position, data->game.player[0].rotation, (data->game.player[0].speed) * (-1));
-        float reverseRotation;
-        if(data->game.player[0].rotation<180)
-            reverseRotation = 180 + data->game.player[0].rotation;
-        else
-            reverseRotation = data->game.player[0].rotation-180;
-        
-        Vector3 Vec3buff = MQCheckWall(*data,"player-barriga0",reverseRotation,data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")]);
-        if(Vec3buff.x != MQTrue)
-        {
-            if(data->game.player[0].position.x+0.5 > Vec3buff.x&&data->game.player[0].position.x-0.5<Vec3buff.x)
-                data->game.player[0].position.x = Vec3buff.x;
-        } 
-        if(Vec3buff.z != MQTrue)
-        {
-            if(data->game.player[0].position.z+0.5 > Vec3buff.z&&data->game.player[0].position.z-0.5<Vec3buff.z)
-                data->game.player[0].position.z = Vec3buff.z;
-        }
-
-
-        if(data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")].index != MQTrue)
-        {
-            data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")].exclude=true;
-            Vec3buff = MQCheckWall(*data,"player-barriga0",reverseRotation,data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")]);
-            if(Vec3buff.x != MQTrue)
-            {
-                if(data->game.player[0].position.x+0.5 > Vec3buff.x&&data->game.player[0].position.x-0.5<Vec3buff.x)
-                    data->game.player[0].position.x = Vec3buff.x;
-            } 
-            if(Vec3buff.z != MQTrue)
-            {
-                if(data->game.player[0].position.z+0.5 > Vec3buff.z&&data->game.player[0].position.z-0.5<Vec3buff.z)
-                    data->game.player[0].position.z = Vec3buff.z;
-            }
-        }
+        if(MQPlayerCollider(*&data,0,true)==false)
+            data->game.player[0].position = MQPlayerMove(data->game.player[0].position, data->game.player[0].rotation, (data->game.player[0].speed) * (-1));
     }
     if(IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
     {
@@ -1064,35 +1004,8 @@ void TECLADO_MAIN(MQDATA *data)
     }
     if(IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
     {
-        data->game.player[0].position = MQPlayerMove(data->game.player[0].position, data->game.player[0].rotation, data->game.player[0].speed);
-        Vector3 Vec3buff = MQCheckWall(*data,"player-barriga0",data->game.player[0].rotation,data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")]);
-        if(Vec3buff.x != MQTrue)
-        {
-            if(data->game.player[0].position.x+0.5 > Vec3buff.x&&data->game.player[0].position.x-0.5<Vec3buff.x)
-                data->game.player[0].position.x = Vec3buff.x;
-        } 
-        if(Vec3buff.z != MQTrue)
-        {
-            if(data->game.player[0].position.z+0.5 > Vec3buff.z&&data->game.player[0].position.z-0.5<Vec3buff.z)
-                data->game.player[0].position.z = Vec3buff.z;
-        }
-
-
-        if(data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")].index != MQTrue)
-        {
-            data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")].exclude=true;
-            Vec3buff = MQCheckWall(*data,"player-barriga0",data->game.player[0].rotation,data->game.other.wallexclude[MQFindWallexclude(*data,"playerwallexclude0")]);
-            if(Vec3buff.x != MQTrue)
-            {
-                if(data->game.player[0].position.x+0.5 > Vec3buff.x&&data->game.player[0].position.x-0.5<Vec3buff.x)
-                    data->game.player[0].position.x = Vec3buff.x;
-            } 
-            if(Vec3buff.z != MQTrue)
-            {
-                if(data->game.player[0].position.z+0.5 > Vec3buff.z&&data->game.player[0].position.z-0.5<Vec3buff.z)
-                    data->game.player[0].position.z = Vec3buff.z;
-            }
-        }
+        if(MQPlayerCollider(*&data,0,false)==false)
+            data->game.player[0].position = MQPlayerMove(data->game.player[0].position, data->game.player[0].rotation, data->game.player[0].speed);
     }
     if(IsKeyDown(KEY_LEFT_SHIFT))
     {
