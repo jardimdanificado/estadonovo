@@ -57,10 +57,7 @@ unsigned int MAXANIM = 1;
 const char* MQTitle = "Estado Novo";
 const char* MQSubTitle = "Uma obra por Jardel Torres";
 int MQScreenX = 600;
-int MQScreenY = 400;
-bool MQMSAAX4 = false;
-bool MQResizeble = false;
-bool MQUpscale2X = true;
+int MQScreenY = 240;
 
 //-----------------------------------
 //DATA_FILE
