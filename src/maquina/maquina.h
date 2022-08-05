@@ -224,7 +224,6 @@ struct MQDATA_GAME_EVENT
 typedef struct MQDATA_GAME_EVENT MQDATA_GAME_EVENT;
 #define MQEmptyEvent (MQDATA_GAME_ITEM){false,false,MQTrue,MQEmptyHitbox,MQEmptyVec3,MQTrue," "};
 
-
 struct MQDATA_GAME_MAP
 {
     MQDATA_GAME_ITEM item[MAXOBJ];

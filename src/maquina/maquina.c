@@ -45,17 +45,6 @@ Vector3 MQDifferenceVec3(Vector3 vec1, Vector3 vec2)
 //FONT&STRING
 //-----------------------------------
 
-//Use into a strcmp() or strcpy()
-//DONT use it direcly
-char *MQStrAddInt(char* string, int value)
-{
-    char buffer[sizeof(string)];
-    strcpy(buffer,string);
-    string = malloc(sizeof(string)+8);
-    snprintf(string,sizeof(string)+8,"%s%d",buffer,value);
-    return string;
-}
-
 Font MQFontStart(char *FontLoc, int FontSize)
 {
     unsigned int fileSize = 0;
@@ -129,7 +118,7 @@ int MQFindHitbox(MQDATA data, char* name)
     return -1;
 }
 
-int MQFindModelByName(MQDATA data, char* name)
+int MQFindModel(MQDATA data, char* name)
 {
     for(int i = 0; i < MAXOBJ; i++)
     {
@@ -281,7 +270,6 @@ Mesh MQApplyMeshTransformFromBone(Model model, ModelAnimation anim, int frame)
             Mesh mesh = model.meshes[m];
             if(mesh.boneIds == NULL || mesh.boneWeights == NULL)
             {
-//                 TRACELOG(LOG_WARNING, "MODEL: UpdateModelAnimation Mesh %i has no connection to bones",m);
                 continue;
             }
 
@@ -325,10 +313,8 @@ Mesh MQApplyMeshTransformFromBone(Model model, ModelAnimation anim, int frame)
                         continue;
                     }
                     boneId = mesh.boneIds[boneCounter];
-                    //int boneIdParent = model.bones[boneId].parent;
                     inTranslation = model.bindPose[boneId].translation;
                     inRotation = model.bindPose[boneId].rotation;
-                    // inScale = model.bindPose[boneId].scale;
                     outTranslation = anim.framePoses[frame][boneId].translation;
                     outRotation = anim.framePoses[frame][boneId].rotation;
                     outScale = anim.framePoses[frame][boneId].scale;
@@ -340,7 +326,6 @@ Mesh MQApplyMeshTransformFromBone(Model model, ModelAnimation anim, int frame)
                     animVertex = Vector3Subtract(animVertex, inTranslation);
                     animVertex = Vector3RotateByQuaternion(animVertex, QuaternionMultiply(outRotation, QuaternionInvert(inRotation)));
                     animVertex = Vector3Add(animVertex, outTranslation);
-//                     animVertex = Vector3Transform(animVertex, model.transform);
                     mesh.animVertices[vCounter] += animVertex.x * boneWeight;
                     mesh.animVertices[vCounter + 1] += animVertex.y * boneWeight;
                     mesh.animVertices[vCounter + 2] += animVertex.z * boneWeight;
@@ -358,9 +343,6 @@ Mesh MQApplyMeshTransformFromBone(Model model, ModelAnimation anim, int frame)
                     }
                 }
             }
-
-            // Upload new vertex data to GPU for model drawing
-            // Only update data when values changed.
             if(updated)
             {
                 mesh.vertices = mesh.animVertices;
@@ -397,12 +379,12 @@ void MQPlayerCreateBodyBox(MQDATA *data, int quem)
 {
     char buffer[128],buffer0[128];
     int modelheadfind;
-    modelheadfind = MQFindModelByName(*data,"player-cabeca");
+    modelheadfind = MQFindModel(*data,"player-cabeca");
     for(int i = modelheadfind; i < modelheadfind+14; i++)
     {
         snprintf(buffer,266,"%s%d",data->files.models[i].name,quem);
         snprintf(buffer0,255,"%s",data->files.models[i].name);
-        MQCreateHitbox(*&data, buffer, GetModelBoundingBox(data->files.models[MQFindModelByName(*data,buffer0)].model));
+        MQCreateHitbox(*&data, buffer, GetModelBoundingBox(data->files.models[MQFindModel(*data,buffer0)].model));
     } 
 }
 
@@ -415,7 +397,7 @@ void MQPlayerUpdateBodyBox(MQDATA *data, int quem, int qualAnim)
     snprintf(buffer,128,"player-cabeca%d",quem);
     int hitboxheadfind,modelheadfind; 
     hitboxheadfind = MQFindHitbox(*data,buffer);
-    modelheadfind = MQFindModelByName(*data,"player-cabeca");
+    modelheadfind = MQFindModel(*data,"player-cabeca");
     for(int i = 0; i < 14; i++)
     {
         modelIndex =  modelheadfind+i;
@@ -731,7 +713,7 @@ bool* MQReturnCollisionCube(BoundingBox input, BoundingBox target)
     });
 }
 
-void MQUpdatePlayerDirectionRay(MQDATA *data,int rayIndex, float rotation, Vector3 position,bool backwards)
+void MQRotateHorizontalRay(MQDATA *data,int rayIndex, float rotation, Vector3 position,bool backwards)
 {
     //z+ frente
     //x+ esquerda
@@ -781,7 +763,7 @@ void MQUpdatePlayerDirectionRay(MQDATA *data,int rayIndex, float rotation, Vecto
     data->files.rays[rayIndex].ray.direction = (Vector3){valorX,0,valorZ};
 }
 
-void MQUpdatePlayerGravityRay(MQDATA *data,int rayIndex, int time, Vector3 position)
+void MQUpdateGravityRay(MQDATA *data,int rayIndex, int time, Vector3 position)
 {
     data->files.rays[rayIndex].ray.position = (Vector3){position.x,position.y-(0.005*(time)),position.z};
     data->files.rays[rayIndex].ray.direction = (Vector3){0,1,0};
@@ -803,7 +785,7 @@ void MQGravit(MQDATA* data, int quem)
     snprintf(buffer,32,"playergravityray%d",quem);
     int gravityrayindex = MQFindRay(*data,buffer);
     free(buffer);
-    MQUpdatePlayerGravityRay(*&data,gravityrayindex,data->game.player[quem].fallTime+1,data->game.player[quem].position);
+    MQUpdateGravityRay(*&data,gravityrayindex,data->game.player[quem].fallTime+1,data->game.player[quem].position);
     for(short i=0;i<MAXOBJ;i++)
     {
         if(strncmp(data->files.hitboxes[i].name,"area",4)!=0&&strncmp(data->files.hitboxes[i].name," ",4)!=0)
@@ -849,7 +831,7 @@ bool MQPlayerCollider(MQDATA*data, int quem, bool backwards)
     int directionrayindex;
     snprintf(buffer,32,"playerdirectionray%d",quem);
     directionrayindex = MQFindRay(*data,buffer);
-    MQUpdatePlayerDirectionRay(*&data,directionrayindex,data->game.player[quem].rotation,data->game.player[quem].position,backwards);
+    MQRotateHorizontalRay(*&data,directionrayindex,data->game.player[quem].rotation,data->game.player[quem].position,backwards);
     free(buffer);
     for(short i=0;i<MAXOBJ;i++)
         if(strncmp(data->files.hitboxes[i].name,"area",4)!=0&&strncmp(data->files.hitboxes[i].name," ",4)!=0)
@@ -892,7 +874,6 @@ bool MQPlayerCollider(MQDATA*data, int quem, bool backwards)
                                 return true;
         }
     }
-    
     return false;
 }
 
@@ -925,7 +906,6 @@ Camera MQCameraStart(Camera *camera)
 //-----------------------------------
 
 #include "load.c"
-
 
 //-----------------------------------
 //SAVEGAME
