@@ -631,45 +631,44 @@ int MQFindEvent(MQDATA data, char* name)
 //COLISION
 //-----------------------------------
 
-MQDATA_WALLEXCLUDE MQCreateEmptyWallexclude()
+Vector3 MQ3DMove(Vector3 position, float rotation, float speed)
 {
-    return((MQDATA_WALLEXCLUDE){" ",false,-1});
-}
-
-MQDATA_WALLEXCLUDE MQCreateWallexclude(char*name,bool exclude, int index)
-{
-    return((MQDATA_WALLEXCLUDE){name,exclude,index});
-}
-
-void MQCleanAllWallExcludeSlots(MQDATA*data)
-{
-    for(int i = 0;i<MAXOBJ;i++)
-        data->game.other.wallexclude[i] = MQCreateEmptyWallexclude();
-}
-
-int MQFindWallexclude(MQDATA data,char* name)
-{
-    int emptyslot;
-    for(int i = MAXOBJ-1;i>0;i--)
+    //z+ frente
+    //x+ esquerda
+    float  valorZ, valorX;
+    int giro = rotation / 90;
+    float resto = rotation - (90 * giro);
+    float restodoresto = 90 - resto;
+    valorZ = speed - resto * (speed / 90);
+    valorX = speed - restodoresto * (speed / 90);
+    switch(giro)
     {
-        if(strcmp(data.game.other.wallexclude[i].name,name)==0)
+        case 0:
         {
-            return(i);
+            position.z += valorZ;
+            position.x += valorX;
         }
-    }
-}
-
-void MQAddWallexcludeToQueue(MQDATA*data,MQDATA_WALLEXCLUDE object)
-{
-    int emptyslot;
-    for(int i = MAXOBJ-1;i>0;i--)
-    {
-        if(strcmp(data->game.other.wallexclude[i].name," ")==0)
+        break;
+        case 1:
         {
-            data->game.other.wallexclude[i] = object;
-            break;
+            position.z -= valorX;
+            position.x += valorZ;
         }
+        break;
+        case 2:
+        {
+            position.z -= valorZ;
+            position.x -= valorX;
+        }
+        break;
+        case 3:
+        {
+            position.z += valorX;
+            position.x -= valorZ;
+        }
+        break;
     }
+    return position;
 }
 
 bool MQCheckCollisionPoint(Vector3 inPosi,BoundingBox target, int size)
@@ -876,13 +875,13 @@ bool MQPlayerCollider(MQDATA*data, int quem, bool backwards)
             caixa.min.z += -0.2;
             if(backwards)
             {
-                caixa.max = MQPlayerMove(caixa.max,data->game.player[quem].rotation,-0.1);
-                caixa.min = MQPlayerMove(caixa.min,data->game.player[quem].rotation,-0.1);
+                caixa.max = MQ3DMove(caixa.max,data->game.player[quem].rotation,-0.1);
+                caixa.min = MQ3DMove(caixa.min,data->game.player[quem].rotation,-0.1);
             }
             else
             {
-                caixa.max = MQPlayerMove(caixa.max,data->game.player[quem].rotation,0.1);
-                caixa.min = MQPlayerMove(caixa.min,data->game.player[quem].rotation,0.1);
+                caixa.max = MQ3DMove(caixa.max,data->game.player[quem].rotation,0.1);
+                caixa.min = MQ3DMove(caixa.min,data->game.player[quem].rotation,0.1);
             }
             data->files.hitboxes[MAXOBJ-2].hitbox = caixa;
             for(int i = 0;i<MAXOBJ;i++)
@@ -996,7 +995,7 @@ void TECLADO_MAIN(MQDATA *data)
     if(IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
     {
         if(MQPlayerCollider(*&data,0,true)==false)
-            data->game.player[0].position = MQPlayerMove(data->game.player[0].position, data->game.player[0].rotation, (data->game.player[0].speed) * (-1));
+            data->game.player[0].position = MQ3DMove(data->game.player[0].position, data->game.player[0].rotation, (data->game.player[0].speed) * (-1));
     }
     if(IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
     {
@@ -1005,7 +1004,7 @@ void TECLADO_MAIN(MQDATA *data)
     if(IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
     {
         if(MQPlayerCollider(*&data,0,false)==false)
-            data->game.player[0].position = MQPlayerMove(data->game.player[0].position, data->game.player[0].rotation, data->game.player[0].speed);
+            data->game.player[0].position = MQ3DMove(data->game.player[0].position, data->game.player[0].rotation, data->game.player[0].speed);
     }
     if(IsKeyDown(KEY_LEFT_SHIFT))
     {

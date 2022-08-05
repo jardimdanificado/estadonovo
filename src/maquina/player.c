@@ -23,46 +23,6 @@ void MQNewPlayer(MQDATA *data, int quem, Vector3 posi)
     MQAddRayToFiles(*&data,(Ray){.position = (Vector3){data->game.player[quem].position.x,data->game.player[quem].position.y,data->game.player[quem].position.z}, .direction = (Vector3){0,1,0}},bufferLocal);
 }
 
-Vector3 MQPlayerMove(Vector3 position, float rotation, float speed)
-{
-    //z+ frente
-    //x+ esquerda
-    float  valorZ, valorX;
-    int giro = rotation / 90;
-    float resto = rotation - (90 * giro);
-    float restodoresto = 90 - resto;
-    valorZ = speed - resto * (speed / 90);
-    valorX = speed - restodoresto * (speed / 90);
-    switch(giro)
-    {
-        case 0:
-        {
-            position.z += valorZ;
-            position.x += valorX;
-        }
-        break;
-        case 1:
-        {
-            position.z -= valorX;
-            position.x += valorZ;
-        }
-        break;
-        case 2:
-        {
-            position.z -= valorZ;
-            position.x -= valorX;
-        }
-        break;
-        case 3:
-        {
-            position.z += valorX;
-            position.x -= valorZ;
-        }
-        break;
-    }
-    return position;
-}
-
 void MQPlayerPickupItem(MQDATA*data,int quem)
 {
     int mapboxindex;
