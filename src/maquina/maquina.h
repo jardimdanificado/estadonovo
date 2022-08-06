@@ -205,7 +205,7 @@ typedef struct MQDATA_GAME_ITEM MQDATA_GAME_ITEM;
 #define MQEmptyItem (MQDATA_GAME_ITEM){" "," ",MQTrue,MQTrue,MQTrue,MQTrue,false,false,MQEmptyHitbox,MQEmptyVec3,MQTrue};
 
     //-----------------------------------
-    //GAME_MAP
+    //GAME_EVENT
     //-----------------------------------
 
 struct MQDATA_GAME_EVENT
@@ -221,14 +221,27 @@ struct MQDATA_GAME_EVENT
 typedef struct MQDATA_GAME_EVENT MQDATA_GAME_EVENT;
 #define MQEmptyEvent (MQDATA_GAME_ITEM){false,false,MQTrue,MQEmptyHitbox,MQEmptyVec3,MQTrue," "};
 
+    //-----------------------------------
+    //GAME_MAP
+    //-----------------------------------
+
+struct MQDATA_GAME_MAP_AREA
+{
+    int hitboxIndex;
+    char name[255];
+    Vector3 cameraPosition;
+};
+typedef struct MQDATA_GAME_MAP_AREA MQDATA_GAME_MAP_AREA;
+
 struct MQDATA_GAME_MAP
 {
+    MQDATA_GAME_MAP_AREA area[MAXOBJ];
     MQDATA_GAME_ITEM item[MAXOBJ];
 };
 typedef struct MQDATA_GAME_MAP MQDATA_GAME_MAP;
 
     //-----------------------------------
-    //DATA_PLAYER
+    //GAME_PLAYER
     //-----------------------------------
 
 struct MQDATA_PLAYER_INVENTORY

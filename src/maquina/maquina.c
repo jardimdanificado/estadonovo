@@ -4,36 +4,7 @@
 
 float MQDifferenceFloat(float a, float b)
 {
-    bool negativo = false;
-    float resultado;
-    if(a < 0)
-    {
-        a = a * (-1);
-        negativo = true;
-    }
-    else if(b < 0)
-    {
-        b = b * (-1);
-        negativo = true;
-    }
-
-    if(negativo == true)
-    {
-        resultado = a + b;
-    }
-    else if(a == b)
-    {
-        return 0;
-    }
-    else if(a > b)
-    {
-        resultado = a - b;
-    }
-    else if(a < b)
-    {
-        resultado = b - a;
-    }
-    return resultado;
+    return ((a+b+abs(a-b))/2);
 }
 
 Vector3 MQDifferenceVec3(Vector3 vec1, Vector3 vec2)
@@ -610,6 +581,18 @@ int MQFindEvent(MQDATA data, char* name)
 }
 
 //-----------------------------------
+//AREA
+//-----------------------------------
+
+void MQCleanAllAreaSlots(MQDATA*data)
+{
+    for(int i = 0;i<MAXOBJ;i++)
+    {
+        data->game.map.area[i] = (MQDATA_GAME_MAP_AREA){.name = " ",.hitboxIndex=MQTrue,.cameraPosition={0,0,0}};
+    }
+}
+
+//-----------------------------------
 //COLISION
 //-----------------------------------
 
@@ -653,7 +636,7 @@ Vector3 MQ3DMove(Vector3 position, float rotation, float speed)
     return position;
 }
 
-bool MQCheckCollisionPoint(Vector3 inPosi,BoundingBox target, int size)
+bool MQCheckCollisionPoint(Vector3 inPosi,BoundingBox target, float size)
 {
     BoundingBox localhitbox;
     localhitbox.min = (Vector3) {inPosi.x - (size/2), inPosi.y - (size/2), inPosi.z - (size/2)};
@@ -680,7 +663,8 @@ bool* MQReturnCollisionCube(BoundingBox input, BoundingBox target)
     //19 18 23
     //26 25 24
 
-    return ((bool[]){
+    return ((bool[])
+    {
         MQCheckCollisionPoint((Vector3) {input.max.x/2, input.max.y/2, input.min.z}, target, 0.02),
         MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y/2, input.min.z}, target, 0.02),
         MQCheckCollisionPoint((Vector3) {input.max.x, input.max.y, input.min.z}, target, 0.02),
@@ -721,42 +705,55 @@ void MQRotateHorizontalRay(MQDATA *data,int rayIndex, float rotation, Vector3 po
     float valorX;
     if(rotation<=90.0)
     {
-        valorZ = 1.0-((1.0/90.0)*rotation);
-        valorX = 0.0+(1.0/90.0)*rotation;
         if(backwards)
         {
             valorZ = -1.0+((1.0/90.0)*rotation);
             valorX = 0.0-(1.0/90.0)*rotation;
         }
+        else
+        {
+            valorZ = 1.0-((1.0/90.0)*rotation);
+            valorX = 0.0+(1.0/90.0)*rotation;
+        }
     }
     else if(rotation<=180)
     {
-        valorZ = 0.0-((1.0/90.0)*(rotation-90.0));
-        valorX = 1.0-((1.0/90.0)*(rotation-90.0));
+        
         if(backwards)
         {
             valorZ = 0.0+((1.0/90.0)*(rotation-90.0));
             valorX = -1.0+((1.0/90.0)*(rotation-90.0));
         }
+        else
+        {
+            valorZ = 0.0-((1.0/90.0)*(rotation-90.0));
+            valorX = 1.0-((1.0/90.0)*(rotation-90.0));
+        }
     }
     else if(rotation<=270)
     {
-        valorZ = -1.0+((1.0/90.0)*(rotation-180.0));
-        valorX = 0.0-((1.0/90.0)*(rotation-180.0));
         if(backwards)
         {
             valorZ = 1.0-((1.0/90.0)*(rotation-180.0));
             valorX = 0.0+((1.0/90.0)*(rotation-180.0));
         }
+        else
+        {
+            valorZ = -1.0+((1.0/90.0)*(rotation-180.0));
+            valorX = 0.0-((1.0/90.0)*(rotation-180.0));
+        }
     }
     else 
     {
-        valorZ = 0.0+((1.0/90.0)*(rotation-270.0));
-        valorX = -1.0+((1.0/90.0)*(rotation-270.0));
         if(backwards)
         {
             valorZ = 0.0-((1.0/90.0)*(rotation-270.0));
             valorX = 1.0-((1.0/90.0)*(rotation-270.0));
+        }
+        else
+        {
+            valorZ = 0.0+((1.0/90.0)*(rotation-270.0));
+            valorX = -1.0+((1.0/90.0)*(rotation-270.0));
         }
     }
     data->files.rays[rayIndex].ray.position = (Vector3){position.x,position.y+1,position.z};
@@ -811,8 +808,6 @@ void MQGravit(MQDATA* data, int quem)
         }
     }
 }
-
-
 
 //-----------------------------------
 //PLAYER
@@ -1027,6 +1022,7 @@ void MQStart(MQDATA *data)
     MQCleanAllItemSlots(*&data);
     MQCleanAllRenderSlots(*&data);
     MQCleanAllEventSlots(*&data);
+    MQCleanAllAreaSlots(*&data);
     //load.c
     MQLoadAll(*&data);
     //SESSION_RENDER
