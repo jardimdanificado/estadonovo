@@ -1027,7 +1027,6 @@ void MQStart(MQDATA *data)
     MQCleanAllItemSlots(*&data);
     MQCleanAllRenderSlots(*&data);
     MQCleanAllEventSlots(*&data);
-    MQCleanAllWallExcludeSlots(*&data);
     //load.c
     MQLoadAll(*&data);
     //SESSION_RENDER
