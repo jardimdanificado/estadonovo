@@ -79,11 +79,11 @@ void MQCleanAllFileSlots(MQDATA* data)
 //FIND
 //-----------------------------------
 
-int MQFindHitbox(MQDATA data, char* name)
+int MQFindHitbox(MQDATA_FILE_HITBOX *hitboxList, char* name)
 {
     for(int i = 0; i < MAXOBJ; i++)
     {
-        if(strcmp(data.files.hitboxes[i].name,name)==0)
+        if(strcmp(hitboxList[i].name,name)==0)
             return i;
     }
     return -1;
@@ -119,6 +119,16 @@ int MQFindRenderTextIndexByName(MQDATA data, char* name)
         {
             return i;
         }
+    }
+    return -1;
+}
+
+int MQFindEmptyHitboxSlot(MQDATA_FILE_HITBOX *hitboxList)
+{
+    for(int i = 0; i < MAXOBJ; i++)
+    {
+        if(strcmp(hitboxList[i].name," ")==0)
+            return i;
     }
     return -1;
 }
@@ -179,21 +189,37 @@ BoundingBox MQHitboxUpdateXYZ(BoundingBox hitboxbase, Vector3 targetPosi)
     return hitbox;
 }
 
-void MQCreateHitbox(MQDATA *data, char *name, BoundingBox Hitbox)
+MQDATA_FILE_HITBOX MQCreateHitbox(char *name, BoundingBox hitbox)
 {
-    int LocalIndex;
-    for(int i = 0;i<MAXOBJ;i++)
-    {
-        if(strcmp(data->files.hitboxes[i].name," ")==0)
-        {
-            LocalIndex = i;
-            break;
-        }
-    }
-    data->files.hitboxes[LocalIndex].hitbox = Hitbox;
-    strcpy(data->files.hitboxes[LocalIndex].name,name);
-    LocalIndex++;
+    //abinDEBUGtext("debug.txt",name);
+    return((MQDATA_FILE_HITBOX){hitbox,name});
 }
+
+//-----------------------------------
+//SAVEGAME
+//-----------------------------------
+
+void MQLoadGame(MQDATA *data)
+{
+/*     FILE *file;
+    file = fopen("data/save/savegame", "r+b");
+    fread(&data->game, sizeof(struct MQDATA_GAME), 1, file);
+    fclose(file); */
+}
+
+void MQSaveGame(MQDATA data)
+{
+/*     remove("data/save/savegame");
+    FILE *file = fopen("data/save/savegame", "w+b");
+    fwrite(&data.game, sizeof(struct MQDATA_GAME), 1, file);
+    fclose(file); */
+}
+
+//-----------------------------------
+//RENDER
+//-----------------------------------
+
+#include "render.c"
 
 //---------------------------------------
 //RAY
@@ -342,7 +368,8 @@ void MQLoadModel(MQDATA *data, char *name, char *link, bool animated, bool isHit
     }
     if(isHitbox==true)
     {
-        MQCreateHitbox(*&data,name,GetModelBoundingBox(data->files.models[LocalIndex].model));
+        data->files.hitboxes[MQFindEmptyHitboxSlot(data->files.hitboxes)].hitbox = MQCreateHitbox(name,GetModelBoundingBox(data->files.models[LocalIndex].model)).hitbox;
+        strcpy(data->files.hitboxes[MQFindEmptyHitboxSlot(data->files.hitboxes)].name,name);
     }
 }
 
@@ -355,7 +382,7 @@ void MQPlayerCreateBodyBox(MQDATA *data, int quem)
     {
         snprintf(buffer,266,"%s%d",data->files.models[i].name,quem);
         snprintf(buffer0,255,"%s",data->files.models[i].name);
-        MQCreateHitbox(*&data, buffer, GetModelBoundingBox(data->files.models[MQFindModel(*data,buffer0)].model));
+        data->files.hitboxes[MQFindEmptyHitboxSlot(data->files.hitboxes)] = MQCreateHitbox(buffer, GetModelBoundingBox(data->files.models[MQFindModel(*data,buffer0)].model));
     } 
 }
 
@@ -367,7 +394,7 @@ void MQPlayerUpdateBodyBox(MQDATA *data, int quem, int qualAnim)
     char buffer[128];
     snprintf(buffer,128,"player-cabeca%d",quem);
     int hitboxheadfind,modelheadfind; 
-    hitboxheadfind = MQFindHitbox(*data,buffer);
+    hitboxheadfind = MQFindHitbox(data->files.hitboxes, buffer);
     modelheadfind = MQFindModel(*data,"player-cabeca");
     for(int i = 0; i < 14; i++)
     {
@@ -491,49 +518,6 @@ int MQVerifyMapItemColision(MQDATA data, BoundingBox collider)
 //EVENTS
 //-----------------------------------
 
-void MQCreateEventbox(MQDATA *data, char *name, BoundingBox Hitbox)
-{
-    int LocalIndex;
-    for(int i = 0;i<MAXOBJ;i++)
-    {
-        if(strcmp(data->game.event[i].name," ")==0)
-        {
-            LocalIndex = i;
-            break;
-        }
-    }
-    data->files.eventboxes[LocalIndex].hitbox= Hitbox;
-    strcpy(data->files.eventboxes[LocalIndex].name,name);
-    LocalIndex++;
-}
-
-void MQCreateEmptyEventbox(MQDATA *data, char *name)
-{
-    int LocalIndex;
-    for(int i = 0;i<MAXOBJ;i++)
-    {
-        if(strcmp(data->game.event[i].name," ")==0)
-        {
-            LocalIndex = i;
-            break;
-        }
-    }
-    strcpy(data->files.eventboxes[LocalIndex].name,name);
-    LocalIndex++;
-}
-
-int MQFindEventbox(MQDATA data, char* name)
-{
-    for(int i = 0;i<MAXOBJ;i++)
-    {
-        if(strcmp(data.files.eventboxes[i].name, name)==0)
-        {
-            return i;
-        }
-    }
-    return -1;
-}
-
 void MQCleanAllEventSlots(MQDATA *data)
 {
     for(int i = 0;i<MAXOBJ;i++)
@@ -553,7 +537,7 @@ void MQAddEventToQueue(MQDATA *data, char*name, int functionIndex, BoundingBox h
     int LocalIndex;
     for(int i = 0;i<MAXOBJ;i++)
     {
-        if(strcmp(data->game.event[i].name," ")==0)
+        if(strcmp(" ", data->game.event[i].name)==0)
         {
             LocalIndex = i;
             break;
@@ -777,15 +761,15 @@ void MQGravit(MQDATA* data, int quem)
     RayCollision gravityraiocolisao;
     char *buffer= malloc(32);
     snprintf(buffer,32,"player-cabeca%d",quem);
-    headIndex = MQFindHitbox(*data, buffer);
+    headIndex = MQFindHitbox(data->files.hitboxes, buffer);
 
     snprintf(buffer,32,"playergravityray%d",quem);
     int gravityrayindex = MQFindRay(*data,buffer);
-    free(buffer);
+    snprintf(buffer,32,"lvl%d_area",data->game.map.currentLevel);
     MQUpdateGravityRay(*&data,gravityrayindex,data->game.player[quem].fallTime+1,data->game.player[quem].position);
     for(short i=0;i<MAXOBJ;i++)
     {
-        if(strncmp(data->files.hitboxes[i].name,"area",4)!=0&&strncmp(data->files.hitboxes[i].name," ",4)!=0)
+        if(strncmp(data->files.hitboxes[i].name,buffer,9)!=0&&strcmp(data->files.hitboxes[i].name," ")!=0)
             if(i<headIndex||i>headIndex+14)
             {
                 gravityraiocolisao = GetRayCollisionBox(data->files.rays[gravityrayindex].ray,data->files.hitboxes[i].hitbox);
@@ -794,6 +778,7 @@ void MQGravit(MQDATA* data, int quem)
                 gravityraiocolisao.hit = false;
             }
     }
+    free(buffer);
     if(gravityraiocolisao.hit == false)
     {
         data->game.player[quem].position.y = MQGravity(data->game.player[quem].position, 0.1, data->game.player[quem].fallTime);
@@ -820,16 +805,17 @@ bool MQPlayerCollider(MQDATA*data, int quem, bool backwards)
     char *buffer= malloc(32);
     int headIndex;
     snprintf(buffer,32,"player-cabeca%d",quem);
-    headIndex = MQFindHitbox(*data, buffer);
+    MQFindHitbox(data->files.hitboxes, buffer);
 
     RayCollision directionraiocolisao;
     int directionrayindex;
     snprintf(buffer,32,"playerdirectionray%d",quem);
     directionrayindex = MQFindRay(*data,buffer);
     MQRotateHorizontalRay(*&data,directionrayindex,data->game.player[quem].rotation,data->game.player[quem].position,backwards);
-    free(buffer);
+    
+    snprintf(buffer,32,"lvl%d_area",data->game.map.currentLevel);
     for(short i=0;i<MAXOBJ;i++)
-        if(strncmp(data->files.hitboxes[i].name,"area",4)!=0&&strncmp(data->files.hitboxes[i].name," ",4)!=0)
+        if(strncmp(data->files.hitboxes[i].name,buffer,9)!=0&&strcmp(data->files.hitboxes[i].name," ")!=0)
             if(i<headIndex||i>headIndex+14)
             {
                 directionraiocolisao = GetRayCollisionBox(data->files.rays[directionrayindex].ray,data->files.hitboxes[i].hitbox);
@@ -837,10 +823,14 @@ bool MQPlayerCollider(MQDATA*data, int quem, bool backwards)
                     break;
                 directionraiocolisao.hit = false;
             }
+    
     if(directionraiocolisao.hit == true)
     {
         if(directionraiocolisao.distance<0.5)
+        {
+            free(buffer);
             return true;
+        }
         else
         {
             BoundingBox caixa = (BoundingBox){.max = data->game.player[quem].position,.min = data->game.player[quem].position};
@@ -865,10 +855,18 @@ bool MQPlayerCollider(MQDATA*data, int quem, bool backwards)
                 if(i<headIndex||i>headIndex+14)
                     if(strcmp(data->files.hitboxes[i].name," ")!=0)
                         if(CheckCollisionBoxes(caixa,data->files.hitboxes[i].hitbox)==true)
-                            if(strncmp(data->files.hitboxes[i].name,"area",4)!=0)
+                        {
+                            snprintf(buffer,32,"lvl%d_area",data->game.map.currentLevel);
+                            if(strncmp(data->files.hitboxes[i].name,buffer,9)!=0)
+                            {
+                                free(buffer);
                                 return true;
+                            }
+                                
+                        }
         }
     }
+    free(buffer);
     return false;
 }
 
@@ -901,32 +899,6 @@ Camera MQCameraStart(Camera *camera)
 //-----------------------------------
 
 #include "load.c"
-
-//-----------------------------------
-//SAVEGAME
-//-----------------------------------
-
-void MQLoadGame(MQDATA *data)
-{
-/*     FILE *file;
-    file = fopen("data/save/savegame", "r+b");
-    fread(&data->game, sizeof(struct MQDATA_GAME), 1, file);
-    fclose(file); */
-}
-
-void MQSaveGame(MQDATA data)
-{
-/*     remove("data/save/savegame");
-    FILE *file = fopen("data/save/savegame", "w+b");
-    fwrite(&data.game, sizeof(struct MQDATA_GAME), 1, file);
-    fclose(file); */
-}
-
-//-----------------------------------
-//RENDER
-//-----------------------------------
-
-#include "render.c"
 
 //-----------------------------------
 //MENU
@@ -1002,6 +974,29 @@ void TECLADO_MAIN(MQDATA *data)
     {
         data->game.player[0].position.y +=0.14;
     }
+    if(IsKeyPressed(KEY_L))
+    {
+        //abinDEBUGcreate("hitboxes.txt");
+        for(int i =0;i<MAXOBJ;i++)
+        {
+            if(strcmp(data->files.hitboxes[i].name," ")==0)
+                break;
+            else
+            {
+                //abinDEBUGtext("debug.txt",data->files.models[i].name);
+                abinDEBUGtext("debug.txt",data->files.hitboxes[i].name);
+            }
+                
+        }
+        /* abinDEBUGcreate("hitboxes.txt");
+        for(int i =0;i<MAXOBJ;i++)
+        {
+            if(strcmp(data->files.hitboxes[i].name," ")==0)
+                break;
+            else
+                abinDEBUGtext("hitboxes.txt",data->files.hitboxes[i].name);
+        } */
+    }
 }
 
 //-----------------------------------
@@ -1038,4 +1033,7 @@ void MQStart(MQDATA *data)
     data->files.fonts[2].font= MQFontStart("data/font/Mockery.ttf", 24);
     //MUSIC
     data->files.musics[0].music = LoadMusicStream("data/audio/music/maintheme_by_kayoa.mp3");
+
+    //CURRENT_LEVEL
+    data->game.map.currentLevel = 0;
 }

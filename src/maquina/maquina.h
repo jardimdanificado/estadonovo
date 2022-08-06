@@ -42,7 +42,7 @@
 #define MQTrue INT_MAX
 #define MQFalse MQTrue*(-1)
 
-#define MAXOBJ 64
+#define MAXOBJ 101
 
 unsigned int MAXANIM = 1;
 
@@ -187,79 +187,84 @@ typedef struct MQDATA_SESSION MQDATA_SESSION;
     //GAME_ITEM
     //-----------------------------------
 
-struct MQDATA_GAME_ITEM
-{
-    char *name;
-    char *type;
-    int index;
-    float content;
-    float condition;
-    int function;
-    bool active;
-    bool locked;
-    BoundingBox hitbox;
-    Vector3 position;
-    float rotation;
-};
-typedef struct MQDATA_GAME_ITEM MQDATA_GAME_ITEM;
-#define MQEmptyItem (MQDATA_GAME_ITEM){" "," ",MQTrue,MQTrue,MQTrue,MQTrue,false,false,MQEmptyHitbox,MQEmptyVec3,MQTrue};
+    struct MQDATA_GAME_ITEM
+    {
+        char *name;
+        char *type;
+        int index;
+        float content;
+        float condition;
+        int function;
+        bool active;
+        bool locked;
+        BoundingBox hitbox;
+        Vector3 position;
+        float rotation;
+    };
+    typedef struct MQDATA_GAME_ITEM MQDATA_GAME_ITEM;
+    #define MQEmptyItem (MQDATA_GAME_ITEM){" "," ",MQTrue,MQTrue,MQTrue,MQTrue,false,false,MQEmptyHitbox,MQEmptyVec3,MQTrue};
 
     //-----------------------------------
     //GAME_EVENT
     //-----------------------------------
 
-struct MQDATA_GAME_EVENT
-{
-    bool active;
-    bool persistent;
-    int function;
-    BoundingBox hitbox;
-    Vector3 position;
-    float rotation;
-    char *name;
-};
-typedef struct MQDATA_GAME_EVENT MQDATA_GAME_EVENT;
-#define MQEmptyEvent (MQDATA_GAME_ITEM){false,false,MQTrue,MQEmptyHitbox,MQEmptyVec3,MQTrue," "};
+    struct MQDATA_GAME_EVENT
+    {
+        bool active;
+        bool persistent;
+        int function;
+        BoundingBox hitbox;
+        Vector3 position;
+        float rotation;
+        char *name;
+    };
+    typedef struct MQDATA_GAME_EVENT MQDATA_GAME_EVENT;
+    #define MQEmptyEvent (MQDATA_GAME_ITEM){false,false,MQTrue,MQEmptyHitbox,MQEmptyVec3,MQTrue," "};
 
     //-----------------------------------
     //GAME_MAP
     //-----------------------------------
 
-struct MQDATA_GAME_MAP_AREA
-{
-    int hitboxIndex;
-    char name[255];
-    Vector3 cameraPosition;
-};
-typedef struct MQDATA_GAME_MAP_AREA MQDATA_GAME_MAP_AREA;
+    struct MQDATA_GAME_MAP_AREA
+    {
+        int hitboxIndex;
+        char name[255];
+        Vector3 cameraPosition;
+    };
+    typedef struct MQDATA_GAME_MAP_AREA MQDATA_GAME_MAP_AREA;
 
-struct MQDATA_GAME_MAP
-{
-    MQDATA_GAME_MAP_AREA area[MAXOBJ];
-    MQDATA_GAME_ITEM item[MAXOBJ];
-};
-typedef struct MQDATA_GAME_MAP MQDATA_GAME_MAP;
+    struct MQDATA_GAME_MAP
+    {
+        MQDATA_GAME_MAP_AREA area[MAXOBJ];
+        MQDATA_GAME_ITEM item[MAXOBJ];
+        int currentLevel;
+    };
+    typedef struct MQDATA_GAME_MAP MQDATA_GAME_MAP;
 
     //-----------------------------------
     //GAME_PLAYER
     //-----------------------------------
 
-struct MQDATA_PLAYER_INVENTORY
-{
-    MQDATA_GAME_ITEM equip[MAXOBJ];
-    MQDATA_GAME_ITEM item[MAXOBJ];
-};
-typedef struct MQDATA_PLAYER_INVENTORY MQDATA_PLAYER_INVENTORY;
+    struct MQDATA_PLAYER_INVENTORY
+    {
+        MQDATA_GAME_ITEM equip[MAXOBJ];
+        MQDATA_GAME_ITEM item[MAXOBJ];
+    };
+    typedef struct MQDATA_PLAYER_INVENTORY MQDATA_PLAYER_INVENTORY;
 
-struct MQDATA_PLAYER
-{
-    MQDATA_PLAYER_INVENTORY inventory;
-    float speed;
-    int fallTime;
-    Vector3 position;
-    float rotation;
-};
-typedef struct MQDATA_PLAYER MQDATA_PLAYER;
+    struct MQDATA_PLAYER
+    {
+        MQDATA_PLAYER_INVENTORY inventory;
+        float speed;
+        int fallTime;
+        Vector3 position;
+        float rotation;
+    };
+    typedef struct MQDATA_PLAYER MQDATA_PLAYER;
+
+//-----------------------------------
+//DATA_GAME
+//-----------------------------------
 
 struct MQDATA_GAME
 {

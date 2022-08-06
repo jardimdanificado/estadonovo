@@ -16,8 +16,9 @@ void MQLoadAll(MQDATA* data)
     strcpy(data->files.langs[6].name,"sem-nome");
     strcpy(data->files.langs[7].text,"Salvar/Carregar");
     strcpy(data->files.langs[7].name,"sem-nome");
-
-
+    //-----------------------------------
+    //PLAYER
+    //-----------------------------------
     MQLoadModel(*&data, "player-cabeca","data/models/player/body/cabeca.iqm",true,false);
     MQLoadModel(*&data, "player-pescoco","data/models/player/body/pescoco.iqm",true,false);
     MQLoadModel(*&data, "player-peitoral","data/models/player/body/peitoral.iqm",true,false);
@@ -37,27 +38,32 @@ void MQLoadAll(MQDATA* data)
     MQLoadModel(*&data, "camisa1","data/models/equips/camisa/1.iqm",true,false);
     MQLoadModel(*&data, "chapeu1","data/models/equips/chapeu/1.iqm",true,false);
     MQLoadModel(*&data, "arma1","data/models/equips/arma/1.iqm",true,false);
-    MQLoadModel(*&data, "map0","data/models/map/level0/0.glb",false,false);
-    MQLoadModel(*&data, "props0","data/models/map/level0/props/0.glb",false,true);
-    MQLoadModel(*&data, "hitbox0","data/models/map/level0/hitbox/hitbox0.glb",false,true);
-    MQLoadModel(*&data, "hitbox1","data/models/map/level0/hitbox/hitbox1.glb",false,true);
-    MQLoadModel(*&data, "hitbox2","data/models/map/level0/hitbox/hitbox2.glb",false,true);
-    MQLoadModel(*&data, "hitbox3","data/models/map/level0/hitbox/hitbox3.glb",false,true);
-    MQLoadModel(*&data, "hitbox4","data/models/map/level0/hitbox/hitbox4.glb",false,true);
-    MQLoadModel(*&data, "hitbox5","data/models/map/level0/hitbox/hitbox5.glb",false,true);
-    MQLoadModel(*&data, "hitbox6","data/models/map/level0/hitbox/hitbox6.glb",false,true);
-    MQLoadModel(*&data, "hitbox7","data/models/map/level0/hitbox/hitbox7.glb",false,true);
-    MQLoadModel(*&data, "hitbox8","data/models/map/level0/hitbox/hitbox8.glb",false,true);
-    MQLoadModel(*&data, "hitbox9","data/models/map/level0/hitbox/hitbox9.glb",false,true);
-    MQLoadModel(*&data, "map0item0","data/models/map/level0/item/0.glb",false,true);
-    MQLoadModel(*&data, "map0item1","data/models/map/level0/item/1.glb",false,true);
-    MQLoadModel(*&data, "map0item2","data/models/map/level0/item/2.glb",false,true);
-    MQLoadModel(*&data, "map0item3","data/models/map/level0/item/3.glb",false,true);
-    MQLoadModel(*&data, "area0","data/models/map/level0/area/0.glb",false,true);
-    MQLoadModel(*&data, "area1","data/models/map/level0/area/1.glb",false,true);
-    MQLoadModel(*&data, "area2","data/models/map/level0/area/2.glb",false,true);
-    MQLoadModel(*&data, "area3","data/models/map/level0/area/3.glb",false,true);
-    MQLoadModel(*&data, "area4","data/models/map/level0/area/4.glb",false,true);
-    MQLoadModel(*&data, "area5","data/models/map/level0/area/5.glb",false,true);
-    MQLoadModel(*&data, "chao0","data/models/map/level0/hitbox/chao.glb",false,true);
+    //-----------------------------------
+    //LEVEL0
+    //-----------------------------------
+    MQLoadModel(*&data, "lvl0_map0","data/models/map/level0/0.glb",false,false);
+    MQLoadModel(*&data, "lvl0_props0","data/models/map/level0/props/0.glb",false,true);
+    MQLoadModel(*&data, "lvl0_hitbox0","data/models/map/level0/hitbox/hitbox0.glb",false,true);
+    MQLoadModel(*&data, "lvl0_hitbox1","data/models/map/level0/hitbox/hitbox1.glb",false,true);
+    MQLoadModel(*&data, "lvl0_hitbox2","data/models/map/level0/hitbox/hitbox2.glb",false,true);
+    MQLoadModel(*&data, "lvl0_hitbox3","data/models/map/level0/hitbox/hitbox3.glb",false,true);
+    MQLoadModel(*&data, "lvl0_hitbox4","data/models/map/level0/hitbox/hitbox4.glb",false,true);
+    MQLoadModel(*&data, "lvl0_hitbox5","data/models/map/level0/hitbox/hitbox5.glb",false,true);
+    MQLoadModel(*&data, "lvl0_hitbox6","data/models/map/level0/hitbox/hitbox6.glb",false,true);
+    MQLoadModel(*&data, "lvl0_hitbox7","data/models/map/level0/hitbox/hitbox7.glb",false,true);
+    MQLoadModel(*&data, "lvl0_hitbox8","data/models/map/level0/hitbox/hitbox8.glb",false,true);
+    MQLoadModel(*&data, "lvl0_hitbox9","data/models/map/level0/hitbox/hitbox9.glb",false,true);
+    MQLoadModel(*&data, "lvl0_map0item0","data/models/map/level0/item/0.glb",false,true);
+    MQLoadModel(*&data, "lvl0_map0item1","data/models/map/level0/item/1.glb",false,true);
+    MQLoadModel(*&data, "lvl0_map0item2","data/models/map/level0/item/2.glb",false,true);
+    MQLoadModel(*&data, "lvl0_map0item3","data/models/map/level0/item/3.glb",false,true);
+    MQLoadModel(*&data, "lvl0_area0","data/models/map/level0/area/0.glb",false,true);
+    MQLoadModel(*&data, "lvl0_area1","data/models/map/level0/area/1.glb",false,true);
+    MQLoadModel(*&data, "lvl0_area2","data/models/map/level0/area/2.glb",false,true);
+    MQLoadModel(*&data, "lvl0_area3","data/models/map/level0/area/3.glb",false,true);
+    MQLoadModel(*&data, "lvl0_area4","data/models/map/level0/area/4.glb",false,true);
+    MQLoadModel(*&data, "lvl0_area5","data/models/map/level0/area/5.glb",false,true);
+    MQLoadModel(*&data, "lvl0_chao0","data/models/map/level0/hitbox/chao.glb",false,true);
+
+    data->files.eventboxes[MQFindEmptyHitboxSlot(data->files.eventboxes)] = MQCreateHitbox("playeruse",(BoundingBox){(Vector3){-0.5,0,-0.5},(Vector3){0.5,2.3,0.5}});
 }

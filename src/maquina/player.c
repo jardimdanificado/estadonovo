@@ -1,12 +1,5 @@
 void MQNewPlayer(MQDATA *data, int quem, Vector3 posi)
 {
-    //tipos
-    //0 - calca
-    //1 - chapeu
-    //2 - camisa
-    //3 - sapatos
-    //4 - oculos
-    //5 - arma
     data->game.player[quem].fallTime = 0;
     data->game.player[quem].rotation = 180;
     data->game.player[quem].position.y = posi.y;
@@ -19,6 +12,11 @@ void MQNewPlayer(MQDATA *data, int quem, Vector3 posi)
     MQAddRayToFiles(*&data,(Ray){.position = (Vector3){data->game.player[quem].position.x,data->game.player[quem].position.y-(0.005*(data->game.player[quem].fallTime+1)),data->game.player[quem].position.z}, .direction = (Vector3){0,1,0}},bufferLocal);
     snprintf(bufferLocal,64,"playerdirectionray%d",quem);
     MQAddRayToFiles(*&data,(Ray){.position = (Vector3){data->game.player[quem].position.x,data->game.player[quem].position.y,data->game.player[quem].position.z}, .direction = (Vector3){0,1,0}},bufferLocal);
+    snprintf(bufferLocal,64,"player%d",quem);
+    MQAddRenderModelToQueue(*&data, MQCreateRenderModel(true,true,false,MQFindModel(*data,"player"),0,0,COR_PELE0,data->game.player[quem].position,data->game.player[quem].rotation,bufferLocal));
+    snprintf(bufferLocal,64,"playeruse%d",quem);
+
+    MQAddEventToQueue(*&data,bufferLocal,MQTrue,data->files.eventboxes[MQFindHitbox(data->files.eventboxes,"playeruse")].hitbox,posi,0,true,false);
 }
 
 void MQPlayerPickupItem(MQDATA*data,int quem)
