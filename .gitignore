@@ -1,12 +1,7 @@
 ./LICENSE
 ./README.md
-build/android/gxbuild/lib
-build/android/gxbuild/raylib
-build/android/gxbuild/assets
-build/android/gxbuild/src
-build/android/gxbuild/include
-build/android/gxbuild/android/sdk
-build/android/gxbuild/android/ndk
 *.keystore
 *.apk
-
+*.a
+*.appimage
+.vscode

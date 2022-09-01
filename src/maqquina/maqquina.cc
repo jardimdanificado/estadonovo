@@ -20,7 +20,20 @@ void PROGRAM::start(int x, int y, string title)
         (Vector3){ 0.0f, 0.5f, 0.0f },      // target
         (Vector3){ 0.0f, 1.0f, 0.0f },      // up
         45.0f, CAMERA_PERSPECTIVE };        // fov, type
+}
 
+void PROGRAM::setLoop(void(*inLoop)()){userLoop = inLoop;}
+
+void PROGRAM::run()
+{
+    data.session.render.frameRatio = round(GetFPS()/60);
+    if(data.session.render.frameRatio == 0)
+        data.session.render.frameRatio = 1;
+    if(data.session.render.frame%data.session.render.frameRatio==0)
+    {
+        userLoop();
+        data.session.render.renderCurrentScene();
+    }
 }
 
 //----------------------------------------------------------------------------------
@@ -73,6 +86,7 @@ Model* _file_::MODEL::getModel(){return(&model);}
 
 void _render_::renderCurrentScene()
 {
+    UpdateCamera(&scene.camera);
     
     BeginDrawing();
     {
@@ -94,6 +108,21 @@ void _render_::renderCurrentScene()
     }
     EndDrawing();
 };
+
+void _render_::SCENE::autoCreateModel(string inName,string inType, Model *inModel, int inFrame, Vector3* inPosi, Vector3* inRota, Color inColor, bool inActive)
+{
+    for(int i =0; i< MAX_OBJ; i++)
+        if(modelSlot[i].getName().compare("noname") == 0)
+            modelSlot[i].create( inName, inType, inModel, inFrame, inPosi, inRota, inColor, inActive);
+}
+
+PROGRAM::DATA::SESSION::RENDER::SCENE::MODEL * _render_::SCENE::findGetModel(string inName)
+{
+    for(int i =0; i< MAX_OBJ; i++)
+        if(modelSlot[i].getName().compare(inName) == 0)
+            return (&modelSlot[i]);
+    return nullptr;
+}
 
 //----------------------------------------------------------------------------------
 // DATA SESSION SCENE
