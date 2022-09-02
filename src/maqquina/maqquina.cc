@@ -20,20 +20,19 @@ void PROGRAM::start(int x, int y, string title)
         (Vector3){ 0.0f, 0.5f, 0.0f },      // target
         (Vector3){ 0.0f, 1.0f, 0.0f },      // up
         45.0f, CAMERA_PERSPECTIVE };        // fov, type
+    SetCameraMode(data.session.render.scene.camera, CAMERA_FREE);
 }
 
 void PROGRAM::setLoop(void(*inLoop)()){userLoop = inLoop;}
-
 void PROGRAM::run()
 {
-    data.session.render.frameRatio = round(GetFPS()/60);
+    data.session.render.frame++;
+    data.session.render.frameRatio = round(GetFPS()/60.0);
     if(data.session.render.frameRatio == 0)
         data.session.render.frameRatio = 1;
     if(data.session.render.frame%data.session.render.frameRatio==0)
-    {
         userLoop();
-        data.session.render.renderCurrentScene();
-    }
+    data.session.render.renderCurrentScene();
 }
 
 //----------------------------------------------------------------------------------
@@ -79,6 +78,29 @@ void _file_::MODEL::load(string path){model = LoadModel(path.c_str());}
 void _file_::MODEL::unload(){UnloadModel(model);}
 Model* _file_::MODEL::getModel(){return(&model);}
 
+//----------------------------------------------------------------------------------
+// DATA FILE HITBOX
+//----------------------------------------------------------------------------------
+
+void _file_::HITBOX::setName(string newName){name = newName;}
+void _file_::HITBOX::setType(string newType){type = newType;}
+void _file_::HITBOX::loadFromFile(string path)
+{
+    Model localModel;
+    localModel = LoadModel(path.c_str());
+    hitbox = GetModelBoundingBox(localModel);
+    UnloadModel(localModel);
+}
+void _file_::HITBOX::loadFromModel(Model* inModel){hitbox = GetModelBoundingBox(*inModel);}
+void _file_::HITBOX::create(string inName, string inType, BoundingBox inHitbox)
+{
+    name = inName;
+    type = inType;
+    hitbox = inHitbox;
+}
+string _file_::HITBOX::getName(){return(name);}
+string _file_::HITBOX::getType(){return(type);}
+BoundingBox* _file_::HITBOX::getHitbox(){return(&hitbox);}
 
 //----------------------------------------------------------------------------------
 // DATA SESSION RENDER
@@ -174,8 +196,8 @@ void _game_::PLAYER::setName(string newName){name = newName;}
 void _game_::PLAYER::setPosition(Vector3 newVec3){position = newVec3;}
 void _game_::PLAYER::setRotation(Vector3 newVec3){position = newVec3;}
 string _game_::PLAYER::getName(){return(name);}
-Vector3 _game_::PLAYER::getPosition(){return position;}
-Vector3 _game_::PLAYER::getRotation(){return rotation;}
+Vector3* _game_::PLAYER::getPosition(){return &position;}
+Vector3* _game_::PLAYER::getRotation(){return &rotation;}
 
 //----------------------------------------------------------------------------------
 // DATA GAME MAP
@@ -185,5 +207,9 @@ void _game_::MAP::setName(string newName){name = newName;}
 void _game_::MAP::setModel(Model*inModel){model = inModel;}
 string _game_::MAP::getName(){return(name);}
 Model* _game_::MAP::getModel(){return(model);}
+void _game_::MAP::setPosition(Vector3 newVec3){position = newVec3;}
+void _game_::MAP::setRotation(Vector3 newVec3){position = newVec3;}
+Vector3* _game_::MAP::getPosition(){return &position;}
+Vector3* _game_::MAP::getRotation(){return &rotation;}
 
 #endif
