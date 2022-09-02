@@ -40,7 +40,11 @@ void PROGRAM::run()
     if(data.session.render.frameRatio == 0)
         data.session.render.frameRatio = 1;
     if(data.session.render.frame%data.session.render.frameRatio==0)
+    {
         userLoop(&data);
+        getKey();
+    }
+        
     data.session.render.renderCurrentScene();
 }
 
@@ -48,8 +52,8 @@ void PROGRAM::run()
 // KEYBOARD
 //----------------------------------------------------------------------------------
 
-void PROGRAM::KEYBOARD::KEY::setFunc(void (*inFunc)(),int keyCondition) {keyFunc[keyCondition] = inFunc;}
-void PROGRAM::KEYBOARD::setKeyFunc(void (*inFunc)(),int KeyID, int keyCondition)
+void PROGRAM::KEYBOARD::KEY::setFunc(void (*inFunc)(PROGRAM::DATA*),int keyCondition) {keyFunc[keyCondition] = inFunc;}
+void PROGRAM::KEYBOARD::setKeyFunc(void (*inFunc)(PROGRAM::DATA*),int KeyID, int keyCondition)
 {
     for (short int i = 0; i < 106; i++)
         if(key_id[i]==KeyID)
@@ -59,13 +63,33 @@ void PROGRAM::KEYBOARD::setKeyFunc(void (*inFunc)(),int KeyID, int keyCondition)
             break;
         }
 }
-void PROGRAM::KEYBOARD::KEY::run(int keyCondition){keyFunc[keyCondition]();}
-void PROGRAM::KEYBOARD::run()
+void PROGRAM::KEYBOARD::KEY::run(PROGRAM::DATA*inData,int keyCondition){keyFunc[keyCondition](inData);}
+void PROGRAM::getKey()
 {
-    for(short int i;i<106;i++)
-        for(short int k;k<3;k++)
-            if(key[i].active[k])
-                key[i].run(k);
+    for(short int i=0;i<106;i++)
+        for(short int k=0;k<3;k++)
+            if(keyboard.key[i].active[k]==true)
+                switch (k)
+                {
+                    case KDOWN:
+                    {
+                        if(IsKeyDown(keyboard.key_id[i])==true)
+                            keyboard.key[i].run(&data,k);
+                    }
+                    break;
+                    case KPRESSED:
+                    {
+                        if(IsKeyPressed(keyboard.key_id[i])==true)
+                            keyboard.key[i].run(&data,k);
+                    }
+                    break;
+                    case KRELEASED:
+                    {
+                        if(IsKeyReleased(keyboard.key_id[i])==true)
+                            keyboard.key[i].run(&data,k);
+                    }
+                    break;
+                }
 }
 
 //----------------------------------------------------------------------------------
