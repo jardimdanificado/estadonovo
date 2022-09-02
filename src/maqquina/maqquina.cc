@@ -2,6 +2,7 @@
 #define ENGINE_C
 
 #include "maqquina.hh"
+
 using _file_ = PROGRAM::DATA::LFILE;
 using _render_ = PROGRAM::DATA::SESSION::RENDER;
 using _game_ = PROGRAM::DATA::GAME;
@@ -21,9 +22,17 @@ void PROGRAM::start(int x, int y, string title)
         (Vector3){ 0.0f, 1.0f, 0.0f },      // up
         45.0f, CAMERA_PERSPECTIVE };        // fov, type
     SetCameraMode(data.session.render.scene.camera, CAMERA_FREE);
+    loadDefaultModels();
 }
 
-void PROGRAM::setLoop(void(*inLoop)()){userLoop = inLoop;}
+void PROGRAM::loadDefaultModels()
+{
+    data.file.autoLoadModel("./assets/models/map/level0/0.glb","map0","map");
+    data.file.autoLoadModel("./assets/models/player/model.iqm","player","player",true);
+
+}
+
+void PROGRAM::setLoop(void(*inLoop)(PROGRAM::DATA *inData)){userLoop = inLoop;}
 void PROGRAM::run()
 {
     data.session.render.frame++;
@@ -31,8 +40,32 @@ void PROGRAM::run()
     if(data.session.render.frameRatio == 0)
         data.session.render.frameRatio = 1;
     if(data.session.render.frame%data.session.render.frameRatio==0)
-        userLoop();
+        userLoop(&data);
     data.session.render.renderCurrentScene();
+}
+
+//----------------------------------------------------------------------------------
+// KEYBOARD
+//----------------------------------------------------------------------------------
+
+void PROGRAM::KEYBOARD::KEY::setFunc(void (*inFunc)(),int keyCondition) {keyFunc[keyCondition] = inFunc;}
+void PROGRAM::KEYBOARD::setKeyFunc(void (*inFunc)(),int KeyID, int keyCondition)
+{
+    for (short int i = 0; i < 106; i++)
+        if(key_id[i]==KeyID)
+        {
+            key[i].active[keyCondition] = true;
+            key[i].setFunc(inFunc,keyCondition);
+            break;
+        }
+}
+void PROGRAM::KEYBOARD::KEY::run(int keyCondition){keyFunc[keyCondition]();}
+void PROGRAM::KEYBOARD::run()
+{
+    for(short int i;i<106;i++)
+        for(short int k;k<3;k++)
+            if(key[i].active[k])
+                key[i].run(k);
 }
 
 //----------------------------------------------------------------------------------
@@ -40,28 +73,39 @@ void PROGRAM::run()
 //----------------------------------------------------------------------------------
 
 PROGRAM::DATA::LFILE::MODEL* _file_::getModel(int index){return(&model[index]);}
-PROGRAM::DATA::LFILE::MODEL* _file_::findGetModel(string name)
+PROGRAM::DATA::LFILE::MODEL* _file_::findGetModel(string inName)
 {
     for(int i = 0;i<MAX_OBJ;i++)
-        if(model[i].getName().compare(name)==0)
+        if(model[i].getName().compare(inName)==0)
             return(&model[i]);
     return(nullptr);
 }
-int _file_::findModel(string name)
+int _file_::findModel(string inName)
 {
     for(int i = 0;i<MAX_OBJ;i++)
-        if(model[i].getName().compare(name)==0)
+        if(model[i].getName().compare(inName)==0)
             return(i);
     return(-1);
 }
-void _file_::loadModel(string path, string name, string type = "notype")
+void _file_::autoLoadModel(string path, string inName, string inType,bool animated)
 {
     for(int i = 0;i<MAX_OBJ;i++)
         if(model[i].getName().compare("noname")==0)
         {
-            model[i].load(path);
-            model[i].setName(name);
-            model[i].setType(type);
+            model[i].loadModel(path);
+            if(animated)
+                model[i].loadAnim(path);
+            model[i].setName(inName);
+            model[i].setType(inType);
+            break;
+        }
+}
+void _file_::autoCreateHitbox(string inName, string inType, BoundingBox inHitbox)
+{
+    for(int i = 0;i<MAX_OBJ;i++)
+        if(hitbox[i].getName().compare("noname")==0)
+        {
+            hitbox[i].create(inName,inType,inHitbox);
             break;
         }
 }
@@ -74,8 +118,14 @@ void _file_::MODEL::setName(string newName){name = newName;}
 void _file_::MODEL::setType(string newType){type = newType;}
 string _file_::MODEL::getName(){return(name);}
 string _file_::MODEL::getType(){return(type);}
-void _file_::MODEL::load(string path){model = LoadModel(path.c_str());}
-void _file_::MODEL::unload(){UnloadModel(model);}
+void _file_::MODEL::loadModel(string path){model = LoadModel(path.c_str());}
+void _file_::MODEL::unloadModel(){UnloadModel(model);}
+void _file_::MODEL::loadAnim(string path)
+{
+    unsigned int localMax = MAX_ANIM;
+    anim = LoadModelAnimations(path.c_str(), &localMax);
+    animated = true;
+}
 Model* _file_::MODEL::getModel(){return(&model);}
 
 //----------------------------------------------------------------------------------
@@ -116,7 +166,7 @@ void _render_::renderCurrentScene()
         BeginMode3D(scene.camera);
         {
             bool doubleCheck = false;//it checks if there are 2 empty slots in sequence, if true it will exit loop
-            
+            Vector3 zerp = {0,0,0};
             for(int i = 0;i<MAX_OBJ;i++)
                 if(scene.modelSlot[i].getActive()==true)
                     DrawModelEx(*scene.modelSlot[i].getModel(),*scene.modelSlot[i].getPosition(),{0,1,0},scene.modelSlot[i].getRotation()->y,{1,1,1},WHITE);
@@ -131,12 +181,16 @@ void _render_::renderCurrentScene()
     EndDrawing();
 };
 
-void _render_::SCENE::autoCreateModel(string inName,string inType, Model *inModel, int inFrame, Vector3* inPosi, Vector3* inRota, Color inColor, bool inActive)
+void _render_::SCENE::autoCreateModel(string inName,string inType, Model *inModel, Vector3* inPosi, Vector3* inRota, bool inActive, int inFrame, Color inColor)
 {
     for(int i =0; i< MAX_OBJ; i++)
         if(modelSlot[i].getName().compare("noname") == 0)
+        {
             modelSlot[i].create( inName, inType, inModel, inFrame, inPosi, inRota, inColor, inActive);
+            break;
+        }
 }
+            
 
 PROGRAM::DATA::SESSION::RENDER::SCENE::MODEL * _render_::SCENE::findGetModel(string inName)
 {
@@ -159,7 +213,6 @@ Vector3* _render_::SCENE::MODEL::getPosition(){return(position);}
 Vector3* _render_::SCENE::MODEL::getRotation(){return(rotation);}
 void _render_::SCENE::MODEL::setName(string newName){name = newName;}
 void _render_::SCENE::MODEL::setType(string newType){type = newType;}
-
 void _render_::SCENE::MODEL::setActive(bool newActive){active = newActive;}
 void _render_::SCENE::MODEL::setModel(Model *inModel){model = inModel;}
 void _render_::SCENE::MODEL::setPosition(Vector3 *newP){position = newP;}
@@ -175,6 +228,7 @@ void _render_::SCENE::MODEL::create(string inName,string inType, Model *inModel,
     rotation = inRota;
     color = inColor;
     active = inActive;
+
 }
 
 //----------------------------------------------------------------------------------

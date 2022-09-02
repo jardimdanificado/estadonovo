@@ -1,17 +1,20 @@
 
 #include "maqquina/maqquina.hh"
 
-void mainLoop()
+void mainLoop (PROGRAM::DATA *inData)
 {
 
-}
+};
 
 int main(void)
 {
     PROGRAM estado;
+
     estado.start(800,600,"Estado Novo");
-    estado.data.file.loadModel("./assets/models/map/level0/0.glb","mapa","map");
-    estado.data.session.render.scene.autoCreateModel("mapa0","map",estado.data.file.findGetModel("mapa")->getModel(),0,estado.data.game.map.getPosition(),estado.data.game.map.getRotation(),WHITE,true);
+    
+    estado.data.session.render.scene.autoCreateModel("mapa","map",estado.data.file.findGetModel("map0")->getModel(),estado.data.game.map.getPosition(),estado.data.game.map.getRotation(),true);
+    estado.data.session.render.scene.autoCreateModel("player0", "player", estado.data.file.findGetModel("player")->getModel(),estado.data.game.player[0].getPosition(),estado.data.game.player[0].getRotation(),true);
+
     estado.setLoop(mainLoop);
     
     while (!WindowShouldClose())
