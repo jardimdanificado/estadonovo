@@ -7,7 +7,7 @@ using _file_ = PROGRAM::DATA::LFILE;
 using _render_ = PROGRAM::DATA::SESSION::RENDER;
 using _game_ = PROGRAM::DATA::GAME;
 
-void PROGRAM::start(int x, int y, string title)
+PROGRAM::PROGRAM(int x, int y, string title)
 {
     //SetConfigFlags(FLAG_MSAA_4X_HINT);  // Enable Multi Sampling Anti Aliasing 4x (if available)
     SetConfigFlags(FLAG_WINDOW_RESIZABLE); 
@@ -52,18 +52,18 @@ void PROGRAM::run()
 // KEYBOARD
 //----------------------------------------------------------------------------------
 
-void PROGRAM::KEYBOARD::KEY::setFunc(void (*inFunc)(PROGRAM::DATA*),int keyCondition) {keyFunc[keyCondition] = inFunc;}
-void PROGRAM::KEYBOARD::setKeyFunc(void (*inFunc)(PROGRAM::DATA*),int KeyID, int keyCondition)
+void PROGRAM::KEYBOARD::KEY::setFunc(void (*inFunc)(PROGRAM::DATA*),int KeyEvent) {keyFunc[KeyEvent] = inFunc;}
+void PROGRAM::KEYBOARD::setKeyFunc(void (*inFunc)(PROGRAM::DATA*),int KeyID, int KeyEvent)
 {
     for (short int i = 0; i < 106; i++)
         if(key_id[i]==KeyID)
         {
-            key[i].active[keyCondition] = true;
-            key[i].setFunc(inFunc,keyCondition);
+            key[i].active[KeyEvent] = true;
+            key[i].setFunc(inFunc,KeyEvent);
             break;
         }
 }
-void PROGRAM::KEYBOARD::KEY::run(PROGRAM::DATA*inData,int keyCondition){keyFunc[keyCondition](inData);}
+void PROGRAM::KEYBOARD::KEY::run(PROGRAM::DATA*inData,int KeyEvent){keyFunc[KeyEvent](inData);}
 void PROGRAM::getKey()
 {
     for(short int i=0;i<106;i++)
@@ -71,19 +71,19 @@ void PROGRAM::getKey()
             if(keyboard.key[i].active[k]==true)
                 switch (k)
                 {
-                    case KDOWN:
+                    case KEYEVENT_DOWN:
                     {
                         if(IsKeyDown(keyboard.key_id[i])==true)
                             keyboard.key[i].run(&data,k);
                     }
                     break;
-                    case KPRESSED:
+                    case KEYEVENT_PRESSED:
                     {
                         if(IsKeyPressed(keyboard.key_id[i])==true)
                             keyboard.key[i].run(&data,k);
                     }
                     break;
-                    case KRELEASED:
+                    case KEYEVENT_RELEASED:
                     {
                         if(IsKeyReleased(keyboard.key_id[i])==true)
                             keyboard.key[i].run(&data,k);
@@ -276,7 +276,54 @@ void _game_::PLAYER::setRotation(Vector3 newVec3){position = newVec3;}
 string _game_::PLAYER::getName(){return(name);}
 Vector3* _game_::PLAYER::getPosition(){return &position;}
 Vector3* _game_::PLAYER::getRotation(){return &rotation;}
-
+void _game_::PLAYER::move(bool backwards)
+{
+    //z+ frente
+    //x+ esquerda
+    float  valorZ, valorX;
+    int giro = rotation.y / 90;
+    float resto = rotation.y - (90 * giro);
+    float restodoresto = 90 - resto;
+    float localSpeed = speed;
+    if(backwards)
+        localSpeed *= -1;
+    valorZ = localSpeed - resto * (localSpeed / 90);
+    valorX = localSpeed - restodoresto * (localSpeed / 90);
+    switch(giro)
+    {
+        case 0:
+        {
+            position.z += valorZ;
+            position.x += valorX;
+        }
+        break;
+        case 1:
+        {
+            position.z -= valorX;
+            position.x += valorZ;
+        }
+        break;
+        case 2:
+        {
+            position.z -= valorZ;
+            position.x -= valorX;
+        }
+        break;
+        case 3:
+        {
+            position.z += valorX;
+            position.x -= valorZ;
+        }
+        break;
+    }
+}
+void _game_::PLAYER::rotate(bool right)
+{
+    if(right == true)
+        rotation.y += 6;
+    else
+        rotation.y -= 6;
+}
 //----------------------------------------------------------------------------------
 // DATA GAME MAP
 //----------------------------------------------------------------------------------

@@ -20,18 +20,18 @@ using std::stringstream;
 #define MAX_OBJ 64
 #define MAX_ANIM 2;
 
-//TYPES
-enum
+enum //TYPES
 {
     MAP,
     PLAYER,
     ITEM
 };
 
-enum
+enum //KEYEVENT
 {
-    KDOWN,KRELEASED,KPRESSED
+    KEYEVENT_DOWN,KEYEVENT_RELEASED,KEYEVENT_PRESSED
 };
+
 class PROGRAM
 {
     public:
@@ -213,6 +213,7 @@ class PROGRAM
                     string name = "ninguem";
                     Vector3 position = {0,0,0};
                     Vector3 rotation = {0,0,0};
+                    float speed = 0.1;
                     public:
                         void setName(string newName);
                         void setPosition(Vector3 inPosition);
@@ -220,6 +221,8 @@ class PROGRAM
                         string getName();
                         Vector3 *getPosition();
                         Vector3 *getRotation();
+                        void move(bool backward = false);//negative values for moving backwards
+                        void rotate(bool right = false);
                 };
                 class MAP
                 {
@@ -315,18 +318,19 @@ class PROGRAM
                 void (*keyFunc[3])(PROGRAM::DATA* inData);
                 public:
                 bool active[3] = {false,false,false};
-                void setFunc(void (*inFunc)(PROGRAM::DATA* inData),int keyCondition);
-                void run(PROGRAM::DATA* inData, int keyCondition);
+                void setFunc(void (*inFunc)(PROGRAM::DATA* inData),int KeyEvent);
+                void run(PROGRAM::DATA* inData, int KeyEvent);
             };
             KEY key[106];
-            void setKeyFunc(void (*inFunc)(PROGRAM::DATA* inData),int KeyID,int keyCondition);
+            void setKeyFunc(void (*inFunc)(PROGRAM::DATA* inData),int KeyID,int KeyEvent);
         };
         void getKey();
         void setLoop(void (*inLoop)(PROGRAM::DATA *inData));
         void run();
-        void start(int wid,int hei,string title);
+        
         DATA data;
         KEYBOARD keyboard;
+        PROGRAM(int inWidth, int inHeight, string inTitle);
     private:
         void (*userLoop) (PROGRAM::DATA *inData);
         void loadDefaultModels();
