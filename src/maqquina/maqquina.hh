@@ -17,322 +17,338 @@ using std::stringstream;
     #define GLSL_VERSION            100
 #endif
 
-#define MAX_OBJ 64
-#define MAX_ANIM 2;
-
-enum //TYPES
+namespace mqq
 {
-    MAP,
-    PLAYER,
-    ITEM
-};
+    enum TYPE
+    {
+        PLAYER,
+        MAP,
+        ITEM
+    };
 
-enum //KEYEVENT
-{
-    KEYEVENT_DOWN,KEYEVENT_RELEASED,KEYEVENT_PRESSED
-};
+    enum KEY_EVENT
+    {
+        DOWN,RELEASED,PRESSED
+    };
 
-class PROGRAM
-{
-    public:
-        struct DATA
-        {
-            struct LFILE
+    enum MAX
+    {
+        OBJ = 64,
+        ANIM = 2
+    };
+
+    namespace qMath
+    {
+        float round360(float input);
+    };
+    class qProgram
+    {
+        public:
+            struct qData
             {
-                class HITBOX
+                struct qFile
                 {
-                    string name = "noname";
-                    string type = "notype";
-                    BoundingBox hitbox;
-                    public:
-                        void setName(string newName);
-                        void setType(string newtype);
-                        string getName();
-                        string getType();
-                        BoundingBox *getHitbox();
-                        void loadFromFile(string path);
-                        void loadFromModel(Model*inModel);
-                        void create(string inName = "noname", string inType= "notype",BoundingBox inHitbox = (BoundingBox){{0,0,0},{0,0,0}});
-                };
-                class MODEL
-                {
-                    string name = "noname";
-                    string type = "notype";
-                    Model model={0};
-                    ModelAnimation* anim;
-                    bool animated = false;
-                    public:
-                        void setName(string newName);
-                        void setType(string newtype);
-                        string getName();
-                        string getType();
-                        Model *getModel();
-                        void loadModel(string path);
-                        void loadAnim(string path);
-                        void unloadAnim();
-                        void unloadModel();
-                };
-                MODEL model[MAX_OBJ];
-                HITBOX hitbox[MAX_OBJ];
-                PROGRAM::DATA::LFILE::MODEL* getModel(int index);
-                PROGRAM::DATA::LFILE::MODEL* findGetModel(string inName);
-                int findModel(string inName);
-                void autoLoadModel(string path, string inType, string inName, bool inAnimated = false);
-                void autoCreateHitbox(string inName, string inType,BoundingBox inHitbox);
-            };
-            struct GAME
-            {
-                class PLAYER
-                {
-                    struct BODY
+                    class qHitbox
                     {
-                        struct HEAD
+                        string name = "noname";
+                        string type = "notype";
+                        BoundingBox hitbox;
+                        public:
+                            void setName(string newName);
+                            void setType(string newtype);
+                            string getName();
+                            string getType();
+                            BoundingBox *getHitbox();
+                            void loadFromFile(string path);
+                            void loadFromModel(Model*inModel);
+                            void create(string inName = "noname", string inType= "notype",BoundingBox inHitbox = (BoundingBox){{0,0,0},{0,0,0}});
+                    };
+                    class qModel
+                    {
+                        string name = "noname";
+                        string type = "notype";
+                        Model model={0};
+                        ModelAnimation* anim;
+                        bool animated = false;
+                        public:
+                            void setName(string newName);
+                            void setType(string newtype);
+                            string getName();
+                            string getType();
+                            Model *getModel();
+                            void loadModel(string path);
+                            void loadAnim(string path);
+                            void unloadAnim();
+                            void unloadModel();
+                    };
+                    qModel model[MAX::OBJ];
+                    qHitbox hitbox[MAX::OBJ];
+                    qProgram::qData::qFile::qModel* getModel(int index);
+                    qProgram::qData::qFile::qModel* findGetModel(string inName);
+                    int findModel(string inName);
+                    void autoLoadModel(string path, string inType, string inName, bool inAnimated = false);
+                    void autoCreateHitbox(string inName, string inType,BoundingBox inHitbox);
+                };
+                struct qGame
+                {
+                    class qPlayer
+                    {
+                        struct qBody
                         {
-                            BoundingBox *hitbox = nullptr;
-                            struct FACE
+                            struct qHead
                             {
-                                struct EYE
+                                BoundingBox *hitbox = nullptr;
+                                struct qFace
                                 {
-                                    string status = "saudavel";
-                                    float hp = 100;
-                                };
-                                struct MOUTH
-                                {
-                                    struct TEETH
+                                    struct qEye
                                     {
                                         string status = "saudavel";
                                         float hp = 100;
                                     };
-                                    TEETH teeth[32];
-                                    string status = "saudavel";
-                                    float hp = 100;
+                                    struct qMouth
+                                    {
+                                        struct qTeeth
+                                        {
+                                            string status = "saudavel";
+                                            float hp = 100;
+                                        };
+                                        qTeeth teeth[32];
+                                        string status = "saudavel";
+                                        float hp = 100;
+                                    };
+                                    struct qNose
+                                    {
+                                        string status = "saudavel";
+                                        float hp = 100;
+                                    };
+                                    struct qEyebrow
+                                    {
+                                        string status = "natural";
+                                        float hp = 100;
+                                    };
+                                    struct qHair
+                                    {
+                                        string status = "careca";
+                                        float hp = 0;
+                                    };
+                                    struct qBeard
+                                    {
+                                        string status = "careca";
+                                        float hp = 0;
+                                    };
+                                    qEye eye[2];
+                                    qMouth mouth;
+                                    qNose nose;
+                                    qEyebrow eyebrow[2];
+                                    qHair hair;
+                                    qBeard beard;
                                 };
-                                struct NOSE
-                                {
-                                    string status = "saudavel";
-                                    float hp = 100;
-                                };
-                                struct EYEBROW
-                                {
-                                    string status = "natural";
-                                    float hp = 100;
-                                };
-                                struct HAIR
-                                {
-                                    string status = "careca";
-                                    float hp = 0;
-                                };
-                                struct BEARD
-                                {
-                                    string status = "careca";
-                                    float hp = 0;
-                                };
-                                EYE eye[2];
-                                MOUTH mouth;
-                                NOSE nose;
-                                EYEBROW eyebrow[2];
-                                HAIR hair;
-                                BEARD beard;
+                                qFace face;
                             };
-                        };
-                        struct NECK
-                        {
-                            BoundingBox *hitbox = nullptr;
-                            string status = "saudavel";
-                            float hp = 100;
-                        };
-                        struct CHEST
-                        {
-                            BoundingBox *hitbox = nullptr;
-                            string status = "saudavel";
-                            float hp = 100;
-                        };
-                        struct BELLY
-                        {
-                            BoundingBox *hitbox = nullptr;
-                            string status = "saudavel";
-                            float hp = 100;
-                        };
-                        struct SHOULDER
-                        {
-                            BoundingBox *hitbox = nullptr;
-                            string status = "saudavel";
-                            float hp = 100;
-                        };
-                        struct ARM
-                        {
-                            BoundingBox *hitbox = nullptr;
-                            string status = "saudavel";
-                            float hp = 100;
-                        };
-                        struct HAND
-                        {
-                            struct FINGER
-                            {
-                                struct NAIL
-                                {
-                                    string status = "saudavel";
-                                    float hp = 100;
-                                };
-                                NAIL nail;
-                            };
-                            FINGER finger[5];
-                            BoundingBox *hitbox = nullptr;
-                            string status = "saudavel";
-                            float hp = 100;
-                        };
-                        struct UPPERLEG
-                        {
-                            BoundingBox *hitbox = nullptr;
-                            string status = "saudavel";
-                            float hp = 100;
-                        };
-                        struct LEG
-                        {
-                            struct FEET
+                            struct qNeck
                             {
                                 BoundingBox *hitbox = nullptr;
                                 string status = "saudavel";
                                 float hp = 100;
                             };
-                            FEET feet;
-                            BoundingBox *hitbox = nullptr;
-                            string status = "saudavel";
-                            float hp = 100;
+                            struct qChest
+                            {
+                                BoundingBox *hitbox = nullptr;
+                                string status = "saudavel";
+                                float hp = 100;
+                            };
+                            struct qBelly
+                            {
+                                BoundingBox *hitbox = nullptr;
+                                string status = "saudavel";
+                                float hp = 100;
+                            };
+                            struct qShoulder
+                            {
+                                BoundingBox *hitbox = nullptr;
+                                string status = "saudavel";
+                                float hp = 100;
+                            };
+                            struct qArm
+                            {
+                                BoundingBox *hitbox = nullptr;
+                                string status = "saudavel";
+                                float hp = 100;
+                            };
+                            struct qHand
+                            {
+                                struct qFinger
+                                {
+                                    struct qNail
+                                    {
+                                        string status = "saudavel";
+                                        float hp = 100;
+                                    };
+                                    qNail nail;
+                                };
+                                qFinger finger[5];
+                                BoundingBox *hitbox = nullptr;
+                                string status = "saudavel";
+                                float hp = 100;
+                            };
+                            struct qUpperleg
+                            {
+                                BoundingBox *hitbox = nullptr;
+                                string status = "saudavel";
+                                float hp = 100;
+                            };
+                            struct qLeg
+                            {
+                                struct qFeet
+                                {
+                                    BoundingBox *hitbox = nullptr;
+                                    string status = "saudavel";
+                                    float hp = 100;
+                                };
+                                qFeet feet;
+                                BoundingBox *hitbox = nullptr;
+                                string status = "saudavel";
+                                float hp = 100;
+                            };
+                            qHead head;
+                            qNeck neck;
+                            qChest chest;
+                            qBelly belly;
+                            qShoulder shoulder[2];
+                            qArm arm[2];
+                            qHand hand[2];
+                            qUpperleg upperleg[2];
+                            qLeg leg[2];
                         };
-                        HEAD head;
-                        NECK neck;
-                        CHEST chest;
-                        SHOULDER shoulder[2];
-                        ARM arm[2];
-                        HAND hand[2];
-                        UPPERLEG upperleg[2];
-                        LEG leg[2];
-                    };
-                    BODY body;
-                    string name = "ninguem";
-                    Vector3 position = {0,0,0};
-                    Vector3 rotation = {0,0,0};
-                    float speed = 0.1;
-                    public:
-                        void setName(string newName);
-                        void setPosition(Vector3 inPosition);
-                        void setRotation(Vector3 inRotation);
-                        string getName();
-                        Vector3 *getPosition();
-                        Vector3 *getRotation();
-                        void move(bool backward = false);//negative values for moving backwards
-                        void rotate(bool right = false);
-                };
-                class MAP
-                {
-                    string name = "nenhum";
-                    Model *model = nullptr;
-                    Vector3 position = (Vector3){0,0,0};
-                    Vector3 rotation = (Vector3){0,0,0};
-                    public:
-                        void setName(string newName);
-                        void setModel(Model *modelPtr);
-                        void setPosition(Vector3 inPosition);
-                        void setRotation(Vector3 inRotation);
-                        string getName();
-                        Model* getModel();
-                        Vector3* getPosition();
-                        Vector3* getRotation();
-                };
-                public:
-                    PLAYER player[MAX_OBJ];
-                    MAP map;
-            };
-            struct SESSION
-            {
-                struct RENDER
-                {
-                    struct SCENE
-                    {
-                        class MODEL
-                        {
-                            string name = "noname";
-                            string type = "notype";
-                            int frame = 0;
-                            bool active = false;
-                            Model *model = nullptr;
-                            Vector3 *position = nullptr;
-                            Vector3 *rotation = nullptr;
-                            Color color = WHITE;
-                            public:
-                                void setName(string newName);
-                                void setType(string newType);
-                                void setActive(bool newActive);
-                                void setModel(Model *inModel);
-                                void setColor(Color inColor);
-                                void setPosition(Vector3 *inPosi);
-                                void setRotation(Vector3 *inRota);
-                                void create(string inName = "noname",string inType = "notype", Model *inModel = nullptr, int inFrame = 0, Vector3* inPosi = nullptr, Vector3* inRota = nullptr,  Color inColor = WHITE, bool inActive = false);
-                                void reset();
-                                string getName();
-                                string getType();
-                                bool getActive();
-                                Model *getModel();
-                                Vector3 *getPosition();
-                                Vector3 *getRotation();
-                                Color *getColor();
-                        };
-                        Camera camera;
-                        Color backgroundColor;
-                        MODEL modelSlot[MAX_OBJ];
-                        PROGRAM::DATA::SESSION::RENDER::SCENE::MODEL *findGetModel(string inName);
-                        void autoCreateModel(string inName,string inType, Model *inModel, Vector3* inPosi, Vector3* inRota,  bool inActive, int inFrame = 0, Color inColor = WHITE);
-                    };
-                    class SCREEN
-                    {
-                        Vector2 resolution=(Vector2){800,600};
-                        bool resizable = true;
+                        qBody body;
+                        string name = "ninguem";
+                        Vector3 position = {0,0,0};
+                        Vector3 rotation = {0,0,0};
+                        float speed = 0.06;
                         public:
-                            RenderTexture renderTexture;
-                            Vector2 getResolution();
-                            float getMaxX();
-                            float getMaxY();
-                            void setResolution(int x,int y);
-                            void setMaxX(float input);
-                            void setMaxY(float input);
+                            void setName(string newName);
+                            void setPosition(Vector3 inPosition);
+                            void setRotation(Vector3 inRotation);
+                            void setRotationY(float inY);
+                            string getName();
+                            Vector3 *getPosition();
+                            Vector3 *getRotation();
+                            void move(bool backward = false);//negative values for moving backwards
+                            void rotate(bool right = false);
                     };
-                    int frameRatio = 1;
-                    int frame = 0;
-                    SCREEN screen;
-                    SCENE scene;
-                    void renderCurrentScene();
+                    class qMap
+                    {
+                        string name = "nenhum";
+                        Model *model = nullptr;
+                        Vector3 position = (Vector3){0,0,0};
+                        Vector3 rotation = (Vector3){0,0,0};
+                        public:
+                            void setName(string newName);
+                            void setModel(Model *modelPtr);
+                            void setPosition(Vector3 inPosition);
+                            void setRotation(Vector3 inRotation);
+                            string getName();
+                            Model* getModel();
+                            Vector3* getPosition();
+                            Vector3* getRotation();
+                    };
+                    public:
+                        qPlayer player[MAX::OBJ];
+                        qMap map;
                 };
-                public:
-                    RENDER render;
+                struct qSession
+                {
+                    struct qRender
+                    {
+                        struct qScene
+                        {
+                            class qModel
+                            {
+                                string name = "noname";
+                                string type = "notype";
+                                int frame = 0;
+                                bool active = false;
+                                Model *model = nullptr;
+                                Vector3 *position = nullptr;
+                                Vector3 *rotation = nullptr;
+                                Color color = WHITE;
+                                public:
+                                    void setName(string newName);
+                                    void setType(string newType);
+                                    void setActive(bool newActive);
+                                    void setModel(Model *inModel);
+                                    void setColor(Color inColor);
+                                    void setPosition(Vector3 *inPosi);
+                                    void setRotation(Vector3 *inRota);
+                                    void create(string inName = "noname",string inType = "notype", Model *inModel = nullptr, int inFrame = 0, Vector3* inPosi = nullptr, Vector3* inRota = nullptr,  Color inColor = WHITE, bool inActive = false);
+                                    void reset();
+                                    string getName();
+                                    string getType();
+                                    bool getActive();
+                                    Model *getModel();
+                                    Vector3 *getPosition();
+                                    Vector3 *getRotation();
+                                    Color *getColor();
+                            };
+                            Camera camera;
+                            Color backgroundColor;
+                            qModel modelSlot[MAX::OBJ];
+                            qProgram::qData::qSession::qRender::qScene::qModel *findGetModel(string inName);
+                            void autoCreateModel(string inName,string inType, Model *inModel, Vector3* inPosi, Vector3* inRota,  bool inActive, int inFrame = 0, Color inColor = WHITE);
+                        };
+                        class qScreen
+                        {
+                            Vector2 resolution=(Vector2){800,600};
+                            bool resizable = true;
+                            public:
+                                RenderTexture renderTexture;
+                                Vector2 getResolution();
+                                float getMaxX();
+                                float getMaxY();
+                                void setResolution(int x,int y);
+                                void setMaxX(float input);
+                                void setMaxY(float input);
+                        };
+                        int frameRatio = 1;
+                        int frame = 0;
+                        qScreen screen;
+                        qScene scene;
+                        void renderCurrentScene();
+                    };
+                    public:
+                        qRender render;
+                };
+                qGame game;
+                qSession session;
+                qFile file;
             };
-            GAME game;
-            SESSION session;
-            LFILE file;
-        };
-        struct KEYBOARD
-        {
-            const int key_id[106] = {0,32,39,44,45,46,47,48,49,50,51,52,53,54,55,56,57,59,61,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,96,256,257,258,259,260,261,262,263,264,265,266,267,268,269,280,281,282,283,284,290,291,292,293,294,295,296,297,298,299,300,301,340,341,342,343,344,345,346,347,348,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336};
-            class KEY
+            struct qKeyboard
             {
-                void (*keyFunc[3])(PROGRAM::DATA* inData);
-                public:
-                bool active[3] = {false,false,false};
-                void setFunc(void (*inFunc)(PROGRAM::DATA* inData),int KeyEvent);
-                void run(PROGRAM::DATA* inData, int KeyEvent);
+                const int key_id[106] = {0,32,39,44,45,46,47,48,49,50,51,52,53,54,55,56,57,59,61,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,96,256,257,258,259,260,261,262,263,264,265,266,267,268,269,280,281,282,283,284,290,291,292,293,294,295,296,297,298,299,300,301,340,341,342,343,344,345,346,347,348,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336};
+                class qKey
+                {
+                    void (*keyFunc[3])(qProgram::qData* inData);
+                    public:
+                    bool active[3] = {false,false,false};
+                    void setFunc(void (*inFunc)(qProgram::qData* inData),int KeyEvent);
+                    void run(qProgram::qData* inData, int KeyEvent);
+                };
+                qKey key[106];
+                void setKeyFunc(void (*inFunc)(qProgram::qData* inData),int KeyID,int KeyEvent);
             };
-            KEY key[106];
-            void setKeyFunc(void (*inFunc)(PROGRAM::DATA* inData),int KeyID,int KeyEvent);
-        };
-        void getKey();
-        void setLoop(void (*inLoop)(PROGRAM::DATA *inData));
-        void run();
-        
-        DATA data;
-        KEYBOARD keyboard;
-        PROGRAM(int inWidth, int inHeight, string inTitle);
-    private:
-        void (*userLoop) (PROGRAM::DATA *inData);
-        void loadDefaultModels();
-};
+            void getKey();
+            void setLoop(void (*inLoop)(qProgram::qData *inData));
+            void run();
+            
+            qData data;
+            qKeyboard keyboard;
+            qProgram(int inWidth, int inHeight, string inTitle);
+        private:
+            void (*userLoop) (qProgram::qData *inData);
+            void loadDefaultModels();
+    };
+}
+
+using namespace mqq;
+
 #endif

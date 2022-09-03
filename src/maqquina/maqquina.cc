@@ -3,11 +3,11 @@
 
 #include "maqquina.hh"
 
-using _file_ = PROGRAM::DATA::LFILE;
-using _render_ = PROGRAM::DATA::SESSION::RENDER;
-using _game_ = PROGRAM::DATA::GAME;
+using _file_ = qProgram::qData::qFile;
+using _render_ = qProgram::qData::qSession::qRender;
+using _game_ = qProgram::qData::qGame;
 
-PROGRAM::PROGRAM(int x, int y, string title)
+qProgram::qProgram(int x, int y, string title)
 {
     //SetConfigFlags(FLAG_MSAA_4X_HINT);  // Enable Multi Sampling Anti Aliasing 4x (if available)
     SetConfigFlags(FLAG_WINDOW_RESIZABLE); 
@@ -25,35 +25,46 @@ PROGRAM::PROGRAM(int x, int y, string title)
     loadDefaultModels();
 }
 
-void PROGRAM::loadDefaultModels()
+void qProgram::loadDefaultModels()
 {
     data.file.autoLoadModel("./assets/models/map/level0/0.glb","map0","map");
     data.file.autoLoadModel("./assets/models/player/model.iqm","player","player",true);
 
 }
 
-void PROGRAM::setLoop(void(*inLoop)(PROGRAM::DATA *inData)){userLoop = inLoop;}
-void PROGRAM::run()
+void qProgram::setLoop(void(*inLoop)(qProgram::qData *prog)){userLoop = inLoop;}
+void qProgram::run()
 {
     data.session.render.frame++;
     data.session.render.frameRatio = round(GetFPS()/60.0);
-    if(data.session.render.frameRatio == 0)
-        data.session.render.frameRatio = 1;
-    if(data.session.render.frame%data.session.render.frameRatio==0)
-    {
-        userLoop(&data);
-        getKey();
-    }
-        
+    if(data.session.render.frameRatio != 0)
+        if(data.session.render.frame%data.session.render.frameRatio==0)
+        {
+            userLoop(&data);
+            getKey();
+        }
     data.session.render.renderCurrentScene();
 }
 
 //----------------------------------------------------------------------------------
-// KEYBOARD
+// qMath
 //----------------------------------------------------------------------------------
 
-void PROGRAM::KEYBOARD::KEY::setFunc(void (*inFunc)(PROGRAM::DATA*),int KeyEvent) {keyFunc[KeyEvent] = inFunc;}
-void PROGRAM::KEYBOARD::setKeyFunc(void (*inFunc)(PROGRAM::DATA*),int KeyID, int KeyEvent)
+float qMath::round360(float input)
+{
+    if(input >= 360)
+        input -= 360;
+    else if(input <0)
+        input += 360;
+    return(input);
+}
+
+//----------------------------------------------------------------------------------
+// qKeyboard
+//----------------------------------------------------------------------------------
+
+void qProgram::qKeyboard::qKey::setFunc(void (*inFunc)(qProgram::qData*),int KeyEvent) {keyFunc[KeyEvent] = inFunc;}
+void qProgram::qKeyboard::setKeyFunc(void (*inFunc)(qProgram::qData*),int KeyID, int KeyEvent)
 {
     for (short int i = 0; i < 106; i++)
         if(key_id[i]==KeyID)
@@ -63,27 +74,27 @@ void PROGRAM::KEYBOARD::setKeyFunc(void (*inFunc)(PROGRAM::DATA*),int KeyID, int
             break;
         }
 }
-void PROGRAM::KEYBOARD::KEY::run(PROGRAM::DATA*inData,int KeyEvent){keyFunc[KeyEvent](inData);}
-void PROGRAM::getKey()
+void qProgram::qKeyboard::qKey::run(qProgram::qData*prog,int KeyEvent){keyFunc[KeyEvent](prog);}
+void qProgram::getKey()
 {
     for(short int i=0;i<106;i++)
         for(short int k=0;k<3;k++)
             if(keyboard.key[i].active[k]==true)
                 switch (k)
                 {
-                    case KEYEVENT_DOWN:
+                    case KEY_EVENT::DOWN:
                     {
                         if(IsKeyDown(keyboard.key_id[i])==true)
                             keyboard.key[i].run(&data,k);
                     }
                     break;
-                    case KEYEVENT_PRESSED:
+                    case KEY_EVENT::PRESSED:
                     {
                         if(IsKeyPressed(keyboard.key_id[i])==true)
                             keyboard.key[i].run(&data,k);
                     }
                     break;
-                    case KEYEVENT_RELEASED:
+                    case KEY_EVENT::RELEASED:
                     {
                         if(IsKeyReleased(keyboard.key_id[i])==true)
                             keyboard.key[i].run(&data,k);
@@ -93,27 +104,27 @@ void PROGRAM::getKey()
 }
 
 //----------------------------------------------------------------------------------
-// DATA FILE
+// qData FILE
 //----------------------------------------------------------------------------------
 
-PROGRAM::DATA::LFILE::MODEL* _file_::getModel(int index){return(&model[index]);}
-PROGRAM::DATA::LFILE::MODEL* _file_::findGetModel(string inName)
+qProgram::qData::qFile::qModel* _file_::getModel(int index){return(&model[index]);}
+qProgram::qData::qFile::qModel* _file_::findGetModel(string inName)
 {
-    for(int i = 0;i<MAX_OBJ;i++)
+    for(int i = 0;i<MAX::OBJ;i++)
         if(model[i].getName().compare(inName)==0)
             return(&model[i]);
     return(nullptr);
 }
 int _file_::findModel(string inName)
 {
-    for(int i = 0;i<MAX_OBJ;i++)
+    for(int i = 0;i<MAX::OBJ;i++)
         if(model[i].getName().compare(inName)==0)
             return(i);
     return(-1);
 }
 void _file_::autoLoadModel(string path, string inName, string inType,bool animated)
 {
-    for(int i = 0;i<MAX_OBJ;i++)
+    for(int i = 0;i<MAX::OBJ;i++)
         if(model[i].getName().compare("noname")==0)
         {
             model[i].loadModel(path);
@@ -126,7 +137,7 @@ void _file_::autoLoadModel(string path, string inName, string inType,bool animat
 }
 void _file_::autoCreateHitbox(string inName, string inType, BoundingBox inHitbox)
 {
-    for(int i = 0;i<MAX_OBJ;i++)
+    for(int i = 0;i<MAX::OBJ;i++)
         if(hitbox[i].getName().compare("noname")==0)
         {
             hitbox[i].create(inName,inType,inHitbox);
@@ -135,49 +146,49 @@ void _file_::autoCreateHitbox(string inName, string inType, BoundingBox inHitbox
 }
 
 //----------------------------------------------------------------------------------
-// DATA FILE MODELS
+// qData FILE qModelS
 //----------------------------------------------------------------------------------
 
-void _file_::MODEL::setName(string newName){name = newName;}
-void _file_::MODEL::setType(string newType){type = newType;}
-string _file_::MODEL::getName(){return(name);}
-string _file_::MODEL::getType(){return(type);}
-void _file_::MODEL::loadModel(string path){model = LoadModel(path.c_str());}
-void _file_::MODEL::unloadModel(){UnloadModel(model);}
-void _file_::MODEL::loadAnim(string path)
+void _file_::qModel::setName(string newName){name = newName;}
+void _file_::qModel::setType(string newType){type = newType;}
+string _file_::qModel::getName(){return(name);}
+string _file_::qModel::getType(){return(type);}
+void _file_::qModel::loadModel(string path){model = LoadModel(path.c_str());}
+void _file_::qModel::unloadModel(){UnloadModel(model);}
+void _file_::qModel::loadAnim(string path)
 {
-    unsigned int localMax = MAX_ANIM;
+    unsigned int localMax = MAX::ANIM;
     anim = LoadModelAnimations(path.c_str(), &localMax);
     animated = true;
 }
-Model* _file_::MODEL::getModel(){return(&model);}
+Model* _file_::qModel::getModel(){return(&model);}
 
 //----------------------------------------------------------------------------------
-// DATA FILE HITBOX
+// qData FILE qHitbox
 //----------------------------------------------------------------------------------
 
-void _file_::HITBOX::setName(string newName){name = newName;}
-void _file_::HITBOX::setType(string newType){type = newType;}
-void _file_::HITBOX::loadFromFile(string path)
+void _file_::qHitbox::setName(string newName){name = newName;}
+void _file_::qHitbox::setType(string newType){type = newType;}
+void _file_::qHitbox::loadFromFile(string path)
 {
     Model localModel;
     localModel = LoadModel(path.c_str());
     hitbox = GetModelBoundingBox(localModel);
     UnloadModel(localModel);
 }
-void _file_::HITBOX::loadFromModel(Model* inModel){hitbox = GetModelBoundingBox(*inModel);}
-void _file_::HITBOX::create(string inName, string inType, BoundingBox inHitbox)
+void _file_::qHitbox::loadFromModel(Model* inModel){hitbox = GetModelBoundingBox(*inModel);}
+void _file_::qHitbox::create(string inName, string inType, BoundingBox inHitbox)
 {
     name = inName;
     type = inType;
     hitbox = inHitbox;
 }
-string _file_::HITBOX::getName(){return(name);}
-string _file_::HITBOX::getType(){return(type);}
-BoundingBox* _file_::HITBOX::getHitbox(){return(&hitbox);}
+string _file_::qHitbox::getName(){return(name);}
+string _file_::qHitbox::getType(){return(type);}
+BoundingBox* _file_::qHitbox::getHitbox(){return(&hitbox);}
 
 //----------------------------------------------------------------------------------
-// DATA SESSION RENDER
+// qData qSession qRender
 //----------------------------------------------------------------------------------
 
 void _render_::renderCurrentScene()
@@ -191,7 +202,7 @@ void _render_::renderCurrentScene()
         {
             bool doubleCheck = false;//it checks if there are 2 empty slots in sequence, if true it will exit loop
             Vector3 zerp = {0,0,0};
-            for(int i = 0;i<MAX_OBJ;i++)
+            for(int i = 0;i<MAX::OBJ;i++)
                 if(scene.modelSlot[i].getActive()==true)
                     DrawModelEx(*scene.modelSlot[i].getModel(),*scene.modelSlot[i].getPosition(),{0,1,0},scene.modelSlot[i].getRotation()->y,{1,1,1},WHITE);
                 else
@@ -205,9 +216,9 @@ void _render_::renderCurrentScene()
     EndDrawing();
 };
 
-void _render_::SCENE::autoCreateModel(string inName,string inType, Model *inModel, Vector3* inPosi, Vector3* inRota, bool inActive, int inFrame, Color inColor)
+void _render_::qScene::autoCreateModel(string inName,string inType, Model *inModel, Vector3* inPosi, Vector3* inRota, bool inActive, int inFrame, Color inColor)
 {
-    for(int i =0; i< MAX_OBJ; i++)
+    for(int i =0; i< MAX::OBJ; i++)
         if(modelSlot[i].getName().compare("noname") == 0)
         {
             modelSlot[i].create( inName, inType, inModel, inFrame, inPosi, inRota, inColor, inActive);
@@ -216,33 +227,33 @@ void _render_::SCENE::autoCreateModel(string inName,string inType, Model *inMode
 }
             
 
-PROGRAM::DATA::SESSION::RENDER::SCENE::MODEL * _render_::SCENE::findGetModel(string inName)
+qProgram::qData::qSession::qRender::qScene::qModel * _render_::qScene::findGetModel(string inName)
 {
-    for(int i =0; i< MAX_OBJ; i++)
+    for(int i =0; i< MAX::OBJ; i++)
         if(modelSlot[i].getName().compare(inName) == 0)
             return (&modelSlot[i]);
     return nullptr;
 }
 
 //----------------------------------------------------------------------------------
-// DATA SESSION SCENE
+// qData qSession qScene
 //----------------------------------------------------------------------------------
 
 
-string _render_::SCENE::MODEL::getName(){return(name);}
-string _render_::SCENE::MODEL::getType(){return(type);}
-bool _render_::SCENE::MODEL::getActive(){return(active);}
-Model* _render_::SCENE::MODEL::getModel(){return(model);}
-Vector3* _render_::SCENE::MODEL::getPosition(){return(position);}
-Vector3* _render_::SCENE::MODEL::getRotation(){return(rotation);}
-void _render_::SCENE::MODEL::setName(string newName){name = newName;}
-void _render_::SCENE::MODEL::setType(string newType){type = newType;}
-void _render_::SCENE::MODEL::setActive(bool newActive){active = newActive;}
-void _render_::SCENE::MODEL::setModel(Model *inModel){model = inModel;}
-void _render_::SCENE::MODEL::setPosition(Vector3 *newP){position = newP;}
-void _render_::SCENE::MODEL::setRotation(Vector3 *newR){rotation = newR;}
+string _render_::qScene::qModel::getName(){return(name);}
+string _render_::qScene::qModel::getType(){return(type);}
+bool _render_::qScene::qModel::getActive(){return(active);}
+Model* _render_::qScene::qModel::getModel(){return(model);}
+Vector3* _render_::qScene::qModel::getPosition(){return(position);}
+Vector3* _render_::qScene::qModel::getRotation(){return(rotation);}
+void _render_::qScene::qModel::setName(string newName){name = newName;}
+void _render_::qScene::qModel::setType(string newType){type = newType;}
+void _render_::qScene::qModel::setActive(bool newActive){active = newActive;}
+void _render_::qScene::qModel::setModel(Model *inModel){model = inModel;}
+void _render_::qScene::qModel::setPosition(Vector3 *newP){position = newP;}
+void _render_::qScene::qModel::setRotation(Vector3 *newR){rotation = newR;}
 //provide no parameters to reset the slot
-void _render_::SCENE::MODEL::create(string inName,string inType, Model *inModel, int inFrame, Vector3* inPosi, Vector3* inRota, Color inColor, bool inActive)
+void _render_::qScene::qModel::create(string inName,string inType, Model *inModel, int inFrame, Vector3* inPosi, Vector3* inRota, Color inColor, bool inActive)
 {
     name = inName;
     type = inType;
@@ -256,27 +267,28 @@ void _render_::SCENE::MODEL::create(string inName,string inType, Model *inModel,
 }
 
 //----------------------------------------------------------------------------------
-// SESSION RENDER SCREEN
+// qSession qRender qScreen
 //----------------------------------------------------------------------------------
 
-Vector2 _render_::SCREEN::getResolution(){return resolution;};
-float _render_::SCREEN::getMaxX(){return resolution.x;};
-float _render_::SCREEN::getMaxY(){return resolution.y;};
-void _render_::SCREEN::setResolution(int x,int y){resolution.x = x;resolution.y = y;};
-void _render_::SCREEN::setMaxX(float input){resolution.x = input;};
-void _render_::SCREEN::setMaxY(float input){resolution.y = input;};
+Vector2 _render_::qScreen::getResolution(){return resolution;};
+float _render_::qScreen::getMaxX(){return resolution.x;};
+float _render_::qScreen::getMaxY(){return resolution.y;};
+void _render_::qScreen::setResolution(int x,int y){resolution.x = x;resolution.y = y;};
+void _render_::qScreen::setMaxX(float input){resolution.x = input;};
+void _render_::qScreen::setMaxY(float input){resolution.y = input;};
 
 //----------------------------------------------------------------------------------
-// DATA GAME PLAYER
+// qData qGame qPlayer
 //----------------------------------------------------------------------------------
 
-void _game_::PLAYER::setName(string newName){name = newName;}
-void _game_::PLAYER::setPosition(Vector3 newVec3){position = newVec3;}
-void _game_::PLAYER::setRotation(Vector3 newVec3){position = newVec3;}
-string _game_::PLAYER::getName(){return(name);}
-Vector3* _game_::PLAYER::getPosition(){return &position;}
-Vector3* _game_::PLAYER::getRotation(){return &rotation;}
-void _game_::PLAYER::move(bool backwards)
+void _game_::qPlayer::setName(string newName){name = newName;}
+void _game_::qPlayer::setPosition(Vector3 newVec3){position = newVec3;}
+void _game_::qPlayer::setRotation(Vector3 newVec3){position = newVec3;}
+void _game_::qPlayer::setRotationY(float inY){rotation.y = inY;}
+string _game_::qPlayer::getName(){return(name);}
+Vector3* _game_::qPlayer::getPosition(){return &position;}
+Vector3* _game_::qPlayer::getRotation(){return &rotation;}
+void _game_::qPlayer::move(bool backwards)
 {
     //z+ frente
     //x+ esquerda
@@ -285,8 +297,8 @@ void _game_::PLAYER::move(bool backwards)
     float resto = rotation.y - (90 * giro);
     float restodoresto = 90 - resto;
     float localSpeed = speed;
-    if(backwards)
-        localSpeed *= -1;
+    if(backwards==true)
+        localSpeed *= (-1);
     valorZ = localSpeed - resto * (localSpeed / 90);
     valorX = localSpeed - restodoresto * (localSpeed / 90);
     switch(giro)
@@ -317,24 +329,24 @@ void _game_::PLAYER::move(bool backwards)
         break;
     }
 }
-void _game_::PLAYER::rotate(bool right)
+void _game_::qPlayer::rotate(bool right)
 {
     if(right == true)
-        rotation.y += 6;
+        rotation.y -= 3;
     else
-        rotation.y -= 6;
+        rotation.y += 3;
 }
 //----------------------------------------------------------------------------------
-// DATA GAME MAP
+// qData qGame qMap
 //----------------------------------------------------------------------------------
 
-void _game_::MAP::setName(string newName){name = newName;}
-void _game_::MAP::setModel(Model*inModel){model = inModel;}
-string _game_::MAP::getName(){return(name);}
-Model* _game_::MAP::getModel(){return(model);}
-void _game_::MAP::setPosition(Vector3 newVec3){position = newVec3;}
-void _game_::MAP::setRotation(Vector3 newVec3){position = newVec3;}
-Vector3* _game_::MAP::getPosition(){return &position;}
-Vector3* _game_::MAP::getRotation(){return &rotation;}
+void _game_::qMap::setName(string newName){name = newName;}
+void _game_::qMap::setModel(Model*inModel){model = inModel;}
+string _game_::qMap::getName(){return(name);}
+Model* _game_::qMap::getModel(){return(model);}
+void _game_::qMap::setPosition(Vector3 newVec3){position = newVec3;}
+void _game_::qMap::setRotation(Vector3 newVec3){position = newVec3;}
+Vector3* _game_::qMap::getPosition(){return &position;}
+Vector3* _game_::qMap::getRotation(){return &rotation;}
 
 #endif
