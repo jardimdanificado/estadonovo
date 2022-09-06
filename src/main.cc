@@ -34,7 +34,7 @@ int main(void)
     estado->setLoop(mainLoop);
 
     estado->data.session.render.scene.autoCreateModel("mapa","map",estado->data.file.findGetModel("map0")->getModel(),estado->data.game.map.getPosition(),estado->data.game.map.getRotation(),true);
-    estado->data.session.render.scene.autoCreateModel("player0", "player", estado->data.file.findGetModel("player")->getModel(),estado->data.game.player[0].getPosition(),estado->data.game.player[0].getRotation(),true);
+    estado->data.session.render.scene.autoCreateModel("player0", "player", estado->data.file.findGetModel("player")->getModel(),estado->data.game.player[0].getPosition(),estado->data.game.player[0].getRotation(),true,0,(Color){127,100,0,255});
     
     estado->keyboard.setKeyFunc(__keyboard::keyWDown,KEY_W,KEY_EVENT::DOWN);
     estado->keyboard.setKeyFunc(__keyboard::keySDown,KEY_S,KEY_EVENT::DOWN);

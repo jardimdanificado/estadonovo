@@ -60,7 +60,7 @@ namespace mqq
                             string getType();
                             BoundingBox *getHitbox();
                             void loadFromFile(string path);
-                            void loadFromModel(Model*inModel);
+                            void loadFromModel(string path);
                             void create(string inName = "noname", string inType= "notype",BoundingBox inHitbox = (BoundingBox){{0,0,0},{0,0,0}});
                     };
                     class qModel
@@ -88,6 +88,7 @@ namespace mqq
                     int findModel(string inName);
                     void autoLoadModel(string path, string inType, string inName, bool inAnimated = false);
                     void autoCreateHitbox(string inName, string inType,BoundingBox inHitbox);
+                    void autoCreateHitboxFromModel(string inName, string inType, string path);
                 };
                 struct qGame
                 {

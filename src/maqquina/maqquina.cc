@@ -29,7 +29,6 @@ void qProgram::loadDefaultModels()
 {
     data.file.autoLoadModel("./assets/models/map/level0/0.glb","map0","map");
     data.file.autoLoadModel("./assets/models/player/model.iqm","player","player",true);
-
 }
 
 void qProgram::setLoop(void(*inLoop)(qProgram::qData *prog)){userLoop = inLoop;}
@@ -176,7 +175,13 @@ void _file_::qHitbox::loadFromFile(string path)
     hitbox = GetModelBoundingBox(localModel);
     UnloadModel(localModel);
 }
-void _file_::qHitbox::loadFromModel(Model* inModel){hitbox = GetModelBoundingBox(*inModel);}
+void _file_::qHitbox::loadFromModel(string path)
+{
+	Model tempModel;
+	tempModel = LoadModel(path.c_str());
+	hitbox = GetModelBoundingBox(tempModel);
+	UnloadModel(tempModel);
+}
 void _file_::qHitbox::create(string inName, string inType, BoundingBox inHitbox)
 {
     name = inName;
