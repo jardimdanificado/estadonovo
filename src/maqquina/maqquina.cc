@@ -206,7 +206,6 @@ void _render_::renderCurrentScene()
         BeginMode3D(scene.camera);
         {
             bool doubleCheck = false;//it checks if there are 2 empty slots in sequence, if true it will exit loop
-            Vector3 zerp = {0,0,0};
             for(int i = 0;i<MAX::OBJ;i++)
                 if(scene.modelSlot[i].getActive()==true)
                     DrawModelEx(*scene.modelSlot[i].getModel(),*scene.modelSlot[i].getPosition(),{0,1,0},scene.modelSlot[i].getRotation()->y,{1,1,1},*scene.modelSlot[i].getColor());
@@ -230,7 +229,6 @@ void _render_::qScene::autoCreateModel(string inName,string inType, Model *inMod
             break;
         }
 }
-            
 
 qProgram::qData::qSession::qRender::qScene::qModel * _render_::qScene::findGetModel(string inName)
 {
@@ -251,6 +249,8 @@ bool _render_::qScene::qModel::getActive(){return(active);}
 Model* _render_::qScene::qModel::getModel(){return(model);}
 Vector3* _render_::qScene::qModel::getPosition(){return(position);}
 Vector3* _render_::qScene::qModel::getRotation(){return(rotation);}
+Color* _render_::qScene::qModel::getColor(){return &color;}
+void _render_::qScene::qModel::setColor(Color inColor){color = inColor;}
 void _render_::qScene::qModel::setName(string newName){name = newName;}
 void _render_::qScene::qModel::setType(string newType){type = newType;}
 void _render_::qScene::qModel::setActive(bool newActive){active = newActive;}
