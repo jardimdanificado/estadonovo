@@ -209,7 +209,7 @@ void _render_::renderCurrentScene()
             Vector3 zerp = {0,0,0};
             for(int i = 0;i<MAX::OBJ;i++)
                 if(scene.modelSlot[i].getActive()==true)
-                    DrawModelEx(*scene.modelSlot[i].getModel(),*scene.modelSlot[i].getPosition(),{0,1,0},scene.modelSlot[i].getRotation()->y,{1,1,1},WHITE);
+                    DrawModelEx(*scene.modelSlot[i].getModel(),*scene.modelSlot[i].getPosition(),{0,1,0},scene.modelSlot[i].getRotation()->y,{1,1,1},*scene.modelSlot[i].getColor());
                 else
                     if(doubleCheck == true)
                         break;
