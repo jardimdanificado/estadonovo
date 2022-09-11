@@ -13,6 +13,7 @@ namespace __startup
 		    inData->session.render.scene.autoCreateModel("mapa","map", inData->file.findGetModel("map0")->getModel(), inData->game.map.getPosition(), inData->game.map.getRotation(), true);
 	    inData->session.render.scene.autoCreateModel("player0", "player", inData->file.findGetModel("player")->getModel(), inData->game.player[0].getPosition(), inData->game.player[0].getRotation(), true, 0, (Color){127,100,0,255});	
 	};
+	
 }
 
 namespace __keyboard
@@ -58,6 +59,7 @@ int main(void)
 
     estado->setLoop(mainLoop);
 	__keyboard::setKeyboard(estado);
+	
     while (!WindowShouldClose())
         estado->run();
 
