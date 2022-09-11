@@ -16,19 +16,14 @@ qProgram::qProgram(int x, int y, string title)
     InitWindow(x, x, title.c_str());
     
     // Define the camera to look into our 3d world
-    data.session.render.scene.camera = {
+    data.session.render.scene.camera = 
+    {
         (Vector3){ 2.0f, 2.0f, 6.0f },      // position
         (Vector3){ 0.0f, 0.5f, 0.0f },      // target
         (Vector3){ 0.0f, 1.0f, 0.0f },      // up
-        45.0f, CAMERA_PERSPECTIVE };        // fov, type
+        45.0f, CAMERA_PERSPECTIVE 
+    };        // fov, type
     SetCameraMode(data.session.render.scene.camera, CAMERA_FREE);
-    loadDefaultModels();
-}
-
-void qProgram::loadDefaultModels()
-{
-    data.file.autoLoadModel("./assets/models/map/level0/0.glb","map0","map");
-    data.file.autoLoadModel("./assets/models/player/model.iqm","player","player",true);
 }
 
 void qProgram::setLoop(void(*inLoop)(qProgram::qData *prog)){userLoop = inLoop;}

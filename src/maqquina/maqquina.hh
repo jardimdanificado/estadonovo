@@ -346,7 +346,6 @@ namespace mqq
             qProgram(int inWidth, int inHeight, string inTitle);
         private:
             void (*userLoop) (qProgram::qData *inData);
-            void loadDefaultModels();
     };
 }
 
