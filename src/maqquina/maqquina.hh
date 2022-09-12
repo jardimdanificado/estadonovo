@@ -52,10 +52,13 @@ namespace mqq
                     {
                         string name = "noname";
                         string type = "notype";
+                        bool active = false;
                         BoundingBox hitbox;
                         public:
+                        	void setActive(bool inActive);
                             void setName(string newName);
                             void setType(string newtype);
+                            bool getActive();
                             string getName();
                             string getType();
                             BoundingBox *getHitbox();
@@ -67,7 +70,7 @@ namespace mqq
                     {
                         string name = "noname";
                         string type = "notype";
-                        Model model={0};
+                        Model model;
                         ModelAnimation* anim;
                         bool animated = false;
                         public:
@@ -86,9 +89,9 @@ namespace mqq
                     qProgram::qData::qFile::qModel* getModel(int index);
                     qProgram::qData::qFile::qModel* findGetModel(string inName);
                     int findModel(string inName);
-                    void autoLoadModel(string path, string inType, string inName, bool inAnimated = false);
+                    void autoLoadModel(string inName, string inType, string path, bool inAnimated = false);
                     void autoCreateHitbox(string inName, string inType,BoundingBox inHitbox);
-                    void autoCreateHitboxFromModel(string inName, string inType, string path);
+                    void autoCreateHitboxFromModel(string inName, string inType, string path, bool inActive = true);
                 };
                 struct qGame
                 {

@@ -116,7 +116,7 @@ int _file_::findModel(string inName)
             return(i);
     return(-1);
 }
-void _file_::autoLoadModel(string path, string inName, string inType,bool animated)
+void _file_::autoLoadModel(string inName, string inType,string path,bool animated)
 {
     for(int i = 0;i<MAX::OBJ;i++)
         if(model[i].getName().compare("noname")==0)
@@ -135,6 +135,18 @@ void _file_::autoCreateHitbox(string inName, string inType, BoundingBox inHitbox
         if(hitbox[i].getName().compare("noname")==0)
         {
             hitbox[i].create(inName,inType,inHitbox);
+            break;
+        }
+}
+void _file_::autoCreateHitboxFromModel(string inName, string inType, string path, bool inActive)
+{
+    for(int i = 0;i<MAX::OBJ;i++)
+        if(hitbox[i].getName().compare("noname")==0)
+        {
+        	hitbox[i].setName(inName);
+        	hitbox[i].setType(inType);
+        	hitbox[i].setActive(inActive);
+            hitbox[i].loadFromModel(path);
             break;
         }
 }
@@ -163,6 +175,7 @@ Model* _file_::qModel::getModel(){return(&model);}
 
 void _file_::qHitbox::setName(string newName){name = newName;}
 void _file_::qHitbox::setType(string newType){type = newType;}
+void _file_::qHitbox::setActive(bool inActive){active = inActive;}
 void _file_::qHitbox::loadFromFile(string path)
 {
     Model localModel;
@@ -186,6 +199,7 @@ void _file_::qHitbox::create(string inName, string inType, BoundingBox inHitbox)
 string _file_::qHitbox::getName(){return(name);}
 string _file_::qHitbox::getType(){return(type);}
 BoundingBox* _file_::qHitbox::getHitbox(){return(&hitbox);}
+bool _file_::qHitbox::getActive(){return(active);}
 
 //----------------------------------------------------------------------------------
 // qData qSession qRender
