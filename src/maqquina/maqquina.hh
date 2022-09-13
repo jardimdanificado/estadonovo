@@ -72,13 +72,14 @@ namespace mqq
                         string type = "notype";
                         Model model;
                         ModelAnimation* anim;
-                        bool animated = false;
+                       	bool animated = false;
                         public:
                             void setName(string newName);
                             void setType(string newtype);
                             string getName();
                             string getType();
                             Model *getModel();
+                            ModelAnimation **getAnim();
                             void loadModel(string path);
                             void loadAnim(string path);
                             void unloadAnim();
@@ -270,13 +271,16 @@ namespace mqq
                             {
                                 string name = "noname";
                                 string type = "notype";
-                                int frame = 0;
+                                int currentFrame = 0;
                                 bool active = false;
                                 Model *model = nullptr;
+                                ModelAnimation **anim = nullptr;
                                 Vector3 *position = nullptr;
                                 Vector3 *rotation = nullptr;
                                 Color color = WHITE;
+                                bool animated = false;
                                 public:
+                                	int currentAnim = 0;
                                     void setName(string newName);
                                     void setType(string newType);
                                     void setActive(bool newActive);
@@ -284,8 +288,9 @@ namespace mqq
                                     void setColor(Color inColor);
                                     void setPosition(Vector3 *inPosi);
                                     void setRotation(Vector3 *inRota);
-                                    void create(string inName = "noname",string inType = "notype", Model *inModel = nullptr, int inFrame = 0, Vector3* inPosi = nullptr, Vector3* inRota = nullptr,  Color inColor = WHITE, bool inActive = false);
                                     void reset();
+									void updateAnim();
+									void frame(bool subtract = false);
                                     string getName();
                                     string getType();
                                     bool getActive();
@@ -293,12 +298,14 @@ namespace mqq
                                     Vector3 *getPosition();
                                     Vector3 *getRotation();
                                     Color *getColor();
+                                    qModel(string inName = "noname",string inType = "notype", Model *inModel = nullptr, ModelAnimation **inAnim = nullptr,bool inActive = false, int inFrame = 0, Vector3* inPosi = nullptr, Vector3* inRota = nullptr,  Color inColor = WHITE);
                             };
+
                             Camera camera;
                             Color backgroundColor;
                             qModel modelSlot[MAX::OBJ];
                             qProgram::qData::qSession::qRender::qScene::qModel *findGetModel(string inName);
-                            void autoCreateModel(string inName,string inType, Model *inModel, Vector3* inPosi, Vector3* inRota,  bool inActive, int inFrame = 0, Color inColor = WHITE);
+                            void autoCreateModel(string inName,string inType, Model *inModel,  ModelAnimation **inAnim = nullptr,bool inActive = false,  Vector3* inPosi = nullptr, Vector3* inRota = nullptr, int inFrame = 0, Color inColor = WHITE);
                         };
                         class qScreen
                         {

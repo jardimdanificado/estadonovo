@@ -1,6 +1,13 @@
 #include "maqquina/maqquina.hh"
 namespace __startup
 {
+	void loadPlayerBase(qProgram::qData *inData)
+	{
+		inData->file.autoLoadModel("player","player","./assets/models/player/model.iqm",true);
+		for(int i = 0;i<10;i++)
+			inData->file.autoCreateHitboxFromModel(TextFormat("map0%d",i),"map", TextFormat("./assets/models/map/level0/hitbox/hitbox%d.glb",i), true);
+	}
+	
 	void loadMap0(qProgram::qData *inData)
 	{
 		inData->file.autoLoadModel("map0","map","./assets/models/map/level0/0.glb");
@@ -8,18 +15,21 @@ namespace __startup
 			inData->file.autoCreateHitboxFromModel(TextFormat("map0%d",i),"map", TextFormat("./assets/models/map/level0/hitbox/hitbox%d.glb",i), true);
 	};
 
-	void loadAllModels(qProgram::qData *inData)
+	void loadAll(qProgram::qData *inData)
 	{
-	    inData->file.autoLoadModel("player","player","./assets/models/player/model.iqm",true);
+	    loadPlayerBase(*&inData);
 		loadMap0(*&inData);
 	};
 
 	void setRenderModels(qProgram::qData *inData)
 	{
+		qProgram::qData::qFile::qModel *localmap0 = inData->file.findGetModel("map0");
+		qProgram::qData::qFile::qModel *localplayer = inData->file.findGetModel("player");
+		
 		//add map to render	
-	    inData->session.render.scene.autoCreateModel("mapa","map", inData->file.findGetModel("map0")->getModel(), inData->game.map.getPosition(), inData->game.map.getRotation(), true);
+	    inData->session.render.scene.autoCreateModel("mapa","map", localmap0->getModel(), localmap0->getAnim(), true, inData->game.map.getPosition(), inData->game.map.getRotation());
 		//add player model to render
-	    inData->session.render.scene.autoCreateModel("player0", "player", inData->file.findGetModel("player")->getModel(), inData->game.player[0].getPosition(), inData->game.player[0].getRotation(), true, 0, (Color){127,100,0,255});	
+	    inData->session.render.scene.autoCreateModel("player0", "player", localplayer->getModel(), localplayer->getAnim(),true , inData->game.player[0].getPosition(), inData->game.player[0].getRotation(), 0, (Color){127,100,0,255});	
 	};
 }
 
@@ -27,11 +37,14 @@ namespace __keyboard
 {
     void keyWDown(qProgram::qData *inData)
     {
+    	inData->session.render.scene.findGetModel("player0")->currentAnim = 1;
         inData->game.player[0].move();
+        inData->session.render.scene.findGetModel("player0")->frame();
     };
     void keySDown(qProgram::qData *inData)
     {
         inData->game.player[0].move(true);
+        inData->session.render.scene.findGetModel("player0")->frame(true);
     };
     void keyADown(qProgram::qData *inData)
     {
@@ -61,7 +74,7 @@ void mainLoop (qProgram::qData *inData)
 int main(void)
 {
     qProgram *estado = new qProgram(800,800,"Estado Novo");
-	__startup::loadAllModels(&estado->data);
+	__startup::loadAll(&estado->data);
 	__startup::setRenderModels(&estado->data);
 
     estado->setLoop(mainLoop);

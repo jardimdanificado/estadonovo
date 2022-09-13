@@ -116,14 +116,16 @@ int _file_::findModel(string inName)
             return(i);
     return(-1);
 }
-void _file_::autoLoadModel(string inName, string inType,string path,bool animated)
+void _file_::autoLoadModel(string inName, string inType,string path,bool inAnimated)
 {
     for(int i = 0;i<MAX::OBJ;i++)
         if(model[i].getName().compare("noname")==0)
         {
             model[i].loadModel(path);
-            if(animated)
+            if(inAnimated)
+            {
                 model[i].loadAnim(path);
+            }
             model[i].setName(inName);
             model[i].setType(inType);
             break;
@@ -167,6 +169,7 @@ void _file_::qModel::loadAnim(string path)
     anim = LoadModelAnimations(path.c_str(), &localMax);
     animated = true;
 }
+ModelAnimation **_file_::qModel::getAnim(){return(&anim);}
 Model* _file_::qModel::getModel(){return(&model);}
 
 //----------------------------------------------------------------------------------
@@ -217,7 +220,9 @@ void _render_::renderCurrentScene()
             bool doubleCheck = false;//it checks if there are 2 empty slots in sequence, if true it will exit loop
             for(int i = 0;i<MAX::OBJ;i++)
                 if(scene.modelSlot[i].getActive()==true)
+                {
                     DrawModelEx(*scene.modelSlot[i].getModel(),*scene.modelSlot[i].getPosition(),{0,1,0},scene.modelSlot[i].getRotation()->y,{1,1,1},*scene.modelSlot[i].getColor());
+				}
                 else
                     if(doubleCheck == true)
                         break;
@@ -229,12 +234,12 @@ void _render_::renderCurrentScene()
     EndDrawing();
 };
 
-void _render_::qScene::autoCreateModel(string inName,string inType, Model *inModel, Vector3* inPosi, Vector3* inRota, bool inActive, int inFrame, Color inColor)
+void _render_::qScene::autoCreateModel(string inName,string inType, Model *inModel, ModelAnimation **inAnim,  bool inActive, Vector3* inPosi, Vector3* inRota,  int inFrame, Color inColor)
 {
     for(int i =0; i< MAX::OBJ; i++)
         if(modelSlot[i].getName().compare("noname") == 0)
         {
-            modelSlot[i].create( inName, inType, inModel, inFrame, inPosi, inRota, inColor, inActive);
+            modelSlot[i] = qModel( inName, inType, inModel, inAnim, inActive, inFrame, inPosi, inRota, inColor);
             break;
         }
 }
@@ -266,19 +271,33 @@ void _render_::qScene::qModel::setActive(bool newActive){active = newActive;}
 void _render_::qScene::qModel::setModel(Model *inModel){model = inModel;}
 void _render_::qScene::qModel::setPosition(Vector3 *newP){position = newP;}
 void _render_::qScene::qModel::setRotation(Vector3 *newR){rotation = newR;}
-//provide no parameters to reset the slot
-void _render_::qScene::qModel::create(string inName,string inType, Model *inModel, int inFrame, Vector3* inPosi, Vector3* inRota, Color inColor, bool inActive)
+void _render_::qScene::qModel::frame(bool subtract)
 {
-    name = inName;
+	if(subtract)
+		currentFrame--;
+	else
+		currentFrame++;
+	
+    if (currentFrame >= anim[currentAnim]->frameCount) currentFrame = 0;
+    else if(currentFrame <0) currentFrame = currentFrame + (anim[currentAnim]->frameCount - 1 );
+
+    UpdateModelAnimation(*model, *anim[currentAnim], currentFrame);
+}
+
+_render_::qScene::qModel::qModel(string inName ,string inType, Model *inModel , ModelAnimation **inAnim ,bool inActive , int inFrame , Vector3* inPosi, Vector3* inRota,  Color inColor)
+{
+	name = inName;
     type = inType;
     model = inModel;
-    frame = inFrame;
+    anim = inAnim;
+    currentFrame = inFrame;
     position = inPosi;
     rotation = inRota;
     color = inColor;
     active = inActive;
-
-}
+    if(inAnim != nullptr)
+    	animated = true;
+};
 
 //----------------------------------------------------------------------------------
 // qSession qRender qScreen
