@@ -280,7 +280,7 @@ namespace mqq
                                 bool animated = false;
                                 public:
                                 	int currentFrame = 0;
-                                	int currentAnim = 1;
+                                	int currentAnim = 0;
                                     void setName(string newName);
                                     void setType(string newType);
                                     void setActive(bool newActive);
