@@ -221,7 +221,7 @@ void _render_::renderCurrentScene()
             for(int i = 0;i<MAX::OBJ;i++)
                 if(scene.modelSlot[i].getActive()==true)
                 {
-                    DrawModelEx(*scene.modelSlot[i].getModel(),*scene.modelSlot[i].getPosition(),{0,1,0},scene.modelSlot[i].getRotation()->y,{1,1,1},*scene.modelSlot[i].getColor());
+                    DrawModelEx(*scene.modelSlot[i].getModel(), *scene.modelSlot[i].getPosition(), {0,1,0}, scene.modelSlot[i].getRotation()->y, {1,1,1}, *scene.modelSlot[i].getColor());
 				}
                 else
                     if(doubleCheck == true)
@@ -271,15 +271,14 @@ void _render_::qScene::qModel::setActive(bool newActive){active = newActive;}
 void _render_::qScene::qModel::setModel(Model *inModel){model = inModel;}
 void _render_::qScene::qModel::setPosition(Vector3 *newP){position = newP;}
 void _render_::qScene::qModel::setRotation(Vector3 *newR){rotation = newR;}
-void _render_::qScene::qModel::frame(bool subtract)
+void _render_::qScene::qModel::frame(int inVal)
 {
-	if(subtract)
-		currentFrame--;
-	else
-		currentFrame++;
+	currentFrame+=inVal;
 	
-    if (currentFrame >= anim[currentAnim]->frameCount) currentFrame = 0;
-    else if(currentFrame <0) currentFrame = currentFrame + (anim[currentAnim]->frameCount - 1 );
+    if (currentFrame >= anim[currentAnim]->frameCount) 
+    	currentFrame = 0;
+    else if(currentFrame <0) 
+    	currentFrame = currentFrame + (anim[currentAnim]->frameCount - 1 );
 
     UpdateModelAnimation(*model, *anim[currentAnim], currentFrame);
 }

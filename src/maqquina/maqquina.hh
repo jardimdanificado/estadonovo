@@ -34,7 +34,7 @@ namespace mqq
     enum MAX
     {
         OBJ = 64,
-        ANIM = 2
+        ANIM = 3
     };
 
     namespace qMath
@@ -271,7 +271,6 @@ namespace mqq
                             {
                                 string name = "noname";
                                 string type = "notype";
-                                int currentFrame = 0;
                                 bool active = false;
                                 Model *model = nullptr;
                                 ModelAnimation **anim = nullptr;
@@ -280,7 +279,8 @@ namespace mqq
                                 Color color = WHITE;
                                 bool animated = false;
                                 public:
-                                	int currentAnim = 0;
+                                	int currentFrame = 0;
+                                	int currentAnim = 1;
                                     void setName(string newName);
                                     void setType(string newType);
                                     void setActive(bool newActive);
@@ -290,7 +290,7 @@ namespace mqq
                                     void setRotation(Vector3 *inRota);
                                     void reset();
 									void updateAnim();
-									void frame(bool subtract = false);
+									void frame(int inVal = 1);
                                     string getName();
                                     string getType();
                                     bool getActive();
