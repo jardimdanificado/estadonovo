@@ -71,7 +71,7 @@ namespace mqq
                         string name = "noname";
                         string type = "notype";
                         Model model;
-                        ModelAnimation* anim;
+                        ModelAnimation *anim;
                        	bool animated = false;
                         public:
                             void setName(string newName);
@@ -273,7 +273,7 @@ namespace mqq
                                 string type = "notype";
                                 bool active = false;
                                 Model *model = nullptr;
-                                ModelAnimation **anim = nullptr;
+                                ModelAnimation *anim;
                                 Vector3 *position = nullptr;
                                 Vector3 *rotation = nullptr;
                                 Color color = WHITE;
@@ -305,7 +305,7 @@ namespace mqq
                             Color backgroundColor;
                             qModel modelSlot[MAX::OBJ];
                             qProgram::qData::qSession::qRender::qScene::qModel *findGetModel(string inName);
-                            void autoCreateModel(string inName,string inType, Model *inModel,  ModelAnimation **inAnim = nullptr,bool inActive = false,  Vector3* inPosi = nullptr, Vector3* inRota = nullptr, int inFrame = 0, Color inColor = WHITE);
+                            void autoCreateModel(string inName,string inType, Model *inModel,  ModelAnimation **inAnim = 0,bool inActive = false,  Vector3* inPosi = nullptr, Vector3* inRota = nullptr, int inFrame = 0, Color inColor = WHITE);
                         };
                         class qScreen
                         {

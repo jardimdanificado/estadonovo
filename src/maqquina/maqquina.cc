@@ -3,6 +3,8 @@
 
 #include "maqquina.hh"
 
+unsigned int MAX_ANIM = MAX::ANIM;
+
 using _file_ = qProgram::qData::qFile;
 using _render_ = qProgram::qData::qSession::qRender;
 using _game_ = qProgram::qData::qGame;
@@ -165,8 +167,8 @@ void _file_::qModel::loadModel(string path){model = LoadModel(path.c_str());}
 void _file_::qModel::unloadModel(){UnloadModel(model);}
 void _file_::qModel::loadAnim(string path)
 {
-    unsigned int localMax = MAX::ANIM;
-    anim = LoadModelAnimations(path.c_str(), &localMax);
+    anim = LoadModelAnimations(path.c_str(), &MAX_ANIM);
+	printf("anim0=%d  anim1=%d\n",anim[0].frameCount,anim[1].frameCount);
     animated = true;
 }
 ModelAnimation **_file_::qModel::getAnim(){return(&anim);}
@@ -275,12 +277,12 @@ void _render_::qScene::qModel::frame(int inVal)
 {
 	currentFrame+=inVal;
 	
-    if (currentFrame >= anim[currentAnim]->frameCount) 
+    if (currentFrame >= anim[currentAnim].frameCount) 
     	currentFrame = 0;
     else if(currentFrame <0) 
-    	currentFrame = currentFrame + (anim[currentAnim]->frameCount - 1 );
-
-    UpdateModelAnimation(*model, *anim[currentAnim], currentFrame);
+    	currentFrame = currentFrame + (anim[currentAnim].frameCount - 1 );
+    printf("anim0=%d  anim1=%d\n",anim[0].frameCount,anim[1].frameCount);
+    UpdateModelAnimation(*model, anim[currentAnim], currentFrame);
 }
 
 _render_::qScene::qModel::qModel(string inName ,string inType, Model *inModel , ModelAnimation **inAnim ,bool inActive , int inFrame , Vector3* inPosi, Vector3* inRota,  Color inColor)
@@ -288,7 +290,7 @@ _render_::qScene::qModel::qModel(string inName ,string inType, Model *inModel , 
 	name = inName;
     type = inType;
     model = inModel;
-    anim = inAnim;
+    anim = *inAnim;
     currentFrame = inFrame;
     position = inPosi;
     rotation = inRota;
