@@ -52,13 +52,10 @@ namespace mqq
                     {
                         string name = "noname";
                         string type = "notype";
-                        bool active = false;
                         BoundingBox hitbox;
                         public:
-                        	void setActive(bool inActive);
                             void setName(string newName);
                             void setType(string newtype);
-                            bool getActive();
                             string getName();
                             string getType();
                             BoundingBox *getHitbox();
@@ -300,7 +297,10 @@ namespace mqq
                                     Color *getColor();
                                     qModel(string inName = "noname",string inType = "notype", Model *inModel = nullptr, ModelAnimation **inAnim = nullptr,bool inActive = false, int inFrame = 0, Vector3* inPosi = nullptr, Vector3* inRota = nullptr,  Color inColor = WHITE);
                             };
-
+							class qHitbox
+							{
+								
+							}
                             Camera camera;
                             Color backgroundColor;
                             qModel modelSlot[MAX::OBJ];

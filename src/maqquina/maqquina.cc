@@ -149,7 +149,6 @@ void _file_::autoCreateHitboxFromModel(string inName, string inType, string path
         {
         	hitbox[i].setName(inName);
         	hitbox[i].setType(inType);
-        	hitbox[i].setActive(inActive);
             hitbox[i].loadFromModel(path);
             break;
         }
@@ -180,7 +179,6 @@ Model* _file_::qModel::getModel(){return(&model);}
 
 void _file_::qHitbox::setName(string newName){name = newName;}
 void _file_::qHitbox::setType(string newType){type = newType;}
-void _file_::qHitbox::setActive(bool inActive){active = inActive;}
 void _file_::qHitbox::loadFromFile(string path)
 {
     Model localModel;
@@ -204,7 +202,6 @@ void _file_::qHitbox::create(string inName, string inType, BoundingBox inHitbox)
 string _file_::qHitbox::getName(){return(name);}
 string _file_::qHitbox::getType(){return(type);}
 BoundingBox* _file_::qHitbox::getHitbox(){return(&hitbox);}
-bool _file_::qHitbox::getActive(){return(active);}
 
 //----------------------------------------------------------------------------------
 // qData qSession qRender
@@ -221,6 +218,11 @@ void _render_::renderCurrentScene()
         {
             bool doubleCheck = false;//it checks if there are 2 empty slots in sequence, if true it will exit loop
             for(int i = 0;i<MAX::OBJ;i++)
+            {
+            	if(scene.modelSlot[i].getActive()==true)
+                {
+                	DrawBoundingBox(BoundingBox box, Color color);
+				}
                 if(scene.modelSlot[i].getActive()==true)
                 {
                     DrawModelEx(*scene.modelSlot[i].getModel(), *scene.modelSlot[i].getPosition(), {0,1,0}, scene.modelSlot[i].getRotation()->y, {1,1,1}, *scene.modelSlot[i].getColor());
@@ -230,6 +232,7 @@ void _render_::renderCurrentScene()
                         break;
                     else
                         doubleCheck = true;
+			}
         }
         EndMode3D();
     }
