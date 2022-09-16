@@ -5,9 +5,105 @@
 
 unsigned int MAX_ANIM = MAX::ANIM;
 
-using _file_ = qProgram::qData::qFile;
-using _render_ = qProgram::qData::qSession::qRender;
-using _game_ = qProgram::qData::qGame;
+using _file_ = qData::qFile;
+using _render_ = qData::qSession::qRender;
+using _game_ = qData::qMundo;
+
+// Update model animated vertex data (positions and normals) for a given frame
+// NOTE: Updated data is returned as mesh
+Mesh qTools::qMesh::rotateMeshFromAnim(Model model, ModelAnimation anim, int frame)
+{
+    if((anim.frameCount > 0) && (anim.bones != NULL) && (anim.framePoses != NULL))
+    {
+        if(frame >= anim.frameCount) frame = frame % anim.frameCount;
+
+        for(int m = 0; m < model.meshCount; m++)
+        {
+            Mesh mesh = model.meshes[m];
+            if(mesh.boneIds == NULL || mesh.boneWeights == NULL)
+            {
+                continue;
+            }
+
+            bool updated = false; // set to true when anim vertex information is updated
+            Vector3 animVertex = { 0,0,0 };
+            Vector3 animNormal = { 0,0,0 };
+
+            Vector3 inTranslation = { 0,0,0 };
+            Quaternion inRotation = { 0,0,0,0 };
+            // Vector3 inScale = { 0 };
+
+            Vector3 outTranslation = { 0,0,0 };
+            Quaternion outRotation = { 0,0,0,0 };
+            Vector3 outScale = { 0,0,0 };
+
+            int boneId = 0;
+            int boneCounter = 0;
+            float boneWeight = 0.0;
+
+            const int vValues = mesh.vertexCount * 3;
+            for(int vCounter = 0; vCounter < vValues; vCounter += 3)
+            {
+                mesh.animVertices[vCounter] = 0;
+                mesh.animVertices[vCounter + 1] = 0;
+                mesh.animVertices[vCounter + 2] = 0;
+
+                if(mesh.animNormals != NULL)
+                {
+                    mesh.animNormals[vCounter] = 0;
+                    mesh.animNormals[vCounter + 1] = 0;
+                    mesh.animNormals[vCounter + 2] = 0;
+                }
+
+                // Iterates over 4 bones per vertex
+                for(int j = 0; j < 4; j++, boneCounter++)
+                {
+                    boneWeight = mesh.boneWeights[boneCounter];
+                    // early stop when no transformation will be applied
+                    if(boneWeight == 0.0f)
+                    {
+                        continue;
+                    }
+                    boneId = mesh.boneIds[boneCounter];
+                    inTranslation = model.bindPose[boneId].translation;
+                    inRotation = model.bindPose[boneId].rotation;
+                    outTranslation = anim.framePoses[frame][boneId].translation;
+                    outRotation = anim.framePoses[frame][boneId].rotation;
+                    outScale = anim.framePoses[frame][boneId].scale;
+
+                    // Vertices processing
+                    // NOTE: We use meshes.vertices (default vertex position) to calculate meshes.animVertices (animated vertex position)
+                    animVertex = (Vector3) { mesh.vertices[vCounter], mesh.vertices[vCounter + 1], mesh.vertices[vCounter + 2] };
+                    animVertex = Vector3Multiply(animVertex, outScale);
+                    animVertex = Vector3Subtract(animVertex, inTranslation);
+                    animVertex = Vector3RotateByQuaternion(animVertex, QuaternionMultiply(outRotation, QuaternionInvert(inRotation)));
+                    animVertex = Vector3Add(animVertex, outTranslation);
+                    mesh.animVertices[vCounter] += animVertex.x * boneWeight;
+                    mesh.animVertices[vCounter + 1] += animVertex.y * boneWeight;
+                    mesh.animVertices[vCounter + 2] += animVertex.z * boneWeight;
+                    updated = true;
+
+                    // Normals processing
+                    // NOTE: We use meshes.baseNormals (default normal) to calculate meshes.normals (animated normals)
+                    if(mesh.normals != NULL)
+                    {
+                        animNormal = (Vector3) { mesh.normals[vCounter], mesh.normals[vCounter + 1], mesh.normals[vCounter + 2] };
+                        animNormal = Vector3RotateByQuaternion(animNormal, QuaternionMultiply(outRotation, QuaternionInvert(inRotation)));
+                        mesh.animNormals[vCounter] += animNormal.x * boneWeight;
+                        mesh.animNormals[vCounter + 1] += animNormal.y * boneWeight;
+                        mesh.animNormals[vCounter + 2] += animNormal.z * boneWeight;
+                    }
+                }
+            }
+            if(updated)
+            {
+                mesh.vertices = mesh.animVertices;
+                return(mesh);
+            }
+        }
+    }
+    return(model.meshes[0]);
+}
 
 qProgram::qProgram(int x, int y, string title)
 {
@@ -16,7 +112,8 @@ qProgram::qProgram(int x, int y, string title)
     data.session.render.screen.setMaxX(x);
     data.session.render.screen.setMaxY(y);
     InitWindow(x, x, title.c_str());
-    
+    for(int i = 0;i<MAX::OBJ;i++)
+    	data.session.render.scene.hitbox[i] = &data.file.hitbox[i];
     // Define the camera to look into our 3d world
     data.session.render.scene.camera = 
     {
@@ -26,9 +123,9 @@ qProgram::qProgram(int x, int y, string title)
         45.0f, CAMERA_PERSPECTIVE 
     };        // fov, type
     SetCameraMode(data.session.render.scene.camera, CAMERA_FREE);
-}
+};
 
-void qProgram::setLoop(void(*inLoop)(qProgram::qData *prog)){userLoop = inLoop;}
+void qProgram::setLoop(void(*inLoop)(qData *prog)){userLoop = inLoop;}
 void qProgram::run()
 {
     data.session.render.frame++;
@@ -59,8 +156,8 @@ float qMath::round360(float input)
 // qKeyboard
 //----------------------------------------------------------------------------------
 
-void qProgram::qKeyboard::qKey::setFunc(void (*inFunc)(qProgram::qData*),int KeyEvent) {keyFunc[KeyEvent] = inFunc;}
-void qProgram::qKeyboard::setKeyFunc(void (*inFunc)(qProgram::qData*),int KeyID, int KeyEvent)
+void qProgram::qKeyboard::qKey::setFunc(void (*inFunc)(qData*),int KeyEvent) {keyFunc[KeyEvent] = inFunc;}
+void qProgram::qKeyboard::setKeyFunc(void (*inFunc)(qData*),int KeyID, int KeyEvent)
 {
     for (short int i = 0; i < 106; i++)
         if(key_id[i]==KeyID)
@@ -70,7 +167,7 @@ void qProgram::qKeyboard::setKeyFunc(void (*inFunc)(qProgram::qData*),int KeyID,
             break;
         }
 }
-void qProgram::qKeyboard::qKey::run(qProgram::qData*prog,int KeyEvent){keyFunc[KeyEvent](prog);}
+void qProgram::qKeyboard::qKey::run(qData*prog,int KeyEvent){keyFunc[KeyEvent](prog);}
 void qProgram::getKey()
 {
     for(short int i=0;i<106;i++)
@@ -103,8 +200,8 @@ void qProgram::getKey()
 // qData FILE
 //----------------------------------------------------------------------------------
 
-qProgram::qData::qFile::qModel* _file_::getModel(int index){return(&model[index]);}
-qProgram::qData::qFile::qModel* _file_::findGetModel(string inName)
+qData::qFile::qModel* _file_::getModel(int index){return(&model[index]);}
+qData::qFile::qModel* _file_::findGetModel(string inName)
 {
     for(int i = 0;i<MAX::OBJ;i++)
         if(model[i].getName().compare(inName)==0)
@@ -150,6 +247,7 @@ void _file_::autoCreateHitboxFromModel(string inName, string inType, string path
         	hitbox[i].setName(inName);
         	hitbox[i].setType(inType);
             hitbox[i].loadFromModel(path);
+            hitbox[i].setActive(inActive);
             break;
         }
 }
@@ -167,7 +265,6 @@ void _file_::qModel::unloadModel(){UnloadModel(model);}
 void _file_::qModel::loadAnim(string path)
 {
     anim = LoadModelAnimations(path.c_str(), &MAX_ANIM);
-	printf("anim0=%d  anim1=%d\n",anim[0].frameCount,anim[1].frameCount);
     animated = true;
 }
 ModelAnimation **_file_::qModel::getAnim(){return(&anim);}
@@ -179,6 +276,8 @@ Model* _file_::qModel::getModel(){return(&model);}
 
 void _file_::qHitbox::setName(string newName){name = newName;}
 void _file_::qHitbox::setType(string newType){type = newType;}
+void _file_::qHitbox::setActive(bool inActive){active = inActive;}
+bool _file_::qHitbox::getActive(){return(active);}
 void _file_::qHitbox::loadFromFile(string path)
 {
     Model localModel;
@@ -219,9 +318,9 @@ void _render_::renderCurrentScene()
             bool doubleCheck = false;//it checks if there are 2 empty slots in sequence, if true it will exit loop
             for(int i = 0;i<MAX::OBJ;i++)
             {
-            	if(scene.modelSlot[i].getActive()==true)
+            	if(scene.hitbox[i]->getActive()==true)
                 {
-                	DrawBoundingBox(BoundingBox box, Color color);
+                	DrawBoundingBox(*scene.hitbox[i]->getHitbox() , BLACK);
 				}
                 if(scene.modelSlot[i].getActive()==true)
                 {
@@ -249,7 +348,7 @@ void _render_::qScene::autoCreateModel(string inName,string inType, Model *inMod
         }
 }
 
-qProgram::qData::qSession::qRender::qScene::qModel * _render_::qScene::findGetModel(string inName)
+qData::qSession::qRender::qScene::qModel * _render_::qScene::findGetModel(string inName)
 {
     for(int i =0; i< MAX::OBJ; i++)
         if(modelSlot[i].getName().compare(inName) == 0)
@@ -284,7 +383,6 @@ void _render_::qScene::qModel::frame(int inVal)
     	currentFrame = 0;
     else if(currentFrame <0) 
     	currentFrame = currentFrame + (anim[currentAnim].frameCount - 1 );
-    printf("anim0=%d  anim1=%d\n",anim[0].frameCount,anim[1].frameCount);
     UpdateModelAnimation(*model, anim[currentAnim], currentFrame);
 }
 
@@ -315,17 +413,17 @@ void _render_::qScreen::setMaxX(float input){resolution.x = input;};
 void _render_::qScreen::setMaxY(float input){resolution.y = input;};
 
 //----------------------------------------------------------------------------------
-// qData qGame qPlayer
+// qData qGame qHuman
 //----------------------------------------------------------------------------------
 
-void _game_::qPlayer::setName(string newName){name = newName;}
-void _game_::qPlayer::setPosition(Vector3 newVec3){position = newVec3;}
-void _game_::qPlayer::setRotation(Vector3 newVec3){position = newVec3;}
-void _game_::qPlayer::setRotationY(float inY){rotation.y = inY;}
-string _game_::qPlayer::getName(){return(name);}
-Vector3* _game_::qPlayer::getPosition(){return &position;}
-Vector3* _game_::qPlayer::getRotation(){return &rotation;}
-void _game_::qPlayer::move(bool backwards)
+void _game_::qCreature::qHuman::setName(string newName){name = newName;}
+void _game_::qCreature::qHuman::setPosition(Vector3 newVec3){position = newVec3;}
+void _game_::qCreature::qHuman::setRotation(Vector3 newVec3){position = newVec3;}
+void _game_::qCreature::qHuman::setRotationY(float inY){rotation.y = inY;}
+string _game_::qCreature::qHuman::getName(){return(name);}
+Vector3* _game_::qCreature::qHuman::getPosition(){return &position;}
+Vector3* _game_::qCreature::qHuman::getRotation(){return &rotation;}
+void _game_::qCreature::qHuman::move(bool backwards)
 {
     //z+ frente
     //x+ esquerda
@@ -366,7 +464,7 @@ void _game_::qPlayer::move(bool backwards)
         break;
     }
 }
-void _game_::qPlayer::rotate(bool right)
+void _game_::qCreature::qHuman::rotate(bool right)
 {
     if(right == true)
         rotation.y -= 3;
