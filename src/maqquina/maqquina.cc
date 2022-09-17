@@ -5,9 +5,9 @@
 
 unsigned int MAX_ANIM = MAX::ANIM;
 
-using _file_ = qData::qFile;
-using _render_ = qData::qSession::qRender;
-using _game_ = qData::qMundo;
+using _file_ = qProgram::qData::qFile;
+using _render_ = qProgram::qData::qSession::qRender;
+using _game_ = qProgram::qData::qWorld;
 
 // Update model animated vertex data (positions and normals) for a given frame
 // NOTE: Updated data is returned as mesh
@@ -124,16 +124,14 @@ qProgram::qProgram(int x, int y, string title)
     };        // fov, type
     SetCameraMode(data.session.render.scene.camera, CAMERA_FREE);
 };
-
-void qProgram::setLoop(void(*inLoop)(qData *prog)){userLoop = inLoop;}
-void qProgram::run()
+void qProgram::run(void(*inLoop)(qData *prog))
 {
     data.session.render.frame++;
     data.session.render.frameRatio = round(GetFPS()/60.0);
     if(data.session.render.frameRatio != 0)
         if(data.session.render.frame%data.session.render.frameRatio==0)
         {
-            userLoop(&data);
+            inLoop(&data);
             getKey();
         }
     data.session.render.renderCurrentScene();
@@ -200,8 +198,8 @@ void qProgram::getKey()
 // qData FILE
 //----------------------------------------------------------------------------------
 
-qData::qFile::qModel* _file_::getModel(int index){return(&model[index]);}
-qData::qFile::qModel* _file_::findGetModel(string inName)
+qProgram::qData::qFile::qModel* _file_::getModel(int index){return(&model[index]);}
+qProgram::qData::qFile::qModel* _file_::findGetModel(string inName)
 {
     for(int i = 0;i<MAX::OBJ;i++)
         if(model[i].getName().compare(inName)==0)
@@ -348,7 +346,7 @@ void _render_::qScene::autoCreateModel(string inName,string inType, Model *inMod
         }
 }
 
-qData::qSession::qRender::qScene::qModel * _render_::qScene::findGetModel(string inName)
+qProgram::qData::qSession::qRender::qScene::qModel * _render_::qScene::findGetModel(string inName)
 {
     for(int i =0; i< MAX::OBJ; i++)
         if(modelSlot[i].getName().compare(inName) == 0)
