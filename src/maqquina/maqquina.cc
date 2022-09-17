@@ -124,14 +124,14 @@ qProgram::qProgram(int x, int y, string title)
     };        // fov, type
     SetCameraMode(data.session.render.scene.camera, CAMERA_FREE);
 };
-void qProgram::run(void(*inLoop)(qData *prog))
+void qProgram::run(void(*inLoop)(qProgram *estado))
 {
-    data.session.render.frame++;
-    data.session.render.frameRatio = round(GetFPS()/60.0);
+    this->data.session.render.frame++;
+    this->data.session.render.frameRatio = round(GetFPS()/60.0);
     if(data.session.render.frameRatio != 0)
         if(data.session.render.frame%data.session.render.frameRatio==0)
         {
-            inLoop(&data);
+            inLoop(this);
             getKey();
         }
     data.session.render.renderCurrentScene();
@@ -148,50 +148,6 @@ float qMath::round360(float input)
     else if(input <0)
         input += 360;
     return(input);
-}
-
-//----------------------------------------------------------------------------------
-// qKeyboard
-//----------------------------------------------------------------------------------
-
-void qProgram::qKeyboard::qKey::setFunc(void (*inFunc)(qData*),int KeyEvent) {keyFunc[KeyEvent] = inFunc;}
-void qProgram::qKeyboard::setKeyFunc(void (*inFunc)(qData*),int KeyID, int KeyEvent)
-{
-    for (short int i = 0; i < 106; i++)
-        if(key_id[i]==KeyID)
-        {
-            key[i].active[KeyEvent] = true;
-            key[i].setFunc(inFunc,KeyEvent);
-            break;
-        }
-}
-void qProgram::qKeyboard::qKey::run(qData*prog,int KeyEvent){keyFunc[KeyEvent](prog);}
-void qProgram::getKey()
-{
-    for(short int i=0;i<106;i++)
-        for(short int k=0;k<3;k++)
-            if(keyboard.key[i].active[k]==true)
-                switch (k)
-                {
-                    case KEY_EVENT::DOWN:
-                    {
-                        if(IsKeyDown(keyboard.key_id[i])==true)
-                            keyboard.key[i].run(&data,k);
-                    }
-                    break;
-                    case KEY_EVENT::PRESSED:
-                    {
-                        if(IsKeyPressed(keyboard.key_id[i])==true)
-                            keyboard.key[i].run(&data,k);
-                    }
-                    break;
-                    case KEY_EVENT::RELEASED:
-                    {
-                        if(IsKeyReleased(keyboard.key_id[i])==true)
-                            keyboard.key[i].run(&data,k);
-                    }
-                    break;
-                }
 }
 
 //----------------------------------------------------------------------------------
@@ -373,9 +329,10 @@ void _render_::qScene::qModel::setActive(bool newActive){active = newActive;}
 void _render_::qScene::qModel::setModel(Model *inModel){model = inModel;}
 void _render_::qScene::qModel::setPosition(Vector3 *newP){position = newP;}
 void _render_::qScene::qModel::setRotation(Vector3 *newR){rotation = newR;}
-void _render_::qScene::qModel::frame(int inVal)
+void _render_::qScene::qModel::setFrameProgression(int inProgression){progression = inProgression;}
+void _render_::qScene::qModel::frame()
 {
-	currentFrame+=inVal;
+	currentFrame+=progression;
 	
     if (currentFrame >= anim[currentAnim].frameCount) 
     	currentFrame = 0;
@@ -481,5 +438,107 @@ void _game_::qMap::setPosition(Vector3 newVec3){position = newVec3;}
 void _game_::qMap::setRotation(Vector3 newVec3){position = newVec3;}
 Vector3* _game_::qMap::getPosition(){return &position;}
 Vector3* _game_::qMap::getRotation(){return &rotation;}
+
+//----------------------------------------------------------------------------------
+// KEYBOARD
+// KEYBOARD
+// KEYBOARD
+// KEYBOARD
+// KEYBOARD
+// KEYBOARD
+//----------------------------------------------------------------------------------
+
+
+void qProgram::qKeyboard::qKey::setFunc(void (*inFunc)(qProgram*estado),int KeyEvent) {keyFunc[KeyEvent] = inFunc;}
+void qProgram::qKeyboard::setKeyFunc(void (*inFunc)(qProgram*estado),int KeyID, int KeyEvent)
+{
+    for (short int i = 0; i < 106; i++)
+        if(key_id[i]==KeyID)
+        {
+            key[i].active[KeyEvent] = true;
+            key[i].setFunc(inFunc,KeyEvent);
+            break;
+        }
+}
+void qProgram::qKeyboard::qKey::run(qProgram *estado,int KeyEvent){keyFunc[KeyEvent](estado);}
+void qProgram::getKey()
+{
+    for(short int i=0;i<106;i++)
+        for(short int k=0;k<3;k++)
+            if(keyboard.key[i].active[k]==true)
+                switch (k)
+                {
+                    case KEY_EVENT::DOWN:
+                    {
+                        if(IsKeyDown(keyboard.key_id[i])==true)
+                            keyboard.key[i].run(this,k);
+                    }
+                    break;
+                    case KEY_EVENT::PRESSED:
+                    {
+                        if(IsKeyPressed(keyboard.key_id[i])==true)
+                            keyboard.key[i].run(this,k);
+                    }
+                    break;
+                    case KEY_EVENT::RELEASED:
+                    {
+                        if(IsKeyReleased(keyboard.key_id[i])==true)
+                            keyboard.key[i].run(this,k);
+                    }
+                    break;
+                }
+}
+
+void  qProgram::qKeyboard::qLayout::qGameplay::_released::keyW(qProgram *estado)
+{
+	qProgram::qData::qSession::qRender::qScene::qModel* localPlayer = estado->data.session.render.scene.findGetModel("player0");
+	localPlayer->setFrameProgression(1);
+	localPlayer->currentAnim = 0;
+};
+void  qProgram::qKeyboard::qLayout::qGameplay::_released::keyS(qProgram *estado)
+{
+	qProgram::qData::qSession::qRender::qScene::qModel* localPlayer = estado->data.session.render.scene.findGetModel("player0");
+	localPlayer->setFrameProgression(1);
+	localPlayer->currentAnim = 0;
+};
+
+void  qProgram::qKeyboard::qLayout::qGameplay::_pressed::keyW(qProgram *estado)
+{
+	qProgram::qData::qSession::qRender::qScene::qModel* localPlayer = estado->data.session.render.scene.findGetModel("player0");
+	localPlayer->setFrameProgression(1);
+	localPlayer->currentAnim = 1;
+};
+void  qProgram::qKeyboard::qLayout::qGameplay::_pressed::keyS(qProgram *estado)
+{
+	qProgram::qData::qSession::qRender::qScene::qModel* localPlayer = estado->data.session.render.scene.findGetModel("player0");
+	localPlayer->setFrameProgression(-1);
+	localPlayer->currentAnim = 1;
+};
+
+void qProgram::qKeyboard::qLayout::qGameplay::_down::keyW(qProgram *estado){estado->data.world.player[0].move();};
+void qProgram::qKeyboard::qLayout::qGameplay::_down::keyS(qProgram *estado){estado->data.world.player[0].move(true);};
+void qProgram::qKeyboard::qLayout::qGameplay::_down::keyA(qProgram *estado)
+{
+    estado->data.world.player[0].setRotationY(qMath::round360(estado->data.world.player[0].getRotation()->y));
+    estado->data.world.player[0].rotate();
+};
+void qProgram::qKeyboard::qLayout::qGameplay::_down::keyD(qProgram *estado)
+{
+    estado->data.world.player[0].setRotationY(qMath::round360(estado->data.world.player[0].getRotation()->y));
+    estado->data.world.player[0].rotate(true);
+};
+void qProgram::qKeyboard::qLayout::qGameplay::useLayout(qProgram *estado)
+{
+	estado->keyboard.setKeyFunc(released.keyW,KEY_W,KEY_EVENT::RELEASED);
+	estado->keyboard.setKeyFunc(released.keyS,KEY_S,KEY_EVENT::RELEASED);
+
+	estado->keyboard.setKeyFunc(pressed.keyW,KEY_W,KEY_EVENT::PRESSED);
+	estado->keyboard.setKeyFunc(pressed.keyS,KEY_S,KEY_EVENT::PRESSED);
+
+	estado->keyboard.setKeyFunc(down.keyW,KEY_W,KEY_EVENT::DOWN);
+	estado->keyboard.setKeyFunc(down.keyS,KEY_S,KEY_EVENT::DOWN);
+	estado->keyboard.setKeyFunc(down.keyA,KEY_A,KEY_EVENT::DOWN);
+	estado->keyboard.setKeyFunc(down.keyD,KEY_D,KEY_EVENT::DOWN);
+};
 
 #endif

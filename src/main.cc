@@ -46,63 +46,9 @@ namespace __startup
 	};
 }
 
-namespace __keyboard
+void mainLoop (qProgram *estado)
 {
-	class _gameplay
-	{
-		struct _released
-		{
-			static void keyW(qProgram::qData *inData){inData->session.render.scene.findGetModel("player0")->currentAnim = 0;};
-			static void keyS(qProgram::qData *inData){inData->session.render.scene.findGetModel("player0")->currentAnim = 0;};
-		};
-		struct _pressed
-		{
-			static void keyS(qProgram::qData *inData){inData->session.render.scene.findGetModel("player0")->currentAnim = 0;};
-		};
-		struct _down
-		{
-			static void keyW(qProgram::qData *inData)
-		    {
-		    	inData->session.render.scene.findGetModel("player0")->currentAnim = 1;
-		        inData->world.player[0].move();
-		        
-		    };
-		    static void keyS(qProgram::qData *inData)
-		    {
-		    	inData->session.render.scene.findGetModel("player0")->currentAnim = 1;
-		        inData->world.player[0].move(true);
-		    };
-		    static void keyA(qProgram::qData *inData)
-		    {
-		        inData->world.player[0].setRotationY(qMath::round360(inData->world.player[0].getRotation()->y));
-		        inData->world.player[0].rotate();
-		    };
-		    static void keyD(qProgram::qData *inData)
-		    {
-		        inData->world.player[0].setRotationY(qMath::round360(inData->world.player[0].getRotation()->y));
-		        inData->world.player[0].rotate(true);
-	    	};
-		};
-		_down down;
-   		_pressed pressed;
-   		_released released;
-    	public:
-		    _gameplay(qProgram *estado)
-		    {
-		   	    estado->keyboard.setKeyFunc(released.keyW,KEY_W,KEY_EVENT::RELEASED);
-		   	    estado->keyboard.setKeyFunc(released.keyS,KEY_S,KEY_EVENT::RELEASED);
-		   	    estado->keyboard.setKeyFunc(down.keyW,KEY_W,KEY_EVENT::DOWN);
-			    estado->keyboard.setKeyFunc(down.keyS,KEY_S,KEY_EVENT::DOWN);
-			    estado->keyboard.setKeyFunc(down.keyA,KEY_A,KEY_EVENT::DOWN);
-			    estado->keyboard.setKeyFunc(down.keyD,KEY_D,KEY_EVENT::DOWN);
-		    };
-	};
-};
-
-
-void mainLoop (qProgram::qData *inData)
-{
-	inData->session.render.scene.findGetModel("player0")->frame();
+	estado->data.session.render.scene.findGetModel("player0")->frame();
 };
 
 int main(void)
@@ -111,7 +57,7 @@ int main(void)
 	__startup::loadAll(&estado->data.file);
 	__startup::setRenderModels(&estado->data);
 
-	__keyboard::_gameplay *teclado = new __keyboard::_gameplay(estado);
+	estado->keyboard.layout.gameplay.useLayout(estado);
 	
     while (!WindowShouldClose())
         estado->run(&mainLoop);

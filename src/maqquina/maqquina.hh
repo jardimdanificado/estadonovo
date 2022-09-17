@@ -270,6 +270,7 @@ class qProgram
     		                Vector3 *rotation = nullptr;
     		                Color color = WHITE;
     		                bool animated = false;
+    		                float progression = 1;
     		                public:
     		                	int currentFrame = 0;
     		                	int currentAnim = 0;
@@ -280,9 +281,10 @@ class qProgram
     		                    void setColor(Color inColor);
     		                    void setPosition(Vector3 *inPosi);
     		                    void setRotation(Vector3 *inRota);
+    		                    void setFrameProgression(int inProgression);
     		                    void reset();
-    				void updateAnim();
-    				void frame(int inVal = 1);
+    							void updateAnim();
+    							void frame();
     		                    string getName();
     		                    string getType();
     		                    bool getActive();
@@ -329,19 +331,49 @@ class qProgram
         struct qKeyboard
         {
             const int key_id[106] = {0,32,39,44,45,46,47,48,49,50,51,52,53,54,55,56,57,59,61,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,96,256,257,258,259,260,261,262,263,264,265,266,267,268,269,280,281,282,283,284,290,291,292,293,294,295,296,297,298,299,300,301,340,341,342,343,344,345,346,347,348,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336};
+			struct qLayout
+			{
+                class qGameplay
+               	{
+               		struct _released
+               		{
+               			static void keyW(qProgram *estado);
+               			static void keyS(qProgram *estado);
+               		};
+               		struct _pressed
+               		{
+               			static void keyW(qProgram *estado);
+               			static void keyS(qProgram *estado);
+               		};
+               		struct _down
+               		{
+               			static void keyW(qProgram *estado);
+               		    static void keyS(qProgram *estado);
+               		    static void keyA(qProgram *estado);
+               		    static void keyD(qProgram *estado);
+               		};
+               		_down down;
+               		_pressed pressed;
+               		_released released;
+                   	public:
+               		    void useLayout(qProgram *estado);
+               	};
+               	qGameplay gameplay;
+            };
             class qKey
             {
-                void (*keyFunc[3])(qData* inData);
+                void (*keyFunc[3])(qProgram* estado) = {nullptr};
                 public:
                 bool active[3] = {false,false,false};
-                void setFunc(void (*inFunc)(qData* inData),int KeyEvent);
-                void run(qData* inData, int KeyEvent);
+                void setFunc(void (*inFunc)(qProgram* estado),int KeyEvent);
+                void run(qProgram* estado, int KeyEvent);
             };
             qKey key[106];
-            void setKeyFunc(void (*inFunc)(qData* inData),int KeyID,int KeyEvent);
+            qLayout layout;
+            void setKeyFunc(void (*inFunc)(qProgram* estado),int KeyID,int KeyEvent);
         };
         void getKey();
-        void run(void (*inLoop)(qData *inData));
+        void run(void (*inLoop)(qProgram *estado));
         
         qData data;
         qKeyboard keyboard;
