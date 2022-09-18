@@ -35,8 +35,22 @@ enum MAX
     ANIM = 3
 };
 
+namespace BODY
+{
+	enum HUMAN
+	{
+		HEAD,
+		NECK,
+		TORSO,
+		BELLY,
+		LSHOULDER,RSHOULDER,
+		LARM,RARM,
+		LHAND,RHAND,
+		LLEG,RLEG,
+		LFEET,RFEET
+	};
+};
 
-	
 namespace qMath
 {
     float round360(float input);
@@ -53,15 +67,15 @@ namespace qTools
 class qProgram
 {
     public:
-    	struct qData
+    	class qData
     	{
+    		public:
     		//----------------------------------------------------------------------------------
     		// file
     		// file
     		// file
     		// file
     		//----------------------------------------------------------------------------------
-    	
     		struct qFile
     		{
     			//----------------------------------------------------------------------------------
@@ -83,9 +97,10 @@ class qProgram
     		            string getName();
     		            string getType();
     		            BoundingBox *getHitbox();
-    		            void loadFromFile(string path);
+    		            qHitbox* getThis();
     		            void loadFromModel(string path);
     		            void create(string inName = "noname", string inType= "notype",BoundingBox inHitbox = (BoundingBox){{0,0,0},{0,0,0}});
+    		            qHitbox(string inName = "noname", string inType= "notype",BoundingBox inHitbox = (BoundingBox){{0,0,0},{0,0,0}});
     		    };
     		    //----------------------------------------------------------------------------------
     			// model
@@ -115,10 +130,14 @@ class qProgram
     		    qHitbox hitbox[MAX::OBJ];
     		    qFile::qModel* getModel(int index);
     		    qFile::qModel* findGetModel(string inName);
+    		    qFile::qHitbox* getHitbox(int index);
+    		    qFile::qHitbox* findGetHitbox(string inName);
     		    int findModel(string inName);
-    		    void autoLoadModel(string inName, string inType, string path, bool inAnimated = false);
-    		    void autoCreateHitbox(string inName, string inType,BoundingBox inHitbox);
-    		    void autoCreateHitboxFromModel(string inName, string inType, string path, bool inActive = true);
+    		    int findHitbox(string inName);
+    		    qModel* autoLoadModel(string inName, string inType, string path, bool inAnimated = false);
+    		    qHitbox* autoCreateHitbox(string inName, string inType,BoundingBox inHitbox);
+    		    qHitbox*  autoCreateHitboxFromModel(string inName, string inType, string path, bool inActive = true);
+    		    qHitbox*  autoCreateHitboxFromModelPointer(string inName, string inType, qModel* inModel, bool inActive = true);
     		};
     		//----------------------------------------------------------------------------------
     		// qHuman
@@ -127,122 +146,140 @@ class qProgram
     		// qHuman
     		//----------------------------------------------------------------------------------	
     	
-    		struct qWorld
+    		class qWorld
     		{
-    			//----------------------------------------------------------------------------------
-    			// qCreature
-    			// qCreature
-    			// qCreature
-    			//----------------------------------------------------------------------------------
-    			struct qCreature
-    			{
-    				//----------------------------------------------------------------------------------
-    				// qBody
-    				// qBody
-    				//----------------------------------------------------------------------------------
-    				struct qBody
-    				{
-    					//----------------------------------------------------------------------------------
-    					// qPart
-    					//----------------------------------------------------------------------------------
-    					class qPart
-    				   	{
-    						public:
-    							struct iStats//innerStats
-    					   		{
-    					   			string status = "saudavel";
-    					           	float hp = 100;
-    								BoundingBox *hitbox = nullptr;
-    					   		};
-    							iStats stats;
-    				   	};
-    				   	//----------------------------------------------------------------------------------
-    					// qHuman
-    					//----------------------------------------------------------------------------------	
-    				   	struct qHuman
-    				    {
-    				        struct qHead
-    				        {
-    				            BoundingBox *hitbox = nullptr;
-    				            struct qFace
-    				            {
-    				                qPart eye[2];
-    				                qPart nose;
-    				                qPart qEyebrow;
-    				                qPart qHair;
-    				                qPart qBeard;
-    			                    qPart::iStats stats;
-    				            };
-    				            qFace face;
-    				        };
-    				        struct qHand
-    				        {
-    				            struct qFinger
-    				            {
-    			            		qPart::iStats stats;
-    				                qPart nail;
-    				            };
-    				            qFinger finger[5];
-    				            qPart::iStats stats;
-    				        };
-    				        qHead head;
-    			   	        qPart neck;
-    			   	        qPart chest;
-    			   	        qPart belly;
-    			   	        qPart shoulder[2];
-    			   	        qPart arm[2];
-    				        qHand hand[2];
-    				        qPart qUpperLeg[2];
-    						qPart leg[2];
-    				    };
+    			public:
+	    			//----------------------------------------------------------------------------------
+	    			// qCreature
+	    			// qCreature
+	    			// qCreature
+	    			//----------------------------------------------------------------------------------
+	    			class qCreature
+	    			{
+		    			public:
+		    				//----------------------------------------------------------------------------------
+		    				// qBody
+		    				// qBody
+		    				//----------------------------------------------------------------------------------
+		    				struct qBody
+		    				{
+			    					//----------------------------------------------------------------------------------
+			    					// qPart
+			    					//----------------------------------------------------------------------------------
+			    					struct qPart
+			    				   	{
+			   							struct iStats//innerStats
+			   					   		{
+			   					   			string status = "saudavel";
+			   					           	float hp = 100;
+			   					   		};
+			   					   		struct iPointers
+			   					   		{
+			   					   			BoundingBox *hitbox = nullptr;
+			   								qProgram::qData::qFile::qModel *model = nullptr;
+			   					   		};
+			   							iStats stats;
+			   							iPointers pointers;
+			    				   	};
+			    				   	//----------------------------------------------------------------------------------
+			    					// qHuman
+			    					//----------------------------------------------------------------------------------	
+			    				   	class qHuman
+			    				    {
+			    				    	public:
+				    				        struct qHead
+				    				        {
+				    				            struct qFace
+				    				            {
+				    				                qPart eye[2];
+				    				                qPart nose;
+				    				                qPart qEyebrow;
+				    				                qPart qHair;
+				    				                qPart qBeard;
+				    			                    qPart::iStats stats;
+				    				            };
+				    				            qPart::iStats stats;
+				    				            qPart::iPointers pointers;
+				    				            qFace face;
+				    				        };
+				    				        struct qHand
+				    				        {
+				    				            struct qFinger
+				    				            {
+				    			            		qPart::iStats stats;
+				    				                qPart nail;
+				    				            };
+				    				            qFinger finger[5];
+				    				            qPart::iStats stats;
+				    				            qPart::iPointers pointers;
+				    				        };
+				    				        qHead head;
+				    			   	        qPart neck;
+				    			   	        qPart torso;
+				    			   	        qPart belly;
+				    			   	        qPart shoulder[2];
+				    			   	        qPart arm[2];
+				    				        qHand hand[2];
+				    				        qPart leg[2];
+				    						qPart feet[2];
+			    							qHuman(qProgram::qData::qFile *inFile, int inIndex = -1);
+			    				    };
+		    				};
+		    				//----------------------------------------------------------------------------------
+		    				// Creatures
+		    				// Creatures
+		    				//----------------------------------------------------------------------------------
+		    				class qHuman
+		    				{
+		    				    
+		    				    string name = "ninguem";
+		    				    Vector3 position = {0,0,0};
+		    				    Vector3 rotation = {0,0,0};
+		    				    float speed = 0.06;
+		    				   	public:
+									qBody::qHuman* body;
+									void setName(string newName);
+									void setPosition(Vector3 inPosition);
+									void setRotation(Vector3 inRotation);
+									void setRotationY(float inY);
+									string getName();
+									Vector3 *getPosition();
+									Vector3 *getRotation();
+									void move(bool backward = false);
+									void rotate(bool right = false);
+									qHuman(qProgram::qData::qFile *inFile, int inIndex = -1);
+		    				};
+		    				qBody body;
+		    				qHuman *player[MAX::OBJ];
+		    				qCreature(qProgram::qData::qFile *inFile);
     				};
-    				//----------------------------------------------------------------------------------
-    				// Creatures
-    				// Creatures
-    				//----------------------------------------------------------------------------------
-    				class qHuman
-    				{
-    				    qBody::qHuman body;
-    				    string name = "ninguem";
-    				    Vector3 position = {0,0,0};
-    				    Vector3 rotation = {0,0,0};
-    				    float speed = 0.06;
-    				   	public:
-    				       void setName(string newName);
-    				       void setPosition(Vector3 inPosition);
-    				       void setRotation(Vector3 inRotation);
-    				       void setRotationY(float inY);
-    				       string getName();
-    				       Vector3 *getPosition();
-    				       Vector3 *getRotation();
-    				       void move(bool backward = false);//negative values for moving backwards
-    				       void rotate(bool right = false);
-    				};
-    			};
-    			//----------------------------------------------------------------------------------
-    			// Creatures
-    			// Creatures
-    			// Creatures
-    			//----------------------------------------------------------------------------------
-    			class qMap
-    			{
-    			    string name = "nenhum";
-    			    Model *model = nullptr;
-    			    Vector3 position = (Vector3){0,0,0};
-    			    Vector3 rotation = (Vector3){0,0,0};
-    			    public:
-    			        void setName(string newName);
-    			        void setModel(Model *modelPtr);
-    			        void setPosition(Vector3 inPosition);
-    			        void setRotation(Vector3 inRotation);
-    			        string getName();
-    			        Model* getModel();
-    			        Vector3* getPosition();
-    			        Vector3* getRotation();
-    			};
-    			
-    			qMap map;
-    			qCreature::qHuman player[MAX::OBJ];
+	    			//----------------------------------------------------------------------------------
+	    			// MAP
+	    			// MAP
+	    			// MAP
+	    			// MAP
+	    			// MAP
+	    			//----------------------------------------------------------------------------------
+	    			class qMap
+	    			{
+	    			    string name = "nenhum";
+	    			    Model *model = nullptr;
+	    			    Vector3 position = (Vector3){0,0,0};
+	    			    Vector3 rotation = (Vector3){0,0,0};
+	    			    public:
+	    			        void setName(string newName);
+	    			        void setModel(Model *modelPtr);
+	    			        void setPosition(Vector3 inPosition);
+	    			        void setRotation(Vector3 inRotation);
+	    			        string getName();
+	    			        Model* getModel();
+	    			        Vector3* getPosition();
+	    			        Vector3* getRotation();
+	    			};
+	    			
+	    			qMap map;
+	    			qCreature* creature;
+	    			qWorld(qProgram::qData::qFile *inFile);
     		};
     		
     	
@@ -320,12 +357,12 @@ class qProgram
     		        qScene scene;
     		        void renderCurrentScene();
     		    };
-    		    public:
-    		        qRender render;
+   		        qRender render;
     		};
-    	    qWorld world;
+    	    qWorld* world;
     	    qSession session;
     	    qFile file;
+    	    qData();
     	};
     	
         struct qKeyboard
@@ -364,20 +401,21 @@ class qProgram
             {
                 void (*keyFunc[3])(qProgram* estado) = {nullptr};
                 public:
-                bool active[3] = {false,false,false};
-                void setFunc(void (*inFunc)(qProgram* estado),int KeyEvent);
-                void run(qProgram* estado, int KeyEvent);
+	                bool active[3] = {false,false,false};
+	                void setFunc(void (*inFunc)(qProgram* estado),int KeyEvent);
+	                void run(qProgram* estado, int KeyEvent);
             };
             qKey key[106];
             qLayout layout;
             void setKeyFunc(void (*inFunc)(qProgram* estado),int KeyID,int KeyEvent);
+            void getKey(qProgram*estado);
         };
-        void getKey();
-        void run(void (*inLoop)(qProgram *estado));
         
         qData data;
         qKeyboard keyboard;
         qProgram(int inWidth, int inHeight, string inTitle);
+        void run(void (*inLoop)(qProgram *estado));
 };
 
 #endif
+

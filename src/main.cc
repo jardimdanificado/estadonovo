@@ -9,15 +9,15 @@ namespace __startup
 		inFile->autoLoadModel("player-bracodireito","player-hitbox","./assets/models/player/body/bracodireito.iqm",true);
 		inFile->autoLoadModel("player-bracoesquerdo","player-hitbox","./assets/models/player/body/bracoesquerdo.iqm",true);
 		inFile->autoLoadModel("player-cabeca","player-hitbox","./assets/models/player/body/cabeca.iqm",true);
-		inFile->autoLoadModel("player-coxadireita","player-hitbox","./assets/models/player/body/coxadireita.iqm",true);
-		inFile->autoLoadModel("player-coxaesquerda","player-hitbox","./assets/models/player/body/coxaesquerda.iqm",true);
+		inFile->autoLoadModel("player-pernadireita","player-hitbox","./assets/models/player/body/coxadireita.iqm",true);
+		inFile->autoLoadModel("player-pernaesquerda","player-hitbox","./assets/models/player/body/coxaesquerda.iqm",true);
 		inFile->autoLoadModel("player-maodireita","player-hitbox","./assets/models/player/body/maodireita.iqm",true);
 		inFile->autoLoadModel("player-maoesquerda","player-hitbox","./assets/models/player/body/maoesquerda.iqm",true);
 		inFile->autoLoadModel("player-ombrodireito","player-hitbox","./assets/models/player/body/ombrodireito.iqm",true);
 		inFile->autoLoadModel("player-ombroesquerdo","player-hitbox","./assets/models/player/body/ombroesquerdo.iqm",true);
 		inFile->autoLoadModel("player-peitoral","player-hitbox","./assets/models/player/body/peitoral.iqm",true);
-		inFile->autoLoadModel("player-pernadireta","player-hitbox","./assets/models/player/body/pernadireta.iqm",true);
-		inFile->autoLoadModel("player-pernaesquerda","player-hitbox","./assets/models/player/body/pernaesquerda.iqm",true);
+		inFile->autoLoadModel("player-pedireito","player-hitbox","./assets/models/player/body/pernadireta.iqm",true);
+		inFile->autoLoadModel("player-peesquerda","player-hitbox","./assets/models/player/body/pernaesquerda.iqm",true);
 		inFile->autoLoadModel("player-pescoco","player-hitbox","./assets/models/player/body/pescoco.iqm",true);
 	};
 	
@@ -40,9 +40,9 @@ namespace __startup
 		qProgram::qData::qFile::qModel *localplayer = inData->file.findGetModel("player");
 		
 		//add map to render	
-	    inData->session.render.scene.autoCreateModel("mapa","map", localmap0->getModel(), localmap0->getAnim(), true, inData->world.map.getPosition(), inData->world.map.getRotation());
+	    inData->session.render.scene.autoCreateModel("mapa","map", localmap0->getModel(), localmap0->getAnim(), true, inData->world->map.getPosition(), inData->world->map.getRotation());
 		//add player model to render
-	    inData->session.render.scene.autoCreateModel("player0", "player", localplayer->getModel(), localplayer->getAnim(),true , inData->world.player[0].getPosition(), inData->world.player[0].getRotation(), 0, (Color){127,100,0,255});	
+	    inData->session.render.scene.autoCreateModel("player0", "player", localplayer->getModel(), localplayer->getAnim(),true , inData->world->creature->player[0]->getPosition(), inData->world->creature->player[0]->getRotation(), 0, (Color){127,100,0,255});	
 	};
 }
 

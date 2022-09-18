@@ -7,7 +7,20 @@ unsigned int MAX_ANIM = MAX::ANIM;
 
 using _file_ = qProgram::qData::qFile;
 using _render_ = qProgram::qData::qSession::qRender;
-using _game_ = qProgram::qData::qWorld;
+using _world_ = qProgram::qData::qWorld;
+
+//----------------------------------------------------------------------------------
+// MATH & OTHER
+//----------------------------------------------------------------------------------
+
+float qMath::round360(float input)
+{
+    if(input >= 360)
+        input -= 360;
+    else if(input <0)
+        input += 360;
+    return(input);
+}
 
 // Update model animated vertex data (positions and normals) for a given frame
 // NOTE: Updated data is returned as mesh
@@ -105,51 +118,6 @@ Mesh qTools::qMesh::rotateMeshFromAnim(Model model, ModelAnimation anim, int fra
     return(model.meshes[0]);
 }
 
-qProgram::qProgram(int x, int y, string title)
-{
-    //SetConfigFlags(FLAG_MSAA_4X_HINT);  // Enable Multi Sampling Anti Aliasing 4x (if available)
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE); 
-    data.session.render.screen.setMaxX(x);
-    data.session.render.screen.setMaxY(y);
-    InitWindow(x, x, title.c_str());
-    for(int i = 0;i<MAX::OBJ;i++)
-    	data.session.render.scene.hitbox[i] = &data.file.hitbox[i];
-    // Define the camera to look into our 3d world
-    data.session.render.scene.camera = 
-    {
-        (Vector3){ 2.0f, 2.0f, 6.0f },      // position
-        (Vector3){ 0.0f, 0.5f, 0.0f },      // target
-        (Vector3){ 0.0f, 1.0f, 0.0f },      // up
-        45.0f, CAMERA_PERSPECTIVE 
-    };        // fov, type
-    SetCameraMode(data.session.render.scene.camera, CAMERA_FREE);
-};
-void qProgram::run(void(*inLoop)(qProgram *estado))
-{
-    this->data.session.render.frame++;
-    this->data.session.render.frameRatio = round(GetFPS()/60.0);
-    if(data.session.render.frameRatio != 0)
-        if(data.session.render.frame%data.session.render.frameRatio==0)
-        {
-            inLoop(this);
-            getKey();
-        }
-    data.session.render.renderCurrentScene();
-}
-
-//----------------------------------------------------------------------------------
-// qMath
-//----------------------------------------------------------------------------------
-
-float qMath::round360(float input)
-{
-    if(input >= 360)
-        input -= 360;
-    else if(input <0)
-        input += 360;
-    return(input);
-}
-
 //----------------------------------------------------------------------------------
 // qData FILE
 //----------------------------------------------------------------------------------
@@ -169,9 +137,26 @@ int _file_::findModel(string inName)
             return(i);
     return(-1);
 }
-void _file_::autoLoadModel(string inName, string inType,string path,bool inAnimated)
+qProgram::qData::qFile::qHitbox* _file_::findGetHitbox(string inName)
 {
     for(int i = 0;i<MAX::OBJ;i++)
+        if(hitbox[i].getName().compare(inName)==0)
+            return(&hitbox[i]);
+    return(nullptr);
+}
+qProgram::qData::qFile::qHitbox* _file_::getHitbox(int index){return(&hitbox[index]);}
+int _file_::findHitbox(string inName)
+{
+    for(int i = 0;i<MAX::OBJ;i++)
+        if(model[i].getName().compare(inName)==0)
+            return(i);
+    return(-1);
+}
+_file_::qModel* _file_::autoLoadModel(string inName, string inType,string path,bool inAnimated)
+{
+	_file_::qModel* tempM = nullptr;
+    for(int i = 0;i<MAX::OBJ;i++)
+	{
         if(model[i].getName().compare("noname")==0)
         {
             model[i].loadModel(path);
@@ -181,29 +166,59 @@ void _file_::autoLoadModel(string inName, string inType,string path,bool inAnima
             }
             model[i].setName(inName);
             model[i].setType(inType);
+            tempM = &model[i];
             break;
         }
+    }
+	return(tempM);
 }
-void _file_::autoCreateHitbox(string inName, string inType, BoundingBox inHitbox)
+_file_::qHitbox* _file_::autoCreateHitbox(string inName, string inType, BoundingBox inHitbox)
 {
+	_file_::qHitbox* tempH = nullptr;
     for(int i = 0;i<MAX::OBJ;i++)
+    {
         if(hitbox[i].getName().compare("noname")==0)
         {
             hitbox[i].create(inName,inType,inHitbox);
+            tempH = &hitbox[i];
             break;
         }
+    }
+    return(tempH);
 }
-void _file_::autoCreateHitboxFromModel(string inName, string inType, string path, bool inActive)
+
+_file_::qHitbox* _file_::autoCreateHitboxFromModel(string inName, string inType, string path, bool inActive)
 {
+	_file_::qHitbox* tempH = nullptr;
     for(int i = 0;i<MAX::OBJ;i++)
+    {
         if(hitbox[i].getName().compare("noname")==0)
         {
         	hitbox[i].setName(inName);
         	hitbox[i].setType(inType);
             hitbox[i].loadFromModel(path);
             hitbox[i].setActive(inActive);
+			tempH = &hitbox[i];
             break;
         }
+	}
+	return(tempH);
+}
+
+_file_::qHitbox* _file_::autoCreateHitboxFromModelPointer(string inName, string inType, _file_::qModel* inModel, bool inActive)
+{
+	_file_::qHitbox* tempH = nullptr;
+    for(int i = 0;i<MAX::OBJ;i++)
+    {
+        if(hitbox[i].getName().compare("noname")==0)
+        {
+            hitbox[i].create(inName,inType,GetModelBoundingBox(*inModel->getModel()));
+            hitbox[i].setActive(inActive);
+			tempH = &hitbox[i];
+            break;
+        }
+	}
+	return(tempH);
 }
 
 //----------------------------------------------------------------------------------
@@ -232,30 +247,32 @@ void _file_::qHitbox::setName(string newName){name = newName;}
 void _file_::qHitbox::setType(string newType){type = newType;}
 void _file_::qHitbox::setActive(bool inActive){active = inActive;}
 bool _file_::qHitbox::getActive(){return(active);}
-void _file_::qHitbox::loadFromFile(string path)
-{
-    Model localModel;
-    localModel = LoadModel(path.c_str());
-    hitbox = GetModelBoundingBox(localModel);
-    UnloadModel(localModel);
-}
 void _file_::qHitbox::loadFromModel(string path)
 {
 	Model tempModel;
 	tempModel = LoadModel(path.c_str());
 	hitbox = GetModelBoundingBox(tempModel);
 	UnloadModel(tempModel);
+	setActive(true);
 }
 void _file_::qHitbox::create(string inName, string inType, BoundingBox inHitbox)
 {
     name = inName;
     type = inType;
     hitbox = inHitbox;
+    setActive(true);
 }
 string _file_::qHitbox::getName(){return(name);}
 string _file_::qHitbox::getType(){return(type);}
 BoundingBox* _file_::qHitbox::getHitbox(){return(&hitbox);}
-
+_file_::qHitbox* _file_::qHitbox::getThis(){return(this);}
+qProgram::qData::qFile::qHitbox::qHitbox(string inName, string inType, BoundingBox inHitbox)
+{
+    name = inName;
+    type = inType;
+    hitbox = inHitbox;
+    setActive(true);
+};
 //----------------------------------------------------------------------------------
 // qData qSession qRender
 //----------------------------------------------------------------------------------
@@ -272,9 +289,10 @@ void _render_::renderCurrentScene()
             bool doubleCheck = false;//it checks if there are 2 empty slots in sequence, if true it will exit loop
             for(int i = 0;i<MAX::OBJ;i++)
             {
-            	if(scene.hitbox[i]->getActive()==true)
+            	if(scene.hitbox[i]->getName().compare("noname")!=0)
                 {
                 	DrawBoundingBox(*scene.hitbox[i]->getHitbox() , BLACK);
+                	printf("%s x=%f y=%f z=%f\n",scene.hitbox[i]->getName().c_str(),scene.hitbox[i]->getHitbox()->max.x,scene.hitbox[i]->getHitbox()->max.y,scene.hitbox[i]->getHitbox()->max.z);
 				}
                 if(scene.modelSlot[i].getActive()==true)
                 {
@@ -371,14 +389,14 @@ void _render_::qScreen::setMaxY(float input){resolution.y = input;};
 // qData qGame qHuman
 //----------------------------------------------------------------------------------
 
-void _game_::qCreature::qHuman::setName(string newName){name = newName;}
-void _game_::qCreature::qHuman::setPosition(Vector3 newVec3){position = newVec3;}
-void _game_::qCreature::qHuman::setRotation(Vector3 newVec3){position = newVec3;}
-void _game_::qCreature::qHuman::setRotationY(float inY){rotation.y = inY;}
-string _game_::qCreature::qHuman::getName(){return(name);}
-Vector3* _game_::qCreature::qHuman::getPosition(){return &position;}
-Vector3* _game_::qCreature::qHuman::getRotation(){return &rotation;}
-void _game_::qCreature::qHuman::move(bool backwards)
+void _world_::qCreature::qHuman::setName(string newName){name = newName;}
+void _world_::qCreature::qHuman::setPosition(Vector3 newVec3){position = newVec3;}
+void _world_::qCreature::qHuman::setRotation(Vector3 newVec3){position = newVec3;}
+void _world_::qCreature::qHuman::setRotationY(float inY){rotation.y = inY;}
+string _world_::qCreature::qHuman::getName(){return(name);}
+Vector3* _world_::qCreature::qHuman::getPosition(){return &position;}
+Vector3* _world_::qCreature::qHuman::getRotation(){return &rotation;}
+void _world_::qCreature::qHuman::move(bool backwards)
 {
     //z+ frente
     //x+ esquerda
@@ -419,25 +437,45 @@ void _game_::qCreature::qHuman::move(bool backwards)
         break;
     }
 }
-void _game_::qCreature::qHuman::rotate(bool right)
+void _world_::qCreature::qHuman::rotate(bool right)
 {
     if(right == true)
         rotation.y -= 3;
     else
         rotation.y += 3;
 }
+
 //----------------------------------------------------------------------------------
-// qData qGame qMap
+// qData qGame
 //----------------------------------------------------------------------------------
 
-void _game_::qMap::setName(string newName){name = newName;}
-void _game_::qMap::setModel(Model*inModel){model = inModel;}
-string _game_::qMap::getName(){return(name);}
-Model* _game_::qMap::getModel(){return(model);}
-void _game_::qMap::setPosition(Vector3 newVec3){position = newVec3;}
-void _game_::qMap::setRotation(Vector3 newVec3){position = newVec3;}
-Vector3* _game_::qMap::getPosition(){return &position;}
-Vector3* _game_::qMap::getRotation(){return &rotation;}
+void _world_::qMap::setName(string newName){name = newName;}
+void _world_::qMap::setModel(Model*inModel){model = inModel;}
+string _world_::qMap::getName(){return(name);}
+Model* _world_::qMap::getModel(){return(model);}
+void _world_::qMap::setPosition(Vector3 newVec3){position = newVec3;}
+void _world_::qMap::setRotation(Vector3 newVec3){position = newVec3;}
+Vector3* _world_::qMap::getPosition(){return &position;}
+Vector3* _world_::qMap::getRotation(){return &rotation;}
+_world_::qCreature::qBody::qHuman::qHuman(qProgram::qData::qFile *inFile, int inIndex)
+{
+	head.pointers.model = inFile->findGetModel("player-cabeca");
+	neck.pointers.model = inFile->findGetModel("player-pescoco");
+	torso.pointers.model = inFile->findGetModel("player-peitoral");
+	belly.pointers.model = inFile->findGetModel("player-barriga");
+	shoulder[0].pointers.model = inFile->findGetModel("player-ombroesquerdo");
+	shoulder[1].pointers.model = inFile->findGetModel("player-ombrodireito");
+	arm[0].pointers.model = inFile->findGetModel("player-bracoesquerdo");
+	arm[1].pointers.model = inFile->findGetModel("player-bracodireito");
+	hand[1].pointers.model = inFile->findGetModel("player-maodireita");
+	hand[1].pointers.model = inFile->findGetModel("player-maodireita");
+	leg[0].pointers.model = inFile->findGetModel("player-pernaesquerda");
+	leg[1].pointers.model = inFile->findGetModel("player-pernadireita");
+	feet[0].pointers.model = inFile->findGetModel("player-pedireito");
+	feet[1].pointers.model = inFile->findGetModel("player-peesquerdo");
+	
+	head.pointers.hitbox = inFile->autoCreateHitboxFromModelPointer(TextFormat("%s%d",head.pointers.model->getName().c_str(),inIndex),"player-hitbox",head.pointers.model)->getHitbox();
+}
 
 //----------------------------------------------------------------------------------
 // KEYBOARD
@@ -461,29 +499,29 @@ void qProgram::qKeyboard::setKeyFunc(void (*inFunc)(qProgram*estado),int KeyID, 
         }
 }
 void qProgram::qKeyboard::qKey::run(qProgram *estado,int KeyEvent){keyFunc[KeyEvent](estado);}
-void qProgram::getKey()
+void qProgram::qKeyboard::getKey(qProgram*estado)
 {
     for(short int i=0;i<106;i++)
         for(short int k=0;k<3;k++)
-            if(keyboard.key[i].active[k]==true)
+            if(key[i].active[k]==true)
                 switch (k)
                 {
                     case KEY_EVENT::DOWN:
                     {
-                        if(IsKeyDown(keyboard.key_id[i])==true)
-                            keyboard.key[i].run(this,k);
+                        if(IsKeyDown(key_id[i])==true)
+                            key[i].run(estado,k);
                     }
                     break;
                     case KEY_EVENT::PRESSED:
                     {
-                        if(IsKeyPressed(keyboard.key_id[i])==true)
-                            keyboard.key[i].run(this,k);
+                        if(IsKeyPressed(key_id[i])==true)
+                            key[i].run(estado,k);
                     }
                     break;
                     case KEY_EVENT::RELEASED:
                     {
-                        if(IsKeyReleased(keyboard.key_id[i])==true)
-                            keyboard.key[i].run(this,k);
+                        if(IsKeyReleased(key_id[i])==true)
+                            key[i].run(estado,k);
                     }
                     break;
                 }
@@ -515,17 +553,17 @@ void  qProgram::qKeyboard::qLayout::qGameplay::_pressed::keyS(qProgram *estado)
 	localPlayer->currentAnim = 1;
 };
 
-void qProgram::qKeyboard::qLayout::qGameplay::_down::keyW(qProgram *estado){estado->data.world.player[0].move();};
-void qProgram::qKeyboard::qLayout::qGameplay::_down::keyS(qProgram *estado){estado->data.world.player[0].move(true);};
+void qProgram::qKeyboard::qLayout::qGameplay::_down::keyW(qProgram *estado){estado->data.world->creature->player[0]->move();};
+void qProgram::qKeyboard::qLayout::qGameplay::_down::keyS(qProgram *estado){estado->data.world->creature->player[0]->move(true);};
 void qProgram::qKeyboard::qLayout::qGameplay::_down::keyA(qProgram *estado)
 {
-    estado->data.world.player[0].setRotationY(qMath::round360(estado->data.world.player[0].getRotation()->y));
-    estado->data.world.player[0].rotate();
+    estado->data.world->creature->player[0]->setRotationY(qMath::round360(estado->data.world->creature->player[0]->getRotation()->y));
+    estado->data.world->creature->player[0]->rotate();
 };
 void qProgram::qKeyboard::qLayout::qGameplay::_down::keyD(qProgram *estado)
 {
-    estado->data.world.player[0].setRotationY(qMath::round360(estado->data.world.player[0].getRotation()->y));
-    estado->data.world.player[0].rotate(true);
+    estado->data.world->creature->player[0]->setRotationY(qMath::round360(estado->data.world->creature->player[0]->getRotation()->y));
+    estado->data.world->creature->player[0]->rotate(true);
 };
 void qProgram::qKeyboard::qLayout::qGameplay::useLayout(qProgram *estado)
 {
@@ -540,5 +578,63 @@ void qProgram::qKeyboard::qLayout::qGameplay::useLayout(qProgram *estado)
 	estado->keyboard.setKeyFunc(down.keyA,KEY_A,KEY_EVENT::DOWN);
 	estado->keyboard.setKeyFunc(down.keyD,KEY_D,KEY_EVENT::DOWN);
 };
+
+//----------------------------------------------------------------------------------
+// PROGRAM PROGRAM PROGRAM PROGRAM PROGRAM
+// PROGRAM PROGRAM PROGRAM PROGRAM PROGRAM
+// PROGRAM PROGRAM PROGRAM PROGRAM PROGRAM
+// PROGRAM PROGRAM PROGRAM PROGRAM PROGRAM
+// PROGRAM PROGRAM PROGRAM PROGRAM PROGRAM
+//----------------------------------------------------------------------------------
+
+qProgram::qData::qWorld::qCreature::qHuman::qHuman(qProgram::qData::qFile *inFile, int inIndex)
+{
+	body = new qProgram::qData::qWorld::qCreature::qBody::qHuman(inFile, inIndex);
+};
+qProgram::qData::qWorld::qCreature::qCreature(qProgram::qData::qFile *inFile)
+{
+	for(int i = 0; i<MAX::OBJ; i++)
+		player[i] = new qProgram::qData::qWorld::qCreature::qHuman(inFile,i);
+}
+qProgram::qData::qWorld::qWorld(qProgram::qData::qFile *inFile)
+{
+	creature = new qProgram::qData::qWorld::qCreature(inFile);
+};
+qProgram::qData::qData()
+{
+	for(int i = 0;i<MAX::OBJ;i++)
+    	session.render.scene.hitbox[i] = &file.hitbox[i];
+	world = new qProgram::qData::qWorld(&this->file);
+};
+qProgram::qProgram(int x, int y, string title)
+{
+    //SetConfigFlags(FLAG_MSAA_4X_HINT);  // Enable Multi Sampling Anti Aliasing 4x (if available)
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE); 
+    data.session.render.screen.setMaxX(x);
+    data.session.render.screen.setMaxY(y);
+    InitWindow(x, x, title.c_str());
+    // Define the camera to look into our 3d world
+    data.session.render.scene.camera = 
+    {
+        (Vector3){ 2.0f, 2.0f, 6.0f },      // position
+        (Vector3){ 0.0f, 0.5f, 0.0f },      // target
+        (Vector3){ 0.0f, 1.0f, 0.0f },      // up
+        45.0f, CAMERA_PERSPECTIVE 
+    };        // fov, type
+    SetCameraMode(data.session.render.scene.camera, CAMERA_FREE);
+};
+void qProgram::run(void(*inLoop)(qProgram *estado))
+{
+    this->data.session.render.frame++;
+    this->data.session.render.frameRatio = round(GetFPS()/60.0);
+    if(data.session.render.frameRatio != 0)
+        if(data.session.render.frame%data.session.render.frameRatio==0)
+        {
+            inLoop(this);
+            keyboard.getKey(this);
+        }
+    data.session.render.renderCurrentScene();
+}
+
 
 #endif
