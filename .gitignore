@@ -9,4 +9,7 @@ build/android/gxbuild/android/sdk
 build/android/gxbuild/android/ndk
 *.keystore
 *.apk
-
+*.nix
+.replit
+.ccls-cache
+.config

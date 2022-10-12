@@ -2,14 +2,15 @@
 #!/bin/bash
 current_time=$(date "+%Y-%m-%d-%H:%M:%S")
 
-mkdir ../../BUILD/EstadoNovo_$current_time/
+rm -r ./EstadoNovo
+mkdir ./EstadoNovo
 
-clang ../src/estadonovo.c -o ../../BUILD/EstadoNovo_$current_time/estadonovo -lGL -L./libs/linux64/ -l:libraylib.a -lm -lpthread -ldl -lrt -lX11&&chmod +x ../../BUILD/EstadoNovo_$current_time/estadonovo
+gcc ../src/estadonovo.c -o ./EstadoNovo/estadonovo -lGL -L./libs/linux64/ -l:libraylib.a -lm -lpthread -ldl -lrt -lX11&&chmod +x ./EstadoNovo/estadonovo
 
-cp -r ../src/data/ ../../BUILD/EstadoNovo_$current_time/
+cp -r ../src/data/ ./EstadoNovo/
 
-cp ../credits.txt ../../BUILD/EstadoNovo_$current_time/
+cp ../credits.txt ./EstadoNovo/
 
-mkdir ../../BUILD/EstadoNovo_$current_time/src
+mkdir ./EstadoNovo/src
 
 

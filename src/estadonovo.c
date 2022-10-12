@@ -7,7 +7,7 @@ int main(void)
     MQStart(&data);
     
     MQNewPlayer(&data, 0, (Vector3) {-0.0625, 5, 6.0625});
-    
+    printf("aoba");
     //start menu
     MQMenu(&data,0);
     data.session.render.camera.target = (Vector3){data.files.hitboxes[MQFindHitbox(data.files.hitboxes, "player-cabeca0")].hitbox.min.x, data.files.hitboxes[MQFindHitbox(data.files.hitboxes, "player-cabeca0")].hitbox.min.y, data.files.hitboxes[MQFindHitbox(data.files.hitboxes, "player-cabeca0")].hitbox.min.z};
