@@ -7,9 +7,15 @@ build/android/gxbuild/src
 build/android/gxbuild/include
 build/android/gxbuild/android/sdk
 build/android/gxbuild/android/ndk
+build/EstadoNovo
 *.keystore
 *.apk
 *.nix
 .replit
 .ccls-cache
 .config
+.git
+.ccls-cache
+.config
+.breakpoints
+replit_zip_error_log.txt
