@@ -27,6 +27,21 @@ function keyPressed()
 }
 
 //------------------------------------------
+//MOUSE
+//------------------------------------------
+
+function mouseClicked() 
+{
+	
+	for(i = 0; i < list.length; i++)
+		if(Check2DCollision(list[i],{x:mouseX-(width/2)-4,y:mouseY-(height/2)-4,h:8,w:8}))
+		{
+			player = list[i];
+			break;
+		}
+}
+
+//------------------------------------------
 //MAIN
 //------------------------------------------
 
@@ -34,7 +49,10 @@ var player;
 
 function preload()
 {
-	data.image.load("idle",["./data/image/null.png","./data/image/crtbase.png"]);
+	let temp = [];
+	for(i=0;i<10;i++)
+		temp.push("./data/image/test/" + i + ".png")
+	data.image.load("idle",temp);
 	data.image.load("null","./data/image/null.png");
 	data.font[0] = loadFont("data/font/Mockery.ttf");
 }
@@ -62,7 +80,14 @@ function draw()
 {
 	list.action.solveAll();
 	clear(255,255,255,255);
+	//mouse
+	stroke(0, 0, 0);
+	strokeWeight(2);
+	noFill();
+	circle(mouseX-(width/2),mouseY-(height/2),8);
+	
   	noStroke();
+	
   	//fill("red");
 	//rect(player.position.x, player.position.y,sistema.grid.default);
 	for(i=0;i<list.length;i++)
@@ -71,7 +96,8 @@ function draw()
 	}
   	//ellipse(mouseX, mouseY, 25, 25);
 	keyDown();
-	//fill("black");
+	
+	fill("black");
 	textFont(data.font[0]);
 	textSize(40);
 	text("testetesteteste",40,40);

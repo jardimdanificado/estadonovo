@@ -100,9 +100,8 @@ data.font = [];
 
 class Folha
 {
-	
 	name;type;list;data;rendering;
-	collision;// static,push,pull,free(push + pull),none
+	collision;// static,free,none
 	x;y;w;h;speed;
 
 	xywh = function(xx,yy,ww,hh)
@@ -148,7 +147,7 @@ class Folha
 					}
 					else
 						for(i = 0; i < this.list.length;i++)
-							if(this.list[i].collision != "pull" && !input.queue.includes(this.list[i].name) && Check2DCollision(lposi,this.list[i]))
+							if(!input.queue.includes(this.list[i].name) && Check2DCollision(lposi,this.list[i]))
 							{
 								var lspeed = this.list[i].Move({x:input.x/2,y:input.y/2,queue:input.queue});
 								if(lspeed.x != 0 || lspeed.y != 0)
@@ -160,10 +159,11 @@ class Folha
 								else
 									input = {x:0,y:0,queue:input.queue};
 							}
-					input = {x:(lspeed.x/2),y:(lspeed.y/2),queue:input.queue};
 				}
 				else
+				{	
 					input = {x:0,y:0,queue:input.queue};
+				}
 			}
 		if(!collisionFound)
 		{
@@ -176,6 +176,9 @@ class Folha
 	RenderingStartup = function()
 	{
 		this.rendering = [];
+		this.rendering.autoFrame = true;
+		this.rendering.reverse = true;
+		this.rendering.framerate = 24;
 		this.rendering.currentFrame = 0;
 		this.rendering.currentAnimation = "null";
 		var backup = this;
@@ -203,6 +206,14 @@ class Folha
 	render = function()
 	{
 		image(data.image[this.rendering.currentAnimation][this.rendering.currentFrame],this.x, this.y, this.w, this.h);
+
+		if(this.rendering.autoFrame && (frameCount) % ceil(round(frameRate())/this.rendering.framerate) == 0)
+		{
+			if(this.rendering.reverse)
+				this.rendering.previousFrame();
+			else
+				this.rendering.nextFrame();
+		}
 	}
 	
 	constructor(name,type,collision,inlist,indata) 
@@ -228,16 +239,8 @@ class Folha
 		this.name = name;
 		this.type = type;
 		this.collision = collision;
-		if(type === "player" || type === "creature")
-		{
-			this.xywh(0,0,0,0);
-			this.speed = 1;
-		}
-		else
-		{
-			this.xywh(0,0,0,0);
-			this.speed = 0;
-		}
+		this.xywh(0,0,0,0);
+		this.speed = 1;
 		this.list.push(this);
 	}
 }
