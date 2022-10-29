@@ -34,7 +34,7 @@ function mouseClicked()
 {
 	
 	for(i = 0; i < resma.length; i++)
-		if(Check2DCollision(resma[i],{x:mouseX-4,y:mouseY-4,h:8,w:8}))
+		if(Check2DCollision(resma[i].current,{x:mouseX-4,y:mouseY-4,h:8,w:8}))
 		{
 			if(resma[i].playable == true)
 				player = resma[i];
@@ -42,9 +42,10 @@ function mouseClicked()
 				player.text.say("o objeto selecionado nao pode ser controlado",2);
 			return 0;
 		}
+	
 	player.target.x = mouseX-(player.current.w/2);
 	player.target.y = mouseY-(player.current.h/2);
-
+	
 }
 
 //------------------------------------------
@@ -86,42 +87,33 @@ function setup()
 	noCursor();
 }
 
-function calcnMove(input)
-{
-	current = input.current;
-	target = input.target;
-	current.x = round(current.x);
-	current.y = round(current.y);
-	let local = {x:round((current.x - target.x)/(abs(current.x - target.x))),y:round((current.y - target.y)/abs(current.y - target.y))}
 
-	if(!isNaN(local.y))
-		input.Move({x:0,y:ceil(local.y*-1)});
-	if(!isNaN(local.x))
-		input.Move({x:ceil(local.x*-1),y:0});
-}
 
 function draw() 
 {
 	resma.action.solveAll();
 	clear();
-
-  	noStroke();
 	
   	//fill("red");
 	//rect(player.position.x, player.position.y,sistema.grid.default);
 	for(i=0;i<resma.length;i++)
 	{
-		//console.log(current)
+		if(resma[i].current.x !== resma[i].target.x || resma[i].current.y !== resma[i].target.y)
+			line(resma[i].current.x+(resma[i].current.w/2),resma[i].current.y+(resma[i].current.h/2),resma[i].target.x+(resma[i].current.w/2),resma[i].target.y+(resma[i].current.h/2))
 		resma[i].rendering.render();
-		//if(resma[i].target.x != 0 || resma[i].target.y != 0)
-		calcnMove(resma[i]);
 	}
-  	
+	for(i=0;i<resma.length;i++)
+	{
+		resma[i].text.say();
+		//if(resma[i].target.x != 0 || resma[i].target.y != 0)
+		resma[i].toTargetMove();
+	}
+	
 	keyDown();
 	
 	//mouse
 	stroke(0, 0, 0);
-	strokeWeight(2);
+	strokeWeight(0.5);
 	noFill();
 	circle(mouseX,mouseY,8);
 }

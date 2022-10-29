@@ -174,6 +174,20 @@ class Folha
 			this.target.x = xx;
 		}
 	}
+
+	toTargetMove = function()
+	{
+		let current = this.current;
+		let target = this.target;
+		current.x = round(current.x);
+		current.y = round(current.y);
+		let local = {x:round((current.x - target.x)/(abs(current.x - target.x))),y:round((current.y - target.y)/abs(current.y - target.y))}
+	
+		if(!isNaN(local.y))
+			this.Move({x:0,y:ceil(local.y*-1)});
+		if(!isNaN(local.x))
+			this.Move({x:ceil(local.x*-1),y:0});
+	}
 	
 	Move = function(input)
 	{
@@ -268,8 +282,7 @@ class Folha
 					this.previousFrame();
 				else
 					this.nextFrame();
-			}
-			backup.text.say();
+			};
 		}
 	}
 
@@ -299,6 +312,7 @@ class Folha
 			else
 				if(this.framesLeft > 0)
 				{
+					noStroke();
 					fill("black");
 					textFont(this.currentFont);
 					textSize(this.fontSize);
@@ -339,10 +353,10 @@ class Folha
 		this.RenderingStartup();
 
 		//not-playable types check
-		if(dic.unplayable.includes(type))
-			this.playable = false;
-		else
+		if(dic.living.includes(type))
 			this.playable = true;
+		else
+			this.playable = false;
 
 		if(!dic.living.includes(type))
 		{
