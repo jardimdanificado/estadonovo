@@ -1,6 +1,17 @@
 //resma.js is the eutimia's engine
 
 //------------------------------------------
+//DICTIONARY
+//------------------------------------------
+
+var dic = [];
+dic.unplayable = ['wall','object','item','prop','door','furniture','tree','plant','other'];
+dic.static = ['wall','door','tree'];
+dic.free = ['plant','furniture','prop','item','object', ,'other'];
+dic.none = ['appearence','ghost','visual','gas','effect','floor','tile'];
+dic.living = ['player','creature','human'];
+
+//------------------------------------------
 //PRIMITIVES && BASICS
 //------------------------------------------
 
@@ -12,6 +23,36 @@ class Vector2
 	{
 		x = ix;
 		y = iy;
+	}
+}
+
+class Position
+{
+	x;y;w;h;
+	xywh = function(xx,yy,ww,hh)
+	{
+		if(hh)
+			if(typeof hh == 'number')
+				this.h = hh;
+		if(ww)
+			if(typeof ww == 'number')
+				this.w = ww;
+		if(yy)
+			if(typeof yy == 'number')
+			{
+				this.y = yy;
+			}
+		if(typeof xx == 'number')
+		{	
+			this.x = xx;
+		}
+	}
+	constructor(xx,yy,ww,hh)
+	{
+		this.x = xx;
+		this.y = yy;
+		this.w = ww;
+		this.h = hh;
 	}
 }
 
@@ -40,37 +81,37 @@ function Check2DCollision(r1, r2)
 }
 
 //------------------------------------------
-//LIST
+//resma
 //------------------------------------------
 
-var list = [];
-list.action = [];
-list.action.pending = [];
-list.action.delete = function(unwanted)
+var resma = [];
+resma.action = [];
+resma.action.pending = [];
+resma.action.delete = function(unwanted)
 {
 	if(!isNaN(unwanted))
-		unwanted = list.action.pending[unwanted];
-	list.action.pending = list.action.pending.filter(function(item){return item !== unwanted;});
+		unwanted = this.pending[unwanted];
+	this.pending = this.pending.filter(function(item){return item !== unwanted;});
 }
-list.action.new = function(nAct,nData)
+resma.action.new = function(nAct,nData)
 {
-	list.action.pending.push({func:nAct,data:nData});
+	this.pending.push({func:nAct,data:nData});
 	console.log()
 }
-list.action.clear = function()
+resma.action.clear = function()
 {
-	list.action.pending = [];
+	this.pending = [];
 }
-list.action.solve = function(which)
+resma.action.solve = function(which)
 {
-	list.action.pending[which].func();
-	list.action.pending.delete(which);
+	this.pending[which].func();
+	this.pending.delete(which);
 }
-list.action.solveAll = function()
+resma.action.solveAll = function()
 {
-	for(i = 0;i < list.action.pending.length;i++)
-		list.action.pending[i].func();
-	list.action.clear();
+	for(i = 0;i < this.pending.length;i++)
+		this.pending[i].func();
+	this.clear();
 }
 
 //------------------------------------------
@@ -100,23 +141,38 @@ data.font = [];
 
 class Folha
 {
-	name;type;list;data;rendering;
+	name;type;resma;data;rendering;
 	collision;// static,free,none
-	x;y;w;h;speed;
+	current;
+	target;
+	speed;playable;
+	pending;
 
 	xywh = function(xx,yy,ww,hh)
 	{
 		if(hh)
 			if(typeof hh == 'number')
-				this.h = hh;
+			{	
+				this.current.h = hh;
+				this.target.h = hh;
+			}
 		if(ww)
 			if(typeof ww == 'number')
-				this.w = ww;
+			{	
+				this.current.w = ww;
+				this.target.w = ww;
+			}
 		if(yy)
 			if(typeof yy == 'number')
-				this.y = yy;
+			{
+				this.current.y = yy;
+				this.target.y = yy;
+			}
 		if(typeof xx == 'number')
-			this.x = xx;
+		{	
+			this.current.x = xx;
+			this.target.x = xx;
+		}
 	}
 	
 	Move = function(input)
@@ -128,32 +184,32 @@ class Folha
 		
 		let lposi =
 		{
-			x:this.x + input.x,
-			y:this.y + input.y,
-			h:this.h,
-			w:this.w
+			x:this.current.x + input.x,
+			y:this.current.y + input.y,
+			h:this.current.h,
+			w:this.current.w
 		}
-		for(i = 0; i < this.list.length;i++)
-			if (Check2DCollision(lposi,this.list[i]) && !input.queue.includes(this.list[i].name))
+		for(i = 0; i < this.resma.length;i++)
+			if (Check2DCollision(lposi,this.resma[i].current) && !input.queue.includes(this.resma[i].name))
 			{
 				collisionFound = true;
-				if(this.list[i].collision != "static")
+				if(this.resma[i].collision != "static")
 				{
-					if (this.list[i].collision == "none")
+					if (this.resma[i].collision == "none")
 					{
-						this.x += input.x;
-						this.y += input.y;
+						this.current.x += input.x;
+						this.current.y += input.y;
 						input = ({x:input.x,y:input.y,queue:input.queue});
 					}
 					else
-						for(i = 0; i < this.list.length;i++)
-							if(!input.queue.includes(this.list[i].name) && Check2DCollision(lposi,this.list[i]))
+						for(i = 0; i < this.resma.length;i++)
+							if(!input.queue.includes(this.resma[i].name) && Check2DCollision(lposi,this.resma[i].current))
 							{
-								var lspeed = this.list[i].Move({x:input.x/2,y:input.y/2,queue:input.queue});
+								var lspeed = this.resma[i].Move({x:input.x/2,y:input.y/2,queue:input.queue});
 								if(lspeed.x != 0 || lspeed.y != 0)
 								{
-									this.x += lspeed.x/4;
-									this.y += lspeed.y/4;
+									this.current.x += lspeed.x/4;
+									this.current.y += lspeed.y/4;
 									input = lspeed;
 								}
 								else
@@ -167,8 +223,8 @@ class Folha
 			}
 		if(!collisionFound)
 		{
-			this.x += input.x;
-			this.y += input.y;
+			this.current.x += input.x;
+			this.current.y += input.y;
 		}
 		return {x:input.x,y:input.y,queue:input.queue};
 	}
@@ -177,7 +233,7 @@ class Folha
 	{
 		this.rendering = [];
 		this.rendering.autoFrame = true;
-		this.rendering.reverse = true;
+		this.rendering.reverse = false;
 		this.rendering.framerate = 24;
 		this.rendering.currentFrame = 0;
 		this.rendering.currentAnimation = "null";
@@ -201,46 +257,111 @@ class Folha
 			else
 				backup.rendering.currentFrame -= 1;
 		}
+		//rendering function
+		this.rendering.render = function()
+		{
+			image(data.image[this.currentAnimation][this.currentFrame],backup.current.x, backup.current.y, backup.current.w, backup.current.h);
+			
+			if(this.autoFrame && (frameCount) % ceil(round(frameRate())/this.framerate) == 0)
+			{
+				if(this.reverse)
+					this.previousFrame();
+				else
+					this.nextFrame();
+			}
+			backup.text.say();
+		}
 	}
 
-	render = function()
+	TextStartup = function()
 	{
-		image(data.image[this.rendering.currentAnimation][this.rendering.currentFrame],this.x, this.y, this.w, this.h);
-
-		if(this.rendering.autoFrame && (frameCount) % ceil(round(frameRate())/this.rendering.framerate) == 0)
+		this.text = [];
+		this.text.currentFont = data.font[0];
+		this.text.fontSize = 12;
+		this.text.canSay = true;
+		this.text.msg = "";
+		this.text.defaultTime = 2;
+		this.text.framesLeft = 0;
+		var backup = this;
+		this.text.say = function(inputmsg,inputframes)
 		{
-			if(this.rendering.reverse)
-				this.rendering.previousFrame();
+			if(backup.text.canSay == false )
+				return {};
+			else if(inputmsg)
+			{
+				if(!inputframes)
+					this.framesLeft = this.defaultTime * frameRate();
+				else
+					this.framesLeft = inputframes * frameRate();
+				this.msg = inputmsg;
+				return {};
+			}
 			else
-				this.rendering.nextFrame();
+				if(this.framesLeft > 0)
+				{
+					fill("black");
+					textFont(this.currentFont);
+					textSize(this.fontSize);
+					text(this.msg,backup.current.x-(((this.fontSize)*this.msg.length)/8)-1 ,backup.current.y-2);
+					this.framesLeft--;
+					if(this.framesLeft <= 0)
+						this.msg = '';
+				}
 		}
 	}
 	
-	constructor(name,type,collision,inlist,indata) 
+	constructor(name,type,inresma,indata) 
 	{
-		if(inlist)
-			this.list = inlist;
+		//check if custom resma/data provided
+		if(inresma)
+			this.resma = inresma;
 		else
-			this.list = list;
-		
+			this.resma = resma;
 		if(indata)
 			this.data = indata;
 		else
 			this.data = data;
-		
-		this.RenderingStartup();
-		
-		for(let i = 0;i < this.list.length;i++)
-			if(this.list[i].name === name)
+
+		//check if a object with same name exists, 
+		//if it exists constructor will return a empty object
+		for(let i = 0;i < this.resma.length;i++)
+			if(this.resma[i].name === name)
 			{
 				console.log(name + " Already exists.");
 				return {};
 			}
+		this.current = new Position(0,0,0,0);
+		this.target = new Position(0,0,0,0);
+		//starts all text stuff for this folha
+		this.TextStartup();
+		
+		//starts all rendering stuff for this folha
+		this.RenderingStartup();
+
+		//not-playable types check
+		if(dic.unplayable.includes(type))
+			this.playable = false;
+		else
+			this.playable = true;
+
+		if(!dic.living.includes(type))
+		{
+			this.target = this.current; 
+		}
+		
+		//Collision types check
+		if(dic.static.includes(type))
+			this.collision = "static";
+		else if(dic.none.includes(type))
+			this.collision = "none";
+		else
+			this.collision = "free";
+		
 		this.name = name;
 		this.type = type;
-		this.collision = collision;
-		this.xywh(0,0,0,0);
+
+		this.current.xywh(0,0,0,0);
 		this.speed = 1;
-		this.list.push(this);
+		this.resma.push(this);
 	}
 }

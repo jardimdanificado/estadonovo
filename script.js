@@ -5,25 +5,25 @@
 function keyDown()
 {
 	if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) 
-		player.Move({x:(-1)*player.speed,y:0});
+		player.target.x -= player.speed;
 	if (keyIsDown(RIGHT_ARROW)|| keyIsDown(68))
-		player.Move({x:player.speed,y:0});
+		player.target.x += player.speed;
 	if (keyIsDown(DOWN_ARROW) || keyIsDown(83))
-		player.Move({x:0,y:player.speed});
+		player.target.y += player.speed;
 	if (keyIsDown(UP_ARROW)|| keyIsDown(87))
-		player.Move({x:0,y:(-1)*player.speed});
+		player.target.y -= player.speed;
 }
 
 function keyPressed()
 {
 	if (keyCode == 71) 
 	{
-		console.log(list);
+		console.log(resma);
 	}
-	if (keyCode == 190)
+	/*if (keyCode == 190)
 		player.rendering.nextFrame();
 	if (keyCode == 188)
-		player.rendering.previousFrame();
+		player.rendering.previousFrame();*/
 }
 
 //------------------------------------------
@@ -33,12 +33,18 @@ function keyPressed()
 function mouseClicked() 
 {
 	
-	for(i = 0; i < list.length; i++)
-		if(Check2DCollision(list[i],{x:mouseX-(width/2)-4,y:mouseY-(height/2)-4,h:8,w:8}))
+	for(i = 0; i < resma.length; i++)
+		if(Check2DCollision(resma[i],{x:mouseX-4,y:mouseY-4,h:8,w:8}))
 		{
-			player = list[i];
-			break;
+			if(resma[i].playable == true)
+				player = resma[i];
+			else 
+				player.text.say("o objeto selecionado nao pode ser controlado",2);
+			return 0;
 		}
+	player.target.x = mouseX-(player.current.w/2);
+	player.target.y = mouseY-(player.current.h/2);
+
 }
 
 //------------------------------------------
@@ -49,56 +55,73 @@ var player;
 
 function preload()
 {
-	let temp = [];
-	for(i=0;i<10;i++)
+	//let temp = [];
+	/*for(i=0;i<10;i++)
 		temp.push("./data/image/test/" + i + ".png")
-	data.image.load("idle",temp);
+	data.image.load("idle",temp);*/
+	data.image.load("idle","./data/image/null.png")
 	data.image.load("null","./data/image/null.png");
-	data.font[0] = loadFont("data/font/Mockery.ttf");
+	data.font[0] = loadFont("data/font/acentos/KyrillaSansSerif-Bold.ttf");
+	data.font[1] = loadFont("data/font/Mockery.ttf");
 }
 
 function setup() 
 {
-	player = new Folha("jao","player","free");
-	player.xywh(12,14,48,48);
+	player = new Folha("jao","player");
+	player.current.xywh(12,14,48,48);
 	player.rendering.update("idle",0);
+	
 	let temp = [];
 	for(i = 0; i < 20; i++)
 	{	
-		temp[i] = new Folha("box" + i,"box","free");
-		temp[i].xywh(0 + (i*22), 100 ,16,16);
+		temp[i] = new Folha("box" + i,"box");
+		temp[i].current.xywh(14 + (i*22), 100 ,16,16);
 	}
-	let temp4 = new Folha("abc","wall","static");
-	temp4.xywh(440,100,16,16);
+	let temp4 = new Folha("abc","wall");
+	temp4.current.xywh(440,100,16,16);
   	//createCanvas(displayWidth, displayHeight);
-  	createCanvas(windowWidth, windowHeight, WEBGL);
+  	createCanvas(windowWidth, windowHeight, P2D);
 	background(255);
 	frameRate(60);
+	noCursor();
+}
+
+function calcnMove(input)
+{
+	current = input.current;
+	target = input.target;
+	current.x = round(current.x);
+	current.y = round(current.y);
+	let local = {x:round((current.x - target.x)/(abs(current.x - target.x))),y:round((current.y - target.y)/abs(current.y - target.y))}
+
+	if(!isNaN(local.y))
+		input.Move({x:0,y:ceil(local.y*-1)});
+	if(!isNaN(local.x))
+		input.Move({x:ceil(local.x*-1),y:0});
 }
 
 function draw() 
 {
-	list.action.solveAll();
-	clear(255,255,255,255);
-	//mouse
-	stroke(0, 0, 0);
-	strokeWeight(2);
-	noFill();
-	circle(mouseX-(width/2),mouseY-(height/2),8);
-	
+	resma.action.solveAll();
+	clear();
+
   	noStroke();
 	
   	//fill("red");
 	//rect(player.position.x, player.position.y,sistema.grid.default);
-	for(i=0;i<list.length;i++)
+	for(i=0;i<resma.length;i++)
 	{
-		list[i].render();
+		//console.log(current)
+		resma[i].rendering.render();
+		//if(resma[i].target.x != 0 || resma[i].target.y != 0)
+		calcnMove(resma[i]);
 	}
-  	//ellipse(mouseX, mouseY, 25, 25);
+  	
 	keyDown();
 	
-	fill("black");
-	textFont(data.font[0]);
-	textSize(40);
-	text("testetesteteste",40,40);
+	//mouse
+	stroke(0, 0, 0);
+	strokeWeight(2);
+	noFill();
+	circle(mouseX,mouseY,8);
 }
