@@ -15,21 +15,21 @@
 		
 		function keyDown()
 		{
-			//if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) 
-				//player.Move({x:(-1)*player.speed,y:0});
-			//if (keyIsDown(RIGHT_ARROW)|| keyIsDown(68))
-				//player.Move({x:player.speed,y:0});
-			//if (keyIsDown(DOWN_ARROW) || keyIsDown(83))
-				//player.Move({x:0,y:player.speed});
-			//if (keyIsDown(UP_ARROW)|| keyIsDown(87))
-				//player.Move({x:0,y:(-1)*player.speed});
+			if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) 
+				map.position.x--;
+			if (keyIsDown(RIGHT_ARROW)|| keyIsDown(68))
+				map.position.x++;
+			if (keyIsDown(DOWN_ARROW) || keyIsDown(83))
+				map.position.z--;
+			if (keyIsDown(UP_ARROW)|| keyIsDown(87))
+				map.position.z++;
 		}
 		
 		function keyPressed()
 		{
 			if (keyCode == 71) 
 			{
-				//console.log(resma);
+				console.log(sistema);
 			}
 			/*if (keyCode == 190)
 				player.rendering.nextFrame();
@@ -41,8 +41,8 @@
 		//MOUSE
 		//------------------------------------------
 		
-		function mouseClicked() 
-		{
+		//function mouseClicked() 
+		//{
 			
 			//for(i = 0; i < resma.length; i++)
 				//if(Check2DCollision(resma[i],{x:mouseX-4,y:mouseY-4,h:8,w:8}))
@@ -55,8 +55,8 @@
 				//}
 			//player.target.x = mouseX;
 			//player.target.y = mouseY;
-			console.log(sistema)
-		}
+			//console.log(sistema)
+		//}
 		
 		//------------------------------------------
 		//MAIN
@@ -66,7 +66,7 @@
 		var player;
 		var camera;
 		var map;
-		
+		var canvas;
 		function preload()
 		{
 			//let temp = [];
@@ -78,20 +78,23 @@
 			//data.font[0] = loadFont("data/font/acentos/KyrillaSansSerif-Bold.ttf");
 			//data.font[1] = loadFont("data/font/Mockery.ttf");
 			sistema = new Sistema();
-			sistema.file.model.load('assets/models/player/idle/0.obj','player');
+			sistema.file.model.load('assets/models/map/level0/0.obj','map0');
+			sistema.file.image.load('assets/models/map/level0/texture_0.png','map0');
 		}
 		
 		function setup()
 		{
+			//canvas
 			sistema.setup();
 			map = 
 			{
 				name:'mapa0',
 				color:{r:0,g:0,b:0,a:0},
-				position:{x:0,y:0,z:0},
-				rotation:{x:0,y:0,z:0},
-				scale:{x:1,y:1,z:1},
-				model:sistema.file.model['player']
+				position:{x:0,y:10,z:0},
+				rotation:{x:25,y:0,z:0},
+				scale:{x:10,y:10,z:10},
+				model:sistema.file.model['map0'],
+				texture:sistema.file.image['map0']
 			}
 			sistema.render.scene.model.add(map);
 		}
@@ -102,7 +105,7 @@
 		
 		  	noStroke();
 		
-			fill(0,0,0);
+			//fill(0,0,0);
 			//model(player);
 			keyDown();
 

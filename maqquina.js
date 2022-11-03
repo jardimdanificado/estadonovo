@@ -66,7 +66,7 @@ rascunho.file.model.load= function (filepath, iname)
 		this.push(loadModel(filepath));
 };
 rascunho.file.image = [];
-rascunho.file.image.load= function (filepath, iname) {
+rascunho.file.image.load = function (filepath, iname) {
 	if (typeof filepath === 'object') {
 		if (iname) {
 			this[iname] = [];
@@ -94,7 +94,8 @@ rascunho.file.image.load= function (filepath, iname) {
 		}
 	}
 
-	else if (iname) {
+	else if (iname) 
+	{
 		this[iname] = loadImage(filepath);
 		this.push(this[iname]);
 	}
@@ -147,6 +148,11 @@ rascunho.render.scene.model.add = function(ref, imodel)
 	this[ref.name].position = ref.position; 
 	this[ref.name].rotation = ref.rotation;
 	this[ref.name].scale = ref.scale;
+	if(ref.texture)
+	{
+		this[ref.name].texture = ref.texture;
+	}
+		
 	this.push(this[ref.name]);
 }
 rascunho.render.scene.text = [];
@@ -289,12 +295,19 @@ class Sistema
 	file = {...rascunho.file};
 	world = {...rascunho.world};
 	render = {...rascunho.render};
+	canvas;
 	setup = function()
 	{
-		createCanvas(sistema.screen.w, sistema.screen.h, WEBGL);
+		this.canvas = createCanvas(sistema.screen.w, sistema.screen.h, WEBGL);
+		//this applies NEAREST for all images interpolation
+		for(let i=0;i<this.file.image.length;i++)
+			this.canvas.getTexture(this.file.image[i]).setInterpolation(NEAREST, NEAREST);
+		
 		background(255);
 		frameRate(60);
 		noCursor();
+		orbitControl();
+		angleMode(DEGREES);
 		this.render.scene.camera = createCamera();
 		//this.render.scene.camera.setPosition(-8,-14,3);
 		//this.render.scene.camera.lookAt(0, 0, 0);
