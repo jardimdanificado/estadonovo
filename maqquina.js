@@ -210,60 +210,61 @@ rascunho.render.scene.render= function()
 		for(i=0;i<this.model.length;i++)
 			if(this.model[i].active)
 			{
-				push(); // Start a new drawing state
-				fill(this.model[i].color.r,this.model[i].color.g,this.model[i].color.b);
-				translate(this.model[i].position.x, this.model[i].position.y, this.model[i].position.z);
-				scale(this.model[i].scale.x, this.model[i].scale.y, this.model[i].scale.z);
-				rotateX(this.model[i].rotation.x);
-				rotateY(this.model[i].rotation.y);
-				rotateZ(this.model[i].rotation.z);
+				this.gfx.clear(this.background.r,this.background.g,this.background.b,this.background.a);
+				this.gfx.push(); // Start a new drawing state
+				this.gfx.fill(this.model[i].color.r,this.model[i].color.g,this.model[i].color.b);
+				this.gfx.translate(this.model[i].position.x, this.model[i].position.y, this.model[i].position.z);
+				this.gfx.scale(this.model[i].scale.x, this.model[i].scale.y, this.model[i].scale.z);
+				this.gfx.rotateX(this.model[i].rotation.x);
+				this.gfx.rotateY(this.model[i].rotation.y);
+				this.gfx.rotateZ(this.model[i].rotation.z);
 				//strokeWeight(10);
 				if(this.model[i].texture)
-					texture(this.model[i].texture);
-				model(this.model[i]);
+					this.gfx.texture(this.model[i].texture);
+				this.gfx.model(this.model[i]);
 				//console.log(this.model[i])
-				pop();
+				this.gfx.pop();
 			}
 	}
 	if(this.text.length)
 		for(i=0;i<this.text.length;i++)
 			if(this.text[i].active)
 			{
-				push(); // Start a new drawing state
-				fill(this.text[i].color.r,this.text[i].color.g,this.text[i].color.b,this.text[i].color.a);
-				textFont(this.text[i].font);
-				textSize(this.text[i].fontSize);
-				textAlign(CENTER, CENTER);
+				this.gfx.push(); // Start a new drawing state
+				this.gfx.fill(this.text[i].color.r,this.text[i].color.g,this.text[i].color.b,this.text[i].color.a);
+				this.gfx.textFont(this.text[i].font);
+				this.gfx.textSize(this.text[i].fontSize);
+				this.gfx.textAlign(CENTER, CENTER);
 				if(this.text[i].isUI)
 				{
-					text(this.text[i].string, this.text[i].position.x, this.text[i].y);
+					this.gfx.text(this.text[i].string, this.text[i].position.x, this.text[i].y);
 				}
 				else
 				{
-					translate(this.text[i].position.x, this.text[i].position.y, this.text[i].position.z);
-					scale(this.text[i].scale.x, this.text[i].scale.y, this.text[i].scale.z);
-					rotate(this.text[i].rotation.x, this.text[i].rotation.y, this.text[i].rotation.z);
-					text(this.text[i].string);
+					this.gfx.translate(this.text[i].position.x, this.text[i].position.y, this.text[i].position.z);
+					this.gfx.scale(this.text[i].scale.x, this.text[i].scale.y, this.text[i].scale.z);
+					this.gfx.rotate(this.text[i].rotation.x, this.text[i].rotation.y, this.text[i].rotation.z);
+					this.gfx.text(this.text[i].string);
 				}
-				pop();
+				this.gfx.pop();
 			}
 	if(this.image.length)
 		for(i=0;i<this.image.length;i++)
 			if(this.image[i].active)
 			{
-				push(); // Start a new drawing state
+				this.gfx.push(); // Start a new drawing state
 				if(this.text[i].isUI)
 				{
-					image(this.image[i], this.image[i].position.x, this.image[i].position.y, this.image[i].scale.w, this.image[i].scale.h);
+					this.gfx.image(this.image[i], this.image[i].position.x, this.image[i].position.y, this.image[i].scale.w, this.image[i].scale.h);
 				}
 				else
 				{
-					translate(this.image[i].position.x, this.image[i].position.y, this.image[i].position.z);
-					rotate(this.image[i].rotation.x, this.image[i].rotation.y, this.image[i].rotation.z);
-					texture(this.image[i]);
-					plane(this.image[i].scale.w,this.image[i].scale.h);
+					this.gfx.translate(this.image[i].position.x, this.image[i].position.y, this.image[i].position.z);
+					this.gfx.rotate(this.image[i].rotation.x, this.image[i].rotation.y, this.image[i].rotation.z);
+					this.gfx.texture(this.image[i]);
+					this.gfx.plane(this.image[i].scale.w,this.image[i].scale.h);
 				}
-				pop();
+				this.gfx.pop();
 			}
 	if(this.shape.length)
 		for(i=0;i<this.shape.length;i++)
@@ -297,18 +298,25 @@ class Sistema
 	render = {...rascunho.render};
 
 	canvas;
+	gfx;
 	setup = function()
 	{
-		this.canvas = createCanvas(sistema.screen.w, sistema.screen.h, WEBGL);
+		this.canvas = createCanvas(sistema.screen.w, sistema.screen.h, P2D);
+		this.gfx = createGraphics(sistema.screen.w, sistema.screen.h, WEBGL);
+		this.render.scene.gfx = this.gfx;
+		this.render.scene.model.background = this.background;
 		//this applies NEAREST for all images interpolation
-		for(let i=0;i<this.file.image.length;i++)
-			this.canvas.getTexture(this.file.image[i]).setInterpolation(NEAREST, NEAREST);
-		background(255);
-		frameRate(60);
+		//for(let i=0;i<this.file.image.length;i++)
+		//	this.gfx.getTexture(this.file.image[i]).setInterpolation(NEAREST, NEAREST);
+		//perspective(PI / 3.0, sistema.screen.w / sistema.screen.h, 0.001, 1000);
+		//this.gfx.ortho()
+		this.gfx.background(255);
+		this.gfx.frameRate(60);
 		noCursor();
-		orbitControl();
-		angleMode(DEGREES);
-		this.render.scene.camera = createCamera();
+		frameRate(60);
+		this.gfx.orbitControl();
+		this.gfx.angleMode(DEGREES);
+		this.render.scene.camera = this.gfx.createCamera();
 		//this.render.scene.camera.setPosition(-8,-14,3);
 		//this.render.scene.camera.lookAt(0, 0, 0);
 	}

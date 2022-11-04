@@ -84,34 +84,37 @@ function setup()
 		scale:{x:10,y:10,z:10},
 		model:sistema.file.model['map0'],
 		texture:sistema.file.image['map0']
-    
 	}
 	sistema.render.scene.model.add(map);
 }
 
 function draw() 
 {
-	clear();
+	sistema.gfx.clear();
 
-	noStroke();
+	sistema.gfx.noStroke();
 
 	//fill(0,0,0);
 	//model(player);
 	keyDown();
 
 	sistema.render.scene.render();
+	image(sistema.gfx, 0, 0, sistema.screen.w, sistema.screen.h);
 	//translate(0,0,0);
 	//scale(1,1,1);
 	//rotateY(0.5);
 	//rotateZ(0);
 	//rotateX(0);
 	//model(sistema.file.model['player'],10);
-	//mouse
 	
+	//mouse
+	//clear();
 	push();
-	stroke(0, 0, 0);
+	//sistema.UI.background("black")
+	stroke(0,0,0);
 	strokeWeight(1);
 	noFill();
-	circle(mouseX-windowWidth/2-3,mouseY-windowHeight/2-3,6);
+	circle(mouseX,mouseY,6);
 	pop();
+	
 }
