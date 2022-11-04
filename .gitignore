@@ -1,0 +1,9 @@
+*.keystore
+*.apk
+*.a
+*.appimage
+.vscode
+.replit
+replit.nix
+.config
+.git
