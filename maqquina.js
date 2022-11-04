@@ -206,7 +206,7 @@ rascunho.render.scene.render= function()
 	clear(this.background.r,this.background.g,this.background.b,this.background.a);
 	noStroke();
 	if(this.model.length)
-	{	
+	{
 		for(i=0;i<this.model.length;i++)
 			if(this.model[i].active)
 			{
@@ -295,6 +295,7 @@ class Sistema
 	file = {...rascunho.file};
 	world = {...rascunho.world};
 	render = {...rascunho.render};
+
 	canvas;
 	setup = function()
 	{
@@ -302,7 +303,6 @@ class Sistema
 		//this applies NEAREST for all images interpolation
 		for(let i=0;i<this.file.image.length;i++)
 			this.canvas.getTexture(this.file.image[i]).setInterpolation(NEAREST, NEAREST);
-		
 		background(255);
 		frameRate(60);
 		noCursor();
