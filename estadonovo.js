@@ -1,4 +1,18 @@
 //------------------------------------------
+//UTIL
+//------------------------------------------
+
+function range(min, max) 
+{
+	let arr = [];
+	for (var i = min; i < max ; i++) 
+	{
+		arr.push(i+"");
+	}
+  return arr;
+}
+
+//------------------------------------------
 //KEYBOARD
 //------------------------------------------
 
@@ -19,6 +33,30 @@ function keyPressed()
 	if (keyCode == 71) 
 	{
 		console.log(sistema);
+	}
+	else if (keyCode == 83 || keyCode == DOWN_ARROW ) 
+	{
+		player.model = sistema.file.model['player-walk'];
+		player.currentProgression = -1;
+	}
+	else if (keyCode == 87 || keyCode == UP_ARROW )
+	{
+		player.model = sistema.file.model['player-walk'];
+		player.currentProgression = 1;
+	}
+}
+
+function keyReleased()
+{
+	if (
+		keyCode == 83 || 
+		keyCode == 87 ||
+ 		keyCode == UP_ARROW || 
+		keyCode == DOWN_ARROW 
+	   ) 
+	{
+		player.currentFrame = 0;
+		player.model = sistema.file.model['player-idle'];
 	}
 	/*if (keyCode == 190)
 		player.rendering.nextFrame();
@@ -58,25 +96,26 @@ var map;
 var canvas;
 function preload()
 {
-	//let temp = [];
-	/*for(i=0;i<10;i++)
-		temp.push("./data/image/test/" + i + ".png")
-	data.image.load("idle",temp);*/
-	//data.image.load("idle","./data/image/null.png")
-	//data.image.load("null","./data/image/null.png");
-	
 	sistema = new Sistema();
 	sistema.file.font.load("assets/font/acentos/KyrillaSansSerif-Bold.ttf");//sistema.file.font[0] as no name given
 	sistema.file.font.load("assets/font/Mockery.ttf");//sistema.file.font[1] as no name given
 	sistema.file.model.load('assets/models/map/level0/0.obj','map0');//single-file model import example
-	sistema.file.model.load('assets/models/player/idle/1.obj','player-idle');
+	let arrayTemporario = range(1,24);//temp numbers array for animation initialization
 	//multi-file model(ANIMATION) import example
 	sistema.file.model.load
 	({
-		...['1','2','3','4','5','6','7'],
+		...arrayTemporario,
 		name:'player-walk',
 		ext:'.obj',
 		path:'assets/models/player/walk/'
+	});
+	arrayTemporario = range(1,239);
+	sistema.file.model.load
+	({
+		...arrayTemporario,
+		name:'player-idle',
+		ext:'.obj',
+		path:'assets/models/player/idle/'
 	});
 	sistema.file.image.load('assets/models/map/level0/texture_0.png','map0');//single-file image import example
 }
@@ -93,7 +132,7 @@ function setup()
 		position:{x:0,y:0,z:0.5},
 		rotation:{x:180,y:180,z:0},
 		scale:{x:1,y:1,z:1},
-		model:sistema.file.model['player-idle']
+		model:sistema.file.model['player-walk']
 	});
 	
 	player = sistema.world.creature['joao'];
@@ -111,6 +150,7 @@ function setup()
 	
 	sistema.render.scene.model.add(map);
 	sistema.render.scene.model.add(player);
+	
 }
 
 function draw() 

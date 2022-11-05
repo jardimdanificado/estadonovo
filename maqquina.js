@@ -31,11 +31,11 @@ function fileStartup()
    			when importing a animation
 	 		ref must follow this template:
 		 	{
-		...['1','2','3','4','5','6','7'],
-		name:'player-walk',
-		ext:'.obj',
-		path:'assets/models/player/walk/'
-	}
+				...['1','2','3','4','5','6','7'],
+				name:'player-walk',
+				ext:'.obj',
+				path:'assets/models/player/walk/'
+			}
 			*/
 			let lobj = [];
 			let tempn = getLength(filepath);
@@ -62,24 +62,28 @@ function fileStartup()
 	{
 		if (typeof filepath === 'object') 
 		{
-			let lobj = [];
-			if(!iname)
-			{
-				if(filepath.name)
-					iname = filepath.name;
-				else
-				{
-					console.log("cannot create a animation without name, please provide one.");
-					return 0;
-				}
+			/*
+   			when importing a animation
+	 		ref must follow this template:
+		 	{
+				...['1','2','3','4','5','6','7'],
+				name:'player-walk',
+				ext:'.obj',
+				path:'assets/models/player/walk/'
 			}
+			*/
+			let lobj = [];
+			let tempn = getLength(filepath);
+
 			if(!filepath.ext)
 				filepath.ext = '.png';
-			for (k = 1; k < getLength(filepath); k++)
+			
+			for (k = 0; k < tempn; k++)
 			{
-				lobj[iname].push(loadImage(filepath.path + filepath[k] + filepath.ext));
-				this.push(lobj[k-1]);
+				lobj.push(loadImage(filepath.path + filepath[k] + filepath.ext));
+				this.push(lobj[k]);
 			}
+			this[filepath.name] = lobj;
 		}
 		else if (iname) 
 		{
@@ -128,7 +132,6 @@ function worldStartup()
 		}
 		*/
 		
-		
 		if(!ref.age)
 		{
 			ref.age = 18;
@@ -140,16 +143,6 @@ function worldStartup()
 
 		ref.move = function(backwards)
 		{
-			//z+ frente
-			//x+ esquerda
-			/*
-   				float  valorZ, valorX;
-				int giro = rotation / 90;
-				float resto = rotation - (90 * giro);
-				float restodoresto = 90 - resto;
-				valorZ = speed - resto * (speed / 90);
-				valorX = speed - restodoresto * (speed / 90);
-   			*/
 			if(this.rotation.y >= 360)
 				this.rotation.y -= 360;
 			else if(this.rotation.y < 0)
@@ -237,15 +230,19 @@ function renderStartup()
 			texture:sistema.file.image['text name']//TEXTURE IS OPTIONAL
 		}
 		*/
-		this[ref.name] = ref.model;
-		this[ref.name].active = true;
-		this[ref.name].color = ref.color;
-		this[ref.name].position = ref.position; 
-		this[ref.name].rotation = ref.rotation;
-		this[ref.name].scale = ref.scale;
-		if(ref.texture)
-			this[ref.name].texture = ref.texture;
-		this.push(this[ref.name]);
+		if(this[ref.name])
+		{
+			delete this[ref.name];
+		}
+
+		if(ref.model[0])
+		{
+			ref.currentFrame = 0;
+			ref.currentProgression = 1;
+		}
+		ref.active = true;
+		this[ref.name] = ref;
+		this.push(ref);
 	}
 	
 	render.scene.text.add = function(ref)
@@ -317,6 +314,28 @@ function renderStartup()
 		for(i=0;i<this.model.length;i++)
 			if(this.model[i].active)
 			{
+				console.log(this.model[i].currentFrame)
+				//(frameCount) % ceil(round(frameRate())/this.framerate) == 0
+				if(frameCount%ceil(round(frameRate())/24)==0 || this.model[i].currentFrame > this.model[i].model.length)
+				{
+					if(this.model[i].model[0])//IF ANIMATED
+					{
+						//console.log(this.model[i].currentFrame)
+						if(this.model[i].currentFrame + this.model[i].currentProgression > this.model[i].model.length-1)
+						{
+							this.model[i].currentFrame = 0;
+						}
+						else if(this.model[i].currentFrame + this.model[i].currentProgression < 0)
+						{
+							this.model[i].currentFrame = this.model[i].model.length-1;
+						}
+						else
+						{
+							this.model[i].currentFrame += this.model[i].currentProgression;
+						}
+					}
+				}
+				//console.log(modelref)
 				this.gfx.push(); // Start a new drawing state
 				this.gfx.fill(this.model[i].color.r,this.model[i].color.g,this.model[i].color.b,this.model[i].color.a);
 				this.gfx.translate(this.model[i].position.x, this.model[i].position.y, this.model[i].position.z);
@@ -324,11 +343,14 @@ function renderStartup()
 				this.gfx.rotateX(this.model[i].rotation.x);
 				this.gfx.rotateY(this.model[i].rotation.y);
 				this.gfx.rotateZ(this.model[i].rotation.z);
-				//strokeWeight(10);
+				//strokeWeight(1);
 				if(this.model[i].texture)
 					this.gfx.texture(this.model[i].texture);
-				this.gfx.model(this.model[i]);
-				//console.log(this.model[i])
+				if(!this.model[i].model.vertices)//IF ANIMATED
+					this.gfx.model(this.model[i].model[this.model[i].currentFrame]);
+				else 
+					this.gfx.model(this.model[i].model);
+				
 				this.gfx.pop();
 			}
 		//TEXT RENDERING
