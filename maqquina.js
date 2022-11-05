@@ -127,8 +127,75 @@ function worldStartup()
 			texture:sistema.file.image['text name']//TEXTURE IS OPTIONAL
 		}
 		*/
+		
+		
+		if(!ref.age)
+		{
+			ref.age = 18;
+		}
+		if(!ref.speed)
+		{
+			ref.speed = 0.15;
+		}
+
+		ref.move = function(backwards)
+		{
+			//z+ frente
+			//x+ esquerda
+			/*
+   				float  valorZ, valorX;
+				int giro = rotation / 90;
+				float resto = rotation - (90 * giro);
+				float restodoresto = 90 - resto;
+				valorZ = speed - resto * (speed / 90);
+				valorX = speed - restodoresto * (speed / 90);
+   			*/
+			if(this.rotation.y >= 360)
+				this.rotation.y -= 360;
+			else if(this.rotation.y < 0)
+				this.rotation.y += 360;
+			
+			let  valorZ, valorX;
+			let giro = (this.rotation.y / 90);
+			let resto = this.rotation.y - (90 * Math.trunc(giro));
+			let restodoresto = 90 - resto;
+			
+			if(backwards==false)
+			{
+				valorZ = this.speed - resto * (this.speed / 90);
+				valorX = this.speed - (restodoresto * (this.speed / 90));
+			}
+			else
+			{
+				valorZ = (this.speed - resto * (this.speed / 90))*(-1);
+				valorX = (this.speed - (restodoresto * (this.speed / 90)))*(-1);
+			}
+			
+			if(giro>=3)
+			{
+				this.position.x -= valorZ;
+				this.position.z -= valorX;
+			}
+			else if(giro>=2)
+			{
+				this.position.x -= valorX;
+				this.position.z += valorZ;
+			}
+			else if(giro>=1)
+			{
+				this.position.x += valorZ;
+				this.position.z += valorX;
+			}
+			else if(giro<1)
+			{
+				this.position.z -= valorZ;
+				this.position.x += valorX;
+			}
+		}
+		
 		if(ref.name)
 			world.creature[ref.name] = ref;
+		
 		world.push(ref);
 	}
 	
@@ -239,8 +306,10 @@ function renderStartup()
 	
 	render.scene.render = function()
 	{
+		//CAMERA
 		this.camera.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z);
 		this.camera.lookAt(this.camera.target.x, this.camera.target.y, this.camera.target.z);
+		//OTHER
 		clear(this.background.r,this.background.g,this.background.b,this.background.a);
 		this.gfx.clear(this.background.r,this.background.g,this.background.b,this.background.a);
 		noStroke();
@@ -249,7 +318,7 @@ function renderStartup()
 			if(this.model[i].active)
 			{
 				this.gfx.push(); // Start a new drawing state
-				this.gfx.fill(this.model[i].color.r,this.model[i].color.g,this.model[i].color.b);
+				this.gfx.fill(this.model[i].color.r,this.model[i].color.g,this.model[i].color.b,this.model[i].color.a);
 				this.gfx.translate(this.model[i].position.x, this.model[i].position.y, this.model[i].position.z);
 				this.gfx.scale(this.model[i].scale.x, this.model[i].scale.y, this.model[i].scale.z);
 				this.gfx.rotateX(this.model[i].rotation.x);

@@ -4,14 +4,14 @@
 
 function keyDown()
 {
-	if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) 
-		player.position.x -= 0.1;
+	if (keyIsDown(LEFT_ARROW) || keyIsDown(65))
+		player.rotation.y -= 6;
 	if (keyIsDown(RIGHT_ARROW)|| keyIsDown(68))
-		player.position.x += 0.1;
+		player.rotation.y += 6;
 	if (keyIsDown(DOWN_ARROW) || keyIsDown(83))
-		player.position.z += 0.1;
+		player.move(true);
 	if (keyIsDown(UP_ARROW)|| keyIsDown(87))
-		player.position.z -= 0.1;
+		player.move(false);
 }
 
 function keyPressed()
@@ -89,7 +89,7 @@ function setup()
 	sistema.world.creature.new
 	({
 		name:'joao',
-		color:{r:0,g:0,b:0,a:0},
+		color:{r:140,g:100,b:0,a:255},
 		position:{x:0,y:0,z:0.5},
 		rotation:{x:180,y:180,z:0},
 		scale:{x:1,y:1,z:1},
