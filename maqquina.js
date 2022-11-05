@@ -1,64 +1,54 @@
 //------------------------------------------
 //SISTEMA.FILE
 //------------------------------------------
+
+function getLength(input)
+{
+	let tempn=0;
+	while(true)
+	{
+		//console.log(tempn)
+		if(input[tempn])
+			tempn++;
+		else
+			return tempn;
+		
+	}
+}
+
 function fileStartup()
 {
 	let file = [];
 	file.model = [];
 	file.image = [];
 	file.font = [];
-	
-	file.model.getAnimLength = function (folderpath) 
-	{
-		let lfile;
-		let found = false;
-		let index = 0;
-		while (found == false) 
-		{
-			lfile = new File(folderpath + index);
-			if (lfile.exists()) 
-			{
-				index++;
-			}
-	
-			else
-				found = true;
-		}
-		return index;
-	};
+
 	file.model.load= function (filepath, iname) 
 	{
 		if (typeof filepath === 'object') 
 		{
-			if (iname) 
+			/*
+   			when importing a animation
+	 		ref must follow this template:
+		 	{
+		...['1','2','3','4','5','6','7'],
+		name:'player-walk',
+		ext:'.obj',
+		path:'assets/models/player/walk/'
+	}
+			*/
+			let lobj = [];
+			let tempn = getLength(filepath);
+
+			if(!filepath.ext)
+				filepath.ext = '.obj';
+			
+			for (k = 0; k < tempn; k++)
 			{
-				this[iname] = [];
-				for (i = 0; i < filepath.length; i++) 
-				{
-					this[iname] = [];
-					this[iname][filepath[i].split("/")[filepath[i].split("/").length - 1]] = [];
-					for (k = 0; k < this.getAnimLength(filepath[i]); k++) 
-					{
-						this[iname][filepath[i].split("/")[filepath[i].split("/").length - 1]]
-							.push(loadModel(filepath[i] + k + ".obj"));
-					}
-					this.push(this[iname]);
-				}
+				lobj.push(loadModel(filepath.path + filepath[k] + filepath.ext));
+				this.push(lobj[k]);
 			}
-			else 
-			{
-				let lobj = [];
-				for (i = 0; i < filepath.length; i++) 
-				{
-					lobj[filepath[i].split("/")[filepath[i].split("/").length - 1]] = [];
-					for (k = 0; k < this.getAnimLength(filepath[i]); k++) 
-					{
-						lobj[filepath[i].split("/")[filepath[i].split("/").length - 1]]
-							.push(loadModel(filepath[i] + k + ".obj"));
-					}
-				}
-				this.push(lobj);
-			}
+			this[filepath.name] = lobj;
 		}
 		else if (iname) 
 		{
@@ -72,31 +62,23 @@ function fileStartup()
 	{
 		if (typeof filepath === 'object') 
 		{
-			if (iname) 
+			let lobj = [];
+			if(!iname)
 			{
-				this[iname] = [];
-				for (i = 0; i < filepath.length; i++) 
+				if(filepath.name)
+					iname = filepath.name;
+				else
 				{
-					this[iname] = [];
-					this[iname][filepath[i].split("/")[filepath[i].split("/").length - 1]] = [];
-					for (k = 0; k < this.getAnimLength(filepath[i]); k++) 
-					{
-						this[iname][filepath[i].split("/")[filepath[i].split("/").length - 1]]
-							.push(loadModel(filepath[i] + k + ".png"));
-					}
-					this.push(this[iname]);
+					console.log("cannot create a animation without name, please provide one.");
+					return 0;
 				}
 			}
-			else 
+			if(!filepath.ext)
+				filepath.ext = '.png';
+			for (k = 1; k < getLength(filepath); k++)
 			{
-				let lobj = [];
-				for (i = 0; i < filepath.length; i++) 
-				{
-					lobj[filepath[i].split("/")[filepath[i].split("/").length - 1]] = [];
-					for (k = 0; k < this.getAnimLength(filepath[i]); k++) 
-						lobj[filepath[i].split("/")[filepath[i].split("/").length - 1]].push(loadModel(filepath[i] + k + ".png"));
-				}
-				this.push(lobj);
+				lobj[iname].push(loadImage(filepath.path + filepath[k] + filepath.ext));
+				this.push(lobj[k-1]);
 			}
 		}
 		else if (iname) 
@@ -125,13 +107,32 @@ function fileStartup()
 
 function worldStartup()
 {
-	return
-	({
-		creature: [],
-		plant: [],
-		prop: [],
-		item: []
-	});
+	let world = [];
+	world.creature = [];
+	world.plant = [];
+	world.prop = [];
+	world.item = [];
+
+	world.creature.new = function(ref)
+	{
+		/*
+	 	ref must follow this template:
+	 	{
+			name:'this creature name',
+			color:{r:0,g:0,b:0,a:0},
+			position:{x:0,y:10,z:0},
+			rotation:{x:180,y:180,z:0},
+			scale:{x:10,y:10,z:10},
+			model:sistema.file.model['model name'],
+			texture:sistema.file.image['text name']//TEXTURE IS OPTIONAL
+		}
+		*/
+		if(ref.name)
+			world.creature[ref.name] = ref;
+		world.push(ref);
+	}
+	
+	return(world);
 }
 
 //------------------------------------------
@@ -142,7 +143,6 @@ function renderStartup()
 {
 	let render = [];
 	render.scene = [];
-	
 	render.scene.background =
 	{
 		r: 1,
@@ -177,9 +177,7 @@ function renderStartup()
 		this[ref.name].rotation = ref.rotation;
 		this[ref.name].scale = ref.scale;
 		if(ref.texture)
-		{
 			this[ref.name].texture = ref.texture;
-		}
 		this.push(this[ref.name]);
 	}
 	
@@ -242,6 +240,7 @@ function renderStartup()
 	render.scene.render = function()
 	{
 		this.camera.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z);
+		this.camera.lookAt(this.camera.target.x, this.camera.target.y, this.camera.target.z);
 		clear(this.background.r,this.background.g,this.background.b,this.background.a);
 		this.gfx.clear(this.background.r,this.background.g,this.background.b,this.background.a);
 		noStroke();
@@ -305,12 +304,15 @@ class Sistema
 		none: ['appearence','ghost','visual','gas','effect','floor','tile'],
 		living: ['player','creature','human']
 	};
+
 	file = fileStartup();
 	world = worldStartup();
 	render = renderStartup();
+	
+	//canvas
+	canvas;//2D
+	gfx;//3D
 
-	canvas;
-	gfx;
 	setup = function()
 	{
 		this.canvas = createCanvas(sistema.screen.w, sistema.screen.h, P2D);//MAIN RENDERER USED FOR UI
@@ -328,8 +330,9 @@ class Sistema
 		this.gfx.angleMode(DEGREES);//set 3D renderer to use DEGREES instead RAD
 		angleMode(DEGREES);
 		this.render.scene.camera = this.gfx.createCamera();//create scene camera
-		this.render.scene.camera.position = {x:0,y:0,z:0};//create scene camera position
-		this.gfx.textureWrap(MIRROR,MIRROR);
+		this.render.scene.camera.position = {x:3,y:-10,z:10};//create scene camera position
+		this.render.scene.camera.target = {x:0,y:0,z:0};//where the camera will look at
+		this.gfx.textureWrap(CLAMP,CLAMP);
 		//this.render.scene.camera.setPosition(-8,-14,3);
 		//this.render.scene.camera.lookAt(0, 0, 0);
 	}
