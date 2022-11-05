@@ -5,13 +5,13 @@
 function keyDown()
 {
 	if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) 
-		map.position.x--;
+		sistema.render.scene.camera.position.x--;
 	if (keyIsDown(RIGHT_ARROW)|| keyIsDown(68))
-		map.position.x++;
+		sistema.render.scene.camera.position.x++;
 	if (keyIsDown(DOWN_ARROW) || keyIsDown(83))
-		map.position.z--;
+		sistema.render.scene.camera.position.z++;
 	if (keyIsDown(UP_ARROW)|| keyIsDown(87))
-		map.position.z++;
+		sistema.render.scene.camera.position.z--;
 }
 
 function keyPressed()
@@ -91,26 +91,15 @@ function setup()
 function draw() 
 {
 	sistema.gfx.clear();
-
 	sistema.gfx.noStroke();
-
-	//fill(0,0,0);
-	//model(player);
 	keyDown();
 
+	
 	sistema.render.scene.render();
 	image(sistema.gfx, 0, 0, sistema.screen.w, sistema.screen.h);
-	//translate(0,0,0);
-	//scale(1,1,1);
-	//rotateY(0.5);
-	//rotateZ(0);
-	//rotateX(0);
-	//model(sistema.file.model['player'],10);
 	
 	//mouse
-	//clear();
 	push();
-	//sistema.UI.background("black")
 	stroke(0,0,0);
 	strokeWeight(1);
 	noFill();
