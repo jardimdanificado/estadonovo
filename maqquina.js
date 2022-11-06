@@ -241,21 +241,24 @@ function renderStartup()
 		}
 		ref.active = true;
 
-		ref.getHitbox = function()
+		if(ref.hitbox)
 		{
-			if(!ref.model[0])
-				return(GetMeshBoundingBox(ref.model));
-			else
-				return(GetMeshBoundingBox(ref.model[ref.currentFrame]))
+			ref.getHitbox = function()
+			{
+				if(!ref.model[0])
+					return(GetMeshBoundingBox(ref.model));
+				else
+					return(GetMeshBoundingBox(ref.model[ref.currentFrame]))
+			}
+			ref.hitboxUpdate = function()
+			{
+				if(!this.hitbox.d)
+					this.hitbox = CreateHitbox({position:this.position,w:this.hitbox.w,h:this.hitbox.h,position:this.position});
+				else
+					this.hitbox = CreateHitbox({position:this.position,w:this.hitbox.w,h:this.hitbox.h,d:this.hitbox.d,position:this.position});
+			}
+			ref.hitboxUpdate();
 		}
-		ref.hitboxUpdate = function()
-		{
-			this.hitbox = this.getHitbox();
-			this.hitbox.min = RotateVerticeSelf(deg2rad(ref.rotation.y),this.hitbox.min);
-			this.hitbox.max = RotateVerticeSelf(deg2rad(ref.rotation.y),this.hitbox.max);
-		}
-		ref.hitboxUpdate();
-		
 		this[ref.name] = ref;
 		this.push(ref);
 	}
@@ -316,10 +319,16 @@ function renderStartup()
 	render.scene.drawHitbox = function(i) 
 	{
 		this.gfx.push();
-		this.gfx.fill(0,255,0,10);
-		this.gfx.translate(this.model[i].position.x,this.model[i].position.y-((this.model[i].hitbox.max.y - this.model[i].hitbox.min.y)/2),this.model[i].position.z);
-		this.gfx.box(this.model[i].hitbox.max.x - this.model[i].hitbox.min.x,this.model[i].hitbox.max.y - this.model[i].hitbox.min.y,this.model[i].hitbox.max.x - this.model[i].hitbox.min.z);
+		let temphb = CreateHitbox(this.model[i].hitbox);
+		if(CheckCollisionBoxes(temphb,{min:{x:-2,y:-2,z:-2},max:{x:2,y:2,z:2}}))
+			this.gfx.fill(255,0,0,100);
+		else
+			this.gfx.fill(0,255,0,100);
+		
+		this.gfx.translate(this.model[i].position.x,this.model[i].position.y-(this.model[i].hitbox.h/2),this.model[i].position.z);
+		this.gfx.box(this.model[i].hitbox.w,this.model[i].hitbox.h,this.model[i].hitbox.w);
 		this.gfx.pop();
+		this.gfx.box(4,4,4);
 	}
 	
 	render.scene.render = function()
@@ -375,8 +384,8 @@ function renderStartup()
 
 				if(this.model[i].name === 'joao')
 				{
-					this.model[i].hitboxUpdate();
 					this.drawHitbox(i);
+					this.model[i].hitboxUpdate();
 				}
 					
 			}

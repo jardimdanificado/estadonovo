@@ -16,6 +16,15 @@ function RotateVerticeSelf( angle, vertice)
     return NewVertice;
 }
 
+function RotateVertice(pivot, angle, vertice)
+{
+    NewVertice = {};
+    NewVertice.y = vertice.y;
+    NewVertice.x = ((vertice.x - pivot.x) * cos(angle)) - ((vertice.z - pivot.z) * sin(angle)) + pivot.x;
+    NewVertice.z = ((vertice.x - pivot.x) * sin(angle)) + ((vertice.z - pivot.z) * cos(angle)) + pivot.z;
+    return NewVertice;
+}
+
 function range(min, max) 
 {
 	let arr = [];
@@ -24,6 +33,46 @@ function range(min, max)
 		arr.push(i+"");
 	}
   return arr;
+}
+
+function Vector3Add(vec1,vec2)
+{
+	if(typeof vec2 === 'object')
+		return({x:vec1.x+vec2.x,y:vec1.y+vec2.y,z:vec1.z+vec2.z});
+	else
+		return({x:vec1.x+vec2,y:vec1.y+vec2,z:vec1.z+vec2});
+}
+
+function Vector3Sub(vec1,vec2)
+{
+	if(typeof vec2 === 'object')
+		return({x:vec1.x-vec2.x,y:vec1.y-vec2.y,z:vec1.z-vec2.z});
+	else
+		return({x:vec1.x-vec2,y:vec1.y-vec2,z:vec1.z-vec2});
+}
+
+function Vector3Div(vec1,vec2)
+{
+	if(typeof vec2 === 'object')
+		return({x:vec1.x/vec2.x,y:vec1.y/vec2.y,z:vec1.z/vec2.z});
+	else
+		return({x:vec1.x/vec2,y:vec1.y/vec2,z:vec1.z/vec2});
+}
+
+function Vector3Mul(vec1,vec2)
+{
+	if(typeof vec2 === 'object')
+		return({x:vec1.x*vec2.x,y:vec1.y*vec2.y,z:vec1.z*vec2.z});
+	else
+		return({x:vec1.x*vec2,y:vec1.y*vec2,z:vec1.z*vec2});
+}
+
+function Vector3Mod(vec1,vec2)
+{
+	if(typeof vec2 === 'object')
+		return({x:vec1.x%vec2.x,y:vec1.y%vec2.y,z:vec1.z%vec2.z});
+	else
+		return({x:vec1.x%vec2,y:vec1.y%vec2,z:vec1.z%vec2});
 }
 
 function Vector3Min(v1, v2)
@@ -75,19 +124,79 @@ function GetMeshBoundingBox(mesh)
     return box;
 }
 
-function CheckCollisionBoxes(box1, box2)
+function CreateHitbox(input)
+{
+	//console.log(input)
+	let lhb = {min:{x:0,y:0,z:0},max:{x:0,y:0,z:0}};
+	lhb.w = input.w;
+	lhb.h = input.h;
+	lhb.position = input.position;
+	if(input.d)
+		lhb.d = input.d;
+	if(input.h && input.w)
+	{
+		lhb.min.x = input.position.x - (input.w/2);
+		lhb.max.x = input.position.x + (input.w/2);
+		lhb.min.y = input.position.y;
+		lhb.max.y = input.position.y - input.h;
+		if(input.d)
+		{
+			lhb.min.z = input.position.z - (input.d/2);
+			lhb.max.z = input.position.z + (input.d/2);
+		}
+		else
+		{
+			lhb.min.z = input.position.z - (input.w/2);
+			lhb.max.z = input.position.z + (input.w/2);
+		}
+	}
+	return(lhb);
+}
+
+function isPointInsideAABB(point, box) 
+{
+	let result = 
+	(
+		point.x >= box.min.x &&
+		point.x <= box.max.x &&
+		point.y >= box.min.y &&
+		point.y <= box.max.y &&
+		point.z >= box.min.z &&
+		point.z <= box.max.z
+	);
+	return(result);
+}
+
+function CheckCollisionBoxes(a, b) 
+{
+	let result =
+	(
+    	a.min.x <= b.max.x &&
+	    a.max.x >= b.min.x &&
+	    a.min.y <= b.max.y &&
+	    a.max.y >= b.min.y &&
+	    a.min.z <= b.max.z &&
+	    a.max.z >= b.min.z
+  	);
+	return(result);
+}
+
+
+
+/*function CheckCollisionBoxes(box1, box2)
 {
     let collision = true;
-
-    if ((box1.max.x >= box2.min.x) && (box1.min.x <= box2.max.x))
+	//console.log(box1,box2);
+    if (box1.max.x >= box2.min.x && box1.min.x <= box2.max.x)
     {
-        if ((box1.max.y < box2.min.y) || (box1.min.y > box2.max.y)) collision = false;
-        if ((box1.max.z < box2.min.z) || (box1.min.z > box2.max.z)) collision = false;
+        if (box1.max.y <= box2.min.y || box1.min.y >= box2.max.y) collision = false;
+        if (box1.max.z <= box2.min.z || box1.min.z >= box2.max.z) collision = false;
     }
+		
     else collision = false;
-
+	//print(collision)
     return collision;
-}
+}*/
 
 //------------------------------------------
 //KEYBOARD
@@ -214,7 +323,8 @@ function setup()
 		position:{x:0,y:0,z:0.5},
 		rotation:{x:180,y:180,z:0},
 		scale:{x:1,y:1,z:1},
-		model:sistema.file.model['player-idle']
+		model:sistema.file.model['player-idle'],
+		hitbox:{w:0.8,h:2}
 	});
 	
 	player = sistema.world.creature['joao'];
