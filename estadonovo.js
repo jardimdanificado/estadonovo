@@ -30,19 +30,27 @@ function keyDown()
 
 function keyPressed()
 {
-	if (keyCode == 71) 
+	if (keyCode == 71)//G
 	{
 		console.log(sistema);
 	}
-	else if (keyCode == 83 || keyCode == DOWN_ARROW ) 
+	else if	(keyCode == 119)//F8
+	{
+		console.log(frameRate());
+	}
+	else if (keyCode == 83 || keyCode == DOWN_ARROW ) //S
 	{
 		player.model = sistema.file.model['player-walk'];
 		player.currentProgression = -1;
+		if(frameCount%10)
+			sistema.render.scene.camera.update();
 	}
-	else if (keyCode == 87 || keyCode == UP_ARROW )
+	else if (keyCode == 87 || keyCode == UP_ARROW ) //W
 	{
 		player.model = sistema.file.model['player-walk'];
 		player.currentProgression = 1;
+		if(frameCount%10)
+			sistema.render.scene.camera.update();
 	}
 }
 
@@ -55,7 +63,6 @@ function keyReleased()
 		keyCode == DOWN_ARROW 
 	   ) 
 	{
-		player.currentFrame = 0;
 		player.model = sistema.file.model['player-idle'];
 	}
 	/*if (keyCode == 190)
@@ -82,7 +89,6 @@ function keyReleased()
 		//}
 	//player.target.x = mouseX;
 	//player.target.y = mouseY;
-	//console.log(sistema)
 //}
 
 //------------------------------------------
@@ -125,6 +131,10 @@ function setup()
 	//canvas
 	
 	sistema.setup();
+
+	delete sistema.setup();
+	//delete sistema._cameraSetup();
+	
 	sistema.world.creature.new
 	({
 		name:'joao',
@@ -132,7 +142,7 @@ function setup()
 		position:{x:0,y:0,z:0.5},
 		rotation:{x:180,y:180,z:0},
 		scale:{x:1,y:1,z:1},
-		model:sistema.file.model['player-walk']
+		model:sistema.file.model['player-idle']
 	});
 	
 	player = sistema.world.creature['joao'];
@@ -147,10 +157,8 @@ function setup()
 		model:sistema.file.model['map0'],
 		texture:sistema.file.image['map0']
 	}
-	
 	sistema.render.scene.model.add(map);
 	sistema.render.scene.model.add(player);
-	
 }
 
 function draw() 
@@ -158,7 +166,6 @@ function draw()
 	sistema.gfx.clear();
 	sistema.gfx.noStroke();
 	keyDown();
-
 	
 	sistema.render.scene.render();
 	image(sistema.gfx, 0, 0, sistema.screen.w, sistema.screen.h);
@@ -170,4 +177,5 @@ function draw()
 	noFill();
 	circle(mouseX,mouseY,6);
 	pop();
+	
 }

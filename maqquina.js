@@ -7,7 +7,6 @@ function getLength(input)
 	let tempn=0;
 	while(true)
 	{
-		//console.log(tempn)
 		if(input[tempn])
 			tempn++;
 		else
@@ -138,7 +137,7 @@ function worldStartup()
 		}
 		if(!ref.speed)
 		{
-			ref.speed = 0.15;
+			ref.speed = 0.08;
 		}
 
 		ref.move = function(backwards)
@@ -274,11 +273,8 @@ function renderStartup()
 			image:sistema.file.image['image name']
 		}
 		*/
-		this[ref.name] = ref.image;
+		this[ref.name] = ref;
 		this[ref.name].active = true;
-		this[ref.name].position = ref.position; 
-		this[ref.name].rotation = ref.rotation;
-		this[ref.name].scale = ref.scale;
 		this.push(this[ref.name]);
 	}
 	
@@ -304,23 +300,25 @@ function renderStartup()
 	render.scene.render = function()
 	{
 		//CAMERA
-		this.camera.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z);
-		this.camera.lookAt(this.camera.target.x, this.camera.target.y, this.camera.target.z);
+		//this.camera.setPosition(this.camera.position.x, this.camera.position.y, this.camera.position.z);
+ 		if(frameCount%2000)//this just runs each 33 seconds
+		{
+			clear(this.background.r,this.background.g,this.background.b,this.background.a);
+			this.gfx.clear(this.background.r,this.background.g,this.background.b,this.background.a);
+			this.camera.update();
+		}
 		//OTHER
-		clear(this.background.r,this.background.g,this.background.b,this.background.a);
-		this.gfx.clear(this.background.r,this.background.g,this.background.b,this.background.a);
-		noStroke();
+		//clear(this.background.r,this.background.g,this.background.b,this.background.a);
+		//this.gfx.clear(this.background.r,this.background.g,this.background.b,this.background.a);
+		//noStroke();
 		//MODEL RENDERING
 		for(i=0;i<this.model.length;i++)
 			if(this.model[i].active)
 			{
-				console.log(this.model[i].currentFrame)
-				//(frameCount) % ceil(round(frameRate())/this.framerate) == 0
-				if(frameCount%ceil(round(frameRate())/24)==0 || this.model[i].currentFrame > this.model[i].model.length)
+				if(frameCount%floor(60/24)==0 || this.model[i].currentFrame > this.model[i].model.length)
 				{
 					if(this.model[i].model[0])//IF ANIMATED
 					{
-						//console.log(this.model[i].currentFrame)
 						if(this.model[i].currentFrame + this.model[i].currentProgression > this.model[i].model.length-1)
 						{
 							this.model[i].currentFrame = 0;
@@ -335,7 +333,6 @@ function renderStartup()
 						}
 					}
 				}
-				//console.log(modelref)
 				this.gfx.push(); // Start a new drawing state
 				this.gfx.fill(this.model[i].color.r,this.model[i].color.g,this.model[i].color.b,this.model[i].color.a);
 				this.gfx.translate(this.model[i].position.x, this.model[i].position.y, this.model[i].position.z);
@@ -368,7 +365,7 @@ function renderStartup()
 		//IMAGE RENDERING
 		for(i=0;i<this.image.length;i++)
 			if(this.image[i].active)
-				image(this.image[i], this.image[i].position.x, this.image[i].position.y, this.image[i].scale.w, this.image[i].scale.h);
+				image(this.image[i].image, this.image[i].position.x, this.image[i].position.y, this.image[i].scale.w, this.image[i].scale.h);
 		//SHAPE RENDERING
 		for(i=0;i<this.shape.length;i++)
 			if(this.shape[i].active)
@@ -379,6 +376,8 @@ function renderStartup()
 	}
 	return render;
 }
+
+
 //------------------------------------------
 //SISTEMA
 //------------------------------------------
@@ -404,6 +403,11 @@ class Sistema
 	canvas;//2D
 	gfx;//3D
 
+	_cameraSetup = function()
+	{
+		
+	}
+	
 	setup = function()
 	{
 		this.canvas = createCanvas(sistema.screen.w, sistema.screen.h, P2D);//MAIN RENDERER USED FOR UI
@@ -411,21 +415,32 @@ class Sistema
 		this.render.scene.gfx = this.gfx;//reference to render be able to use 3D renderer
 		this.render.scene.model.background = this.background;//scene background color
 		//this applies NEAREST for all loaded images interpolation
+		this.gfx.noSmooth();
 		for(let i=0;i<this.file.image.length;i++)
 			this.gfx._renderer.getTexture(this.file.image[i]).setInterpolation(NEAREST, NEAREST);
 		this.gfx.perspective(PI / 3.0, sistema.screen.w / sistema.screen.h, 0.001, 1000);
 		this.gfx.background(this.render.scene.background.r,this.render.scene.background.g,this.render.scene.background.b,this.render.scene.background.a);//this sets the 3D scene background color
 		this.gfx.frameRate(60);//3D renderer framerate
+		//noSmooth();
+		
 		noCursor();//disable cursor in main renderer
 		frameRate(60);//main renderer framerate
 		this.gfx.angleMode(DEGREES);//set 3D renderer to use DEGREES instead RAD
 		angleMode(DEGREES);
 		this.render.scene.camera = this.gfx.createCamera();//create scene camera
 		this.render.scene.camera.position = {x:3,y:-10,z:10};//create scene camera position
+		this.render.scene.camera.setPosition(this.render.scene.camera.position.x, this.render.scene.camera.position.y, this.render.scene.camera.position.z);
 		this.render.scene.camera.target = {x:0,y:0,z:0};//where the camera will look at
-		this.gfx.textureWrap(CLAMP,CLAMP);
+		this.render.scene.camera.update = function()
+		{
+			this.lookAt(this.target.x,this.target.y,this.target.z);
+		}
+		this.render.scene.camera.update();
+		this.gfx.textureWrap(CLAMP,CLAMP);		
 		//this.render.scene.camera.setPosition(-8,-14,3);
 		//this.render.scene.camera.lookAt(0, 0, 0);
+		
+
 	}
 	constructor()
 	{
