@@ -240,6 +240,22 @@ function renderStartup()
 			ref.currentProgression = 1;
 		}
 		ref.active = true;
+
+		ref.getHitbox = function()
+		{
+			if(!ref.model[0])
+				return(GetMeshBoundingBox(ref.model));
+			else
+				return(GetMeshBoundingBox(ref.model[ref.currentFrame]))
+		}
+		ref.hitboxUpdate = function()
+		{
+			this.hitbox = this.getHitbox();
+			this.hitbox.min = RotateVerticeSelf(deg2rad(ref.rotation.y),this.hitbox.min);
+			this.hitbox.max = RotateVerticeSelf(deg2rad(ref.rotation.y),this.hitbox.max);
+		}
+		ref.hitboxUpdate();
+		
 		this[ref.name] = ref;
 		this.push(ref);
 	}
@@ -296,6 +312,15 @@ function renderStartup()
 		this[ref.name].shape = ref.shape;
 		this.push(this[ref.name]);
 	}
+
+	render.scene.drawHitbox = function(i) 
+	{
+		this.gfx.push();
+		this.gfx.fill(0,255,0,10);
+		this.gfx.translate(this.model[i].position.x,this.model[i].position.y-((this.model[i].hitbox.max.y - this.model[i].hitbox.min.y)/2),this.model[i].position.z);
+		this.gfx.box(this.model[i].hitbox.max.x - this.model[i].hitbox.min.x,this.model[i].hitbox.max.y - this.model[i].hitbox.min.y,this.model[i].hitbox.max.x - this.model[i].hitbox.min.z);
+		this.gfx.pop();
+	}
 	
 	render.scene.render = function()
 	{
@@ -307,10 +332,6 @@ function renderStartup()
 			this.gfx.clear(this.background.r,this.background.g,this.background.b,this.background.a);
 			this.camera.update();
 		}
-		//OTHER
-		//clear(this.background.r,this.background.g,this.background.b,this.background.a);
-		//this.gfx.clear(this.background.r,this.background.g,this.background.b,this.background.a);
-		//noStroke();
 		//MODEL RENDERING
 		for(i=0;i<this.model.length;i++)
 			if(this.model[i].active)
@@ -333,8 +354,8 @@ function renderStartup()
 						}
 					}
 				}
+				
 				this.gfx.push(); // Start a new drawing state
-				this.gfx.fill(this.model[i].color.r,this.model[i].color.g,this.model[i].color.b,this.model[i].color.a);
 				this.gfx.translate(this.model[i].position.x, this.model[i].position.y, this.model[i].position.z);
 				this.gfx.scale(this.model[i].scale.x, this.model[i].scale.y, this.model[i].scale.z);
 				this.gfx.rotateX(this.model[i].rotation.x);
@@ -343,12 +364,21 @@ function renderStartup()
 				//strokeWeight(1);
 				if(this.model[i].texture)
 					this.gfx.texture(this.model[i].texture);
+				else
+					this.gfx.fill(this.model[i].color.r,this.model[i].color.g,this.model[i].color.b,this.model[i].color.a);
+				
 				if(!this.model[i].model.vertices)//IF ANIMATED
 					this.gfx.model(this.model[i].model[this.model[i].currentFrame]);
 				else 
 					this.gfx.model(this.model[i].model);
-				
 				this.gfx.pop();
+
+				if(this.model[i].name === 'joao')
+				{
+					this.model[i].hitboxUpdate();
+					this.drawHitbox(i);
+				}
+					
 			}
 		//TEXT RENDERING
 		for(i=0;i<this.text.length;i++)
@@ -402,11 +432,6 @@ class Sistema
 	//canvas
 	canvas;//2D
 	gfx;//3D
-
-	_cameraSetup = function()
-	{
-		
-	}
 	
 	setup = function()
 	{
@@ -429,16 +454,14 @@ class Sistema
 		angleMode(DEGREES);
 		this.render.scene.camera = this.gfx.createCamera();//create scene camera
 		this.render.scene.camera.position = {x:3,y:-10,z:10};//create scene camera position
-		this.render.scene.camera.setPosition(this.render.scene.camera.position.x, this.render.scene.camera.position.y, this.render.scene.camera.position.z);
 		this.render.scene.camera.target = {x:0,y:0,z:0};//where the camera will look at
 		this.render.scene.camera.update = function()
 		{
+			this.setPosition(this.position.x, this.position.y, this.position.z);
 			this.lookAt(this.target.x,this.target.y,this.target.z);
 		}
 		this.render.scene.camera.update();
-		this.gfx.textureWrap(CLAMP,CLAMP);		
-		//this.render.scene.camera.setPosition(-8,-14,3);
-		//this.render.scene.camera.lookAt(0, 0, 0);
+		this.gfx.textureWrap(CLAMP,CLAMP);	
 		
 
 	}

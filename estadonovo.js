@@ -2,6 +2,20 @@
 //UTIL
 //------------------------------------------
 
+function deg2rad(angle)
+{
+	return(angle * PI/180);
+}
+
+function RotateVerticeSelf( angle, vertice)
+{
+    let NewVertice = {};
+    NewVertice.y = vertice.y;
+    NewVertice.x = vertice.x * cos(angle) - vertice.z * sin(angle);
+    NewVertice.z = vertice.x * sin(angle) + vertice.z * cos(angle);
+    return NewVertice;
+}
+
 function range(min, max) 
 {
 	let arr = [];
@@ -10,6 +24,69 @@ function range(min, max)
 		arr.push(i+"");
 	}
   return arr;
+}
+
+function Vector3Min(v1, v2)
+{
+    let result = { x:0,y:0,z:0 };
+
+    result.x = min([v1.x, v2.x]);
+    result.y = min([v1.y, v2.y]);
+    result.z = min([v1.z, v2.z]);
+
+    return result;
+}
+
+// Get max value for each pair of components
+function Vector3Max(v1,v2)
+{
+    let result = { x:0,y:0,z:0 };
+
+    result.x = max([v1.x, v2.x]);
+    result.y = max([v1.y, v2.y]);
+    result.z = max([v1.z, v2.z]);
+	//console.log (v1)
+    return result;
+}
+
+function GetMeshBoundingBox(mesh)
+{
+    // Get min and max vertex to construct bounds (AABB)
+    let minVertex = { x:0,y:0,z:0 };
+    let maxVertex = { x:0,y:0,z:0 };
+
+    if (mesh.vertices)
+    {
+        minVertex = mesh.vertices[0];
+        maxVertex = mesh.vertices[0];
+        for (let i = 1; i < mesh.vertices.length; i++)
+        {
+            minVertex = Vector3Min(minVertex, mesh.vertices[i]);
+            maxVertex = Vector3Max(maxVertex, mesh.vertices[i]);
+        }
+    }
+	//console.log(minVertex)
+	//console.log(maxVertex)
+    // Create the bounding box
+    let box = {};
+    box.min = minVertex;
+    box.max = maxVertex;
+
+    return box;
+}
+
+function CheckCollisionBoxes(box1, box2)
+{
+    let collision = true;
+
+    if ((box1.max.x >= box2.min.x) && (box1.min.x <= box2.max.x))
+    {
+        if ((box1.max.y < box2.min.y) || (box1.min.y > box2.max.y)) collision = false;
+        if ((box1.max.z < box2.min.z) || (box1.min.z > box2.max.z)) collision = false;
+    }
+    else collision = false;
+
+    return collision;
 }
 
 //------------------------------------------
@@ -65,10 +142,6 @@ function keyReleased()
 	{
 		player.model = sistema.file.model['player-idle'];
 	}
-	/*if (keyCode == 190)
-		player.rendering.nextFrame();
-	if (keyCode == 188)
-		player.rendering.previousFrame();*/
 }
 
 //------------------------------------------
@@ -131,7 +204,6 @@ function setup()
 	//canvas
 	
 	sistema.setup();
-
 	delete sistema.setup();
 	//delete sistema._cameraSetup();
 	
