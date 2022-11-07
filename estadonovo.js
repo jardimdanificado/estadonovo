@@ -2,6 +2,21 @@
 //UTIL
 //------------------------------------------
 
+function getLength(input)
+{
+	//console.log(input)
+	let tempn=0;
+
+	while(true)
+	{
+		if(input[tempn])
+			tempn++;
+		else
+			return tempn;
+		
+	}
+}
+
 function deg2rad(angle)
 {
 	return(angle * PI/180);
@@ -100,10 +115,11 @@ function Vector3Max(v1,v2)
 
 function GetMeshBoundingBox(mesh)
 {
+	//console.log(mesh)
     // Get min and max vertex to construct bounds (AABB)
     let minVertex = { x:0,y:0,z:0 };
     let maxVertex = { x:0,y:0,z:0 };
-
+	
     if (mesh.vertices)
     {
         minVertex = mesh.vertices[0];
@@ -201,7 +217,7 @@ function keyReleased()
 		keyCode == 87 ||
  		keyCode == UP_ARROW || 
 		keyCode == DOWN_ARROW 
-	   ) 
+	   )
 	{
 		player.model = sistema.file.model['player-idle'];
 	}
@@ -236,6 +252,7 @@ var player;
 var camera;
 var map;
 var canvas;
+
 function preload()
 {
 	sistema = new Sistema();
@@ -259,17 +276,22 @@ function preload()
 		ext:'.obj',
 		path:'assets/models/player/idle/'
 	});
+	arrayTemporario = range(0,9);//PLEASE CHANGE THIS FROM 9 TO 10 TO INCLUDE THE FLOOR
+	sistema.file.model.load
+	({
+		...arrayTemporario,
+		name:'lvl0hitboxes',
+		ext:'.obj',
+		path:'assets/models/map/level0/hitbox/'
+	});
 	sistema.file.image.load('assets/models/map/level0/texture_0.png','map0');//single-file image import example
 }
 
 function setup()
 {
-	//canvas
-	
 	sistema.setup();
 	delete sistema.setup();
-	//delete sistema._cameraSetup();
-	
+
 	sistema.world.creature.new
 	({
 		name:'joao',
@@ -277,8 +299,7 @@ function setup()
 		position:{x:0,y:0,z:0.5},
 		rotation:{x:180,y:180,z:0},
 		scale:{x:1,y:1,z:1},
-		model:sistema.file.model['player-idle'],
-		hitbox:{w:0.8,h:2}
+		model:sistema.file.model['player-idle']
 	});
 	
 	player = sistema.world.creature['joao'];
@@ -293,8 +314,23 @@ function setup()
 		model:sistema.file.model['map0'],
 		texture:sistema.file.image['map0']
 	}
+
+	sistema.file.hitbox.fromModel
+	({
+		...sistema.file.model['lvl0hitboxes'],
+		name:'lvl0'
+	});
+	
 	sistema.render.scene.model.add(map);
 	sistema.render.scene.model.add(player);
+	//sistema.render.scene.hitbox.add(player.hitbox);
+
+	for(i = 0;i<sistema.file.hitbox.length;i++)
+	{
+		sistema.file.hitbox[i].rotation = {x:180,y:180,z:0};
+		sistema.render.scene.hitbox.add(sistema.file.hitbox[i]);
+	}
+		
 }
 
 function draw() 
@@ -302,6 +338,11 @@ function draw()
 	sistema.gfx.clear();
 	sistema.gfx.noStroke();
 	keyDown();
+
+	for(i = 0; i < sistema.render.scene.hitbox.length;i++)
+		if(player.hitbox != sistema.render.scene.hitbox[i])
+			if(CheckCollisionBoxes(player.hitbox,sistema.render.scene.hitbox[i]))
+				print("colidiu");
 	
 	sistema.render.scene.render();
 	image(sistema.gfx, 0, 0, sistema.screen.w, sistema.screen.h);
@@ -313,5 +354,4 @@ function draw()
 	noFill();
 	circle(mouseX,mouseY,6);
 	pop();
-	
 }

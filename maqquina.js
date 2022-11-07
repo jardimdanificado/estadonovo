@@ -2,25 +2,47 @@
 //SISTEMA.FILE
 //------------------------------------------
 
-function getLength(input)
-{
-	let tempn=0;
-	while(true)
-	{
-		if(input[tempn])
-			tempn++;
-		else
-			return tempn;
-		
-	}
-}
-
 function fileStartup()
 {
 	let file = [];
 	file.model = [];
 	file.image = [];
 	file.font = [];
+	file.hitbox = [];
+
+	file.hitbox.fromModel = function (filepath, iname) 
+	{
+		if (typeof filepath === 'object') 
+		{
+			/*
+   			when importing a hitbox collection
+	 		ref must follow this template:
+		 	{
+				...[model,model,model,model],
+				name:'lvl0hitboxes'
+			}
+			*/
+			let lobj = [];
+			let tempn = getLength(filepath);
+
+			if(!filepath.ext)
+				filepath.ext = '.obj';
+			
+			for (k = 0; k < tempn; k++)
+			{
+				lobj.push(GetMeshBoundingBox(filepath[k]));
+				this.push(lobj[k]);
+			}
+			this[filepath.name] = lobj;
+		}
+		else if (iname) 
+		{
+			this[iname] = GetMeshBoundingBox(loadModel(filepath));
+			this.push(this[iname]);
+		}
+		else
+			this.push(GetMeshBoundingBox(loadModel(filepath)));
+	};
 
 	file.model.load= function (filepath, iname) 
 	{
@@ -197,11 +219,12 @@ function worldStartup()
 //------------------------------------------
 //SISTEMA.RENDER
 //------------------------------------------
-
+var buff;
 function renderStartup()
 {
 	let render = [];
 	render.scene = [];
+	
 	render.scene.background =
 	{
 		r: 1,
@@ -214,6 +237,88 @@ function renderStartup()
 	render.scene.image = [];
 	render.scene.text = [];
 	render.scene.shape = [];
+	render.scene.hitbox = [];
+	
+	render.scene.hitbox.add = function(ref)
+	{
+		/*
+	 	ref must follow this template:
+	 	{
+   			name:'this hitbox name',
+			min:{x:0,y:0,z:0},
+			max:{x:0,y:0,z:0}
+		}
+		*/
+		//this generate the new boundingbox if a queued model contains this hitbox
+		//else it can be generated via the aditional property
+		//console.log(ref)
+		ref.generate = function(mesh)
+		{
+			let tempb;
+
+			//if(!mesh)
+				//return false;
+			if(mesh.frame)
+				mesh.frame();
+			if(mesh[this.currentFrame])
+			{
+				tempb = (GetMeshBoundingBox(mesh[this.currentFrame]));
+				buff = tempb;
+			}
+			else
+				tempb = (GetMeshBoundingBox(mesh));
+			
+			tempb.min = RotateVerticeSelf(this.rotation.y, tempb.min);
+			tempb.max = RotateVerticeSelf(this.rotation.y, tempb.max);
+
+			//if(tempb.min.x > tempb.max.x && tempb.min.y > tempb.max.y && tempb.min.z > tempb.max.z)
+			tempb = {max:Vector3Max(tempb.min,tempb.max),min:Vector3Min(tempb.min,tempb.max)};
+			//buff = tempb;
+			tempb.min = Vector3Add(tempb.min,this.position);
+			tempb.max = Vector3Add(tempb.max,this.position);
+			
+			return(tempb);
+		}
+		
+		ref.update = function()
+		{
+			let temp = this.generate(this.model);
+			if(temp != false)//generate returns false if it cant generate a hitbox
+			{
+				//this.frame();
+				this.min = temp.min;
+				this.max = temp.max;
+			}
+		}
+		
+		ref.draw = function() 
+		{
+			render.scene.gfx.push();
+			render.scene.gfx.fill(0,255,0,100);
+			render.scene.gfx.translate(this.min.x,this.min.y*(-1),this.min.z);
+			render.scene.gfx.box
+			(
+				0.1,0.1,0.1
+			);
+			render.scene.gfx.pop();
+			
+			render.scene.gfx.push();
+			render.scene.gfx.translate(this.max.x,this.max.y*(-1),this.max.z);
+			render.scene.gfx.fill(255,0,0,100);
+			render.scene.gfx.box
+			(
+				0.1,0.1,0.1
+			);
+			render.scene.gfx.pop();
+		}
+		if(ref.name)
+		{
+			render.scene.hitbox[ref.name] = ref;
+		}
+		ref.active = true;
+		ref.visible = true;//debug
+		render.scene.hitbox.push(ref);
+	}
 	
 	render.scene.model.add = function(ref)
 	{
@@ -238,33 +343,42 @@ function renderStartup()
 		{
 			ref.currentFrame = 0;
 			ref.currentProgression = 1;
+			ref.frame = function()
+			{
+					if(this.currentFrame + this.currentProgression > getLength(this))
+					{
+						this.currentFrame = 0;
+					}
+					else if(this.currentFrame + this.currentProgression < 0)
+					{
+						this.currentFrame = getLength(this);
+					}
+					else
+					{
+						this.currentFrame += this.currentProgression;
+					}
+			}
+			ref.model.frame = ref.frame;
 		}
 		ref.active = true;
-
-		if(ref.hitbox)
+		if(!ref.hitbox)
+			ref.hitbox = GetMeshBoundingBox(ref.model);
+		
+		ref.hitbox = 
 		{
-			ref.getHitbox = function()//this get the ref 
-			{
-				let tempb;
-				
-				if(!ref.model[0])
-					tempb = (GetMeshBoundingBox(ref.model));
-				else
-					tempb = (GetMeshBoundingBox(ref.model[ref.currentFrame]))
-
-				tempb.min = RotateVerticeSelf(this.rotation.y, tempb.min);
-				tempb.max = RotateVerticeSelf(this.rotation.y, tempb.max);
-
-				//if(tempb.min.x > tempb.max.x && tempb.min.y > tempb.max.y && tempb.min.z > tempb.max.z)
-				tempb = {max:Vector3Max(tempb.min,tempb.max),min:Vector3Min(tempb.min,tempb.max)};
-				tempb.min = Vector3Add(tempb.min,this.position);
-				tempb.max = Vector3Add(tempb.max,this.position);
-				return(tempb);
-			}
-			
-			//ref.hitboxUpdate();
-			ref.hitbox = ref.getHitbox();
-		}
+			min:Vector3Min(ref.hitbox.min,ref.hitbox.max),
+			max:Vector3Max(ref.hitbox.min,ref.hitbox.max),
+			rotation:ref.rotation,
+			position:ref.position,
+			model:ref.model
+		};
+		
+		render.scene.hitbox.add(ref.hitbox);
+		if(ref.frame)
+			ref.hitbox.frame = ref.frame;
+		//ref.hitboxUpdate();
+		ref.hitbox.update();
+		
 		this[ref.name] = ref;
 		this.push(ref);
 	}
@@ -321,33 +435,6 @@ function renderStartup()
 		this[ref.name].shape = ref.shape;
 		this.push(this[ref.name]);
 	}
-
-	render.scene.drawHitbox = function(i) 
-	{
-		this.gfx.push();
-
-		if(CheckCollisionBoxes(this.model[i].hitbox,{min:{x:-2,y:-2,z:-2},max:{x:2,y:2,z:2}}))
-			console.log("colidiu")
-		else
-			this.gfx.fill(0,255,0,100);
-		this.gfx.translate(this.model[i].hitbox.min.x,this.model[i].hitbox.min.y*(-1),this.model[i].hitbox.min.z);
-		this.gfx.box
-		(
-			0.1,0.1,0.1
-		);
-		this.gfx.pop();
-		
-		this.gfx.push();
-		this.gfx.translate(this.model[i].hitbox.max.x,this.model[i].hitbox.max.y*(-1),this.model[i].hitbox.max.z);
-		this.gfx.fill(255,0,0,100);
-		this.gfx.box
-		(
-			0.1,0.1,0.1
-		);
-		this.gfx.pop();
-		
-		this.gfx.box(4,4,4);
-	}
 	
 	render.scene.render = function()
 	{
@@ -363,23 +450,9 @@ function renderStartup()
 		for(i=0;i<this.model.length;i++)
 			if(this.model[i].active)
 			{
-				if(frameCount%floor(60/24)==0 || this.model[i].currentFrame > this.model[i].model.length)
+				if(this.model[i].frame && (frameCount%floor(60/24)==0 || this.model[i].currentFrame > this.model[i].model.length || this.model[i].currentFrame < 0))
 				{
-					if(this.model[i].model[0])//IF ANIMATED
-					{
-						if(this.model[i].currentFrame + this.model[i].currentProgression > this.model[i].model.length-1)
-						{
-							this.model[i].currentFrame = 0;
-						}
-						else if(this.model[i].currentFrame + this.model[i].currentProgression < 0)
-						{
-							this.model[i].currentFrame = this.model[i].model.length-1;
-						}
-						else
-						{
-							this.model[i].currentFrame += this.model[i].currentProgression;
-						}
-					}
+					this.model[i].frame();
 				}
 				
 				this.gfx.push(); // Start a new drawing state
@@ -400,12 +473,12 @@ function renderStartup()
 					this.gfx.model(this.model[i].model);
 				this.gfx.pop();
 
-				if(this.model[i].name === 'joao')
-				{
-					this.drawHitbox(i);
-					this.model[i].hitbox = this.model[i].getHitbox();
-				}
+				this.model[i].hitbox.update();
 			}
+		//HITBOX RENDERING
+		for(i=0;i<this.hitbox.length;i++)
+			if(this.hitbox[i].active && this.hitbox[i].visible)
+				this.hitbox[i].draw();
 		//TEXT RENDERING
 		for(i=0;i<this.text.length;i++)
 			if(this.text[i].active)
