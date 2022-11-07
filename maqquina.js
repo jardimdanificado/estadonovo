@@ -243,21 +243,27 @@ function renderStartup()
 
 		if(ref.hitbox)
 		{
-			ref.getHitbox = function()
+			ref.getHitbox = function()//this get the ref 
 			{
+				let tempb;
+				
 				if(!ref.model[0])
-					return(GetMeshBoundingBox(ref.model));
+					tempb = (GetMeshBoundingBox(ref.model));
 				else
-					return(GetMeshBoundingBox(ref.model[ref.currentFrame]))
+					tempb = (GetMeshBoundingBox(ref.model[ref.currentFrame]))
+
+				tempb.min = RotateVerticeSelf(this.rotation.y, tempb.min);
+				tempb.max = RotateVerticeSelf(this.rotation.y, tempb.max);
+
+				//if(tempb.min.x > tempb.max.x && tempb.min.y > tempb.max.y && tempb.min.z > tempb.max.z)
+				tempb = {max:Vector3Max(tempb.min,tempb.max),min:Vector3Min(tempb.min,tempb.max)};
+				tempb.min = Vector3Add(tempb.min,this.position);
+				tempb.max = Vector3Add(tempb.max,this.position);
+				return(tempb);
 			}
-			ref.hitboxUpdate = function()
-			{
-				if(!this.hitbox.d)
-					this.hitbox = CreateHitbox({position:this.position,w:this.hitbox.w,h:this.hitbox.h,position:this.position});
-				else
-					this.hitbox = CreateHitbox({position:this.position,w:this.hitbox.w,h:this.hitbox.h,d:this.hitbox.d,position:this.position});
-			}
-			ref.hitboxUpdate();
+			
+			//ref.hitboxUpdate();
+			ref.hitbox = ref.getHitbox();
 		}
 		this[ref.name] = ref;
 		this.push(ref);
@@ -319,15 +325,27 @@ function renderStartup()
 	render.scene.drawHitbox = function(i) 
 	{
 		this.gfx.push();
-		let temphb = CreateHitbox(this.model[i].hitbox);
-		if(CheckCollisionBoxes(temphb,{min:{x:-2,y:-2,z:-2},max:{x:2,y:2,z:2}}))
-			this.gfx.fill(255,0,0,100);
+
+		if(CheckCollisionBoxes(this.model[i].hitbox,{min:{x:-2,y:-2,z:-2},max:{x:2,y:2,z:2}}))
+			console.log("colidiu")
 		else
 			this.gfx.fill(0,255,0,100);
-		
-		this.gfx.translate(this.model[i].position.x,this.model[i].position.y-(this.model[i].hitbox.h/2),this.model[i].position.z);
-		this.gfx.box(this.model[i].hitbox.w,this.model[i].hitbox.h,this.model[i].hitbox.w);
+		this.gfx.translate(this.model[i].hitbox.min.x,this.model[i].hitbox.min.y*(-1),this.model[i].hitbox.min.z);
+		this.gfx.box
+		(
+			0.1,0.1,0.1
+		);
 		this.gfx.pop();
+		
+		this.gfx.push();
+		this.gfx.translate(this.model[i].hitbox.max.x,this.model[i].hitbox.max.y*(-1),this.model[i].hitbox.max.z);
+		this.gfx.fill(255,0,0,100);
+		this.gfx.box
+		(
+			0.1,0.1,0.1
+		);
+		this.gfx.pop();
+		
 		this.gfx.box(4,4,4);
 	}
 	
@@ -385,9 +403,8 @@ function renderStartup()
 				if(this.model[i].name === 'joao')
 				{
 					this.drawHitbox(i);
-					this.model[i].hitboxUpdate();
+					this.model[i].hitbox = this.model[i].getHitbox();
 				}
-					
 			}
 		//TEXT RENDERING
 		for(i=0;i<this.text.length;i++)

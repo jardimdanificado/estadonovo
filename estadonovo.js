@@ -124,36 +124,7 @@ function GetMeshBoundingBox(mesh)
     return box;
 }
 
-function CreateHitbox(input)
-{
-	//console.log(input)
-	let lhb = {min:{x:0,y:0,z:0},max:{x:0,y:0,z:0}};
-	lhb.w = input.w;
-	lhb.h = input.h;
-	lhb.position = input.position;
-	if(input.d)
-		lhb.d = input.d;
-	if(input.h && input.w)
-	{
-		lhb.min.x = input.position.x - (input.w/2);
-		lhb.max.x = input.position.x + (input.w/2);
-		lhb.min.y = input.position.y;
-		lhb.max.y = input.position.y - input.h;
-		if(input.d)
-		{
-			lhb.min.z = input.position.z - (input.d/2);
-			lhb.max.z = input.position.z + (input.d/2);
-		}
-		else
-		{
-			lhb.min.z = input.position.z - (input.w/2);
-			lhb.max.z = input.position.z + (input.w/2);
-		}
-	}
-	return(lhb);
-}
-
-function isPointInsideAABB(point, box) 
+function CheckCollisionPointBox(point, box) 
 {
 	let result = 
 	(
@@ -180,23 +151,6 @@ function CheckCollisionBoxes(a, b)
   	);
 	return(result);
 }
-
-
-
-/*function CheckCollisionBoxes(box1, box2)
-{
-    let collision = true;
-	//console.log(box1,box2);
-    if (box1.max.x >= box2.min.x && box1.min.x <= box2.max.x)
-    {
-        if (box1.max.y <= box2.min.y || box1.min.y >= box2.max.y) collision = false;
-        if (box1.max.z <= box2.min.z || box1.min.z >= box2.max.z) collision = false;
-    }
-		
-    else collision = false;
-	//print(collision)
-    return collision;
-}*/
 
 //------------------------------------------
 //KEYBOARD
