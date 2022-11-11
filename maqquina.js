@@ -11,7 +11,7 @@ function fileStartup()
 
 	file.model.load= function (filepath, iname) 
 	{
-		if (typeof filepath === 'object') 
+		if (typeof filepath === 'object')
 		{
 			/*
    			when importing a animation
@@ -24,6 +24,8 @@ function fileStartup()
 			}
 			*/
 			let lobj = [];
+			lobj.name = filepath.name;
+			
 			let tempn = getLength(filepath);
 
 			if(!filepath.ext)
@@ -32,6 +34,7 @@ function fileStartup()
 			for (k = 0; k < tempn; k++)
 			{
 				lobj.push(loadModel(filepath.path + filepath[k] + filepath.ext));
+				lobj[k].name = filepath.name + "_" + filepath[k];
 				this.push(lobj[k]);
 			}
 			this[filepath.name] = lobj;
@@ -39,6 +42,7 @@ function fileStartup()
 		else if (iname) 
 		{
 			this[iname] = loadModel(filepath);
+			this[iname].name = iname;
 			this.push(this[iname]);
 		}
 		else
@@ -129,47 +133,13 @@ function worldStartup()
 
 		ref.move = function(backwards)
 		{
-			if(this.rotation.y >= 360)
-				this.rotation.y -= 360;
-			else if(this.rotation.y < 0)
-				this.rotation.y += 360;
-			
-			let  valorZ, valorX;
-			let giro = (this.rotation.y / 90);
-			let resto = this.rotation.y - (90 * Math.trunc(giro));
-			let restodoresto = 90 - resto;
-			
-			if(backwards==false)
-			{
-				valorZ = this.speed - resto * (this.speed / 90);
-				valorX = this.speed - (restodoresto * (this.speed / 90));
-			}
+			if(backwards)
+				temp = move3D(this.position,this.rotation,this.speed*(-1));
 			else
-			{
-				valorZ = (this.speed - resto * (this.speed / 90))*(-1);
-				valorX = (this.speed - (restodoresto * (this.speed / 90)))*(-1);
-			}
-			
-			if(giro>=3)
-			{
-				this.position.x -= valorZ;
-				this.position.z -= valorX;
-			}
-			else if(giro>=2)
-			{
-				this.position.x -= valorX;
-				this.position.z += valorZ;
-			}
-			else if(giro>=1)
-			{
-				this.position.x += valorZ;
-				this.position.z += valorX;
-			}
-			else if(giro<1)
-			{
-				this.position.z -= valorZ;
-				this.position.x += valorX;
-			}
+				temp = move3D(this.position,this.rotation,this.speed);
+
+			this.position.x = temp.x;
+			this.position.z = temp.z;
 		}
 		
 		if(ref.name)
@@ -212,9 +182,10 @@ function sceneStartup()
 			rotation:{x:180,y:180,z:0},//ROTATION IS OPTIONAL THE DEFAULT IS {x:180,y:180,z:0}
 			scale:{x:10,y:10,z:10},//SCALE S OPTIONAL THE DEFAULT IS {x:1,y:1,z:1}
 			model:sistema.file.model['model name'],
-			texture:sistema.file.image['text name']//TEXTURE IS OPTIONAL,
+			texture:sistema.file.image['text name'], //TEXTURE IS OPTIONAL
    			active: true, //active is optional DEFAULT IS TRUE
-	  		visible: true // visible is optional DEFAULT IS TRUE
+	  		visible: true, // visible is optional DEFAULT IS FALSE
+	 		collsion: 'static'// collision is option DEFAULT IS static
 		}
 		*/
 		if(this[ref.name])
@@ -222,38 +193,51 @@ function sceneStartup()
 			delete this[ref.name];
 		}
 
-		if(!ref.position)
+		if(!ref.hasOwnProperty("position"))
 			ref.position = {x:0,y:0,z:0};
 		
-		if(!ref.rotation)
+		if(!ref.hasOwnProperty("rotation"))
 			ref.rotation = {x:180,y:180,z:0};
 
-		if(!ref.scale)
+		if(!ref.hasOwnProperty("scale"))
 			ref.scale = {x:1,y:1,z:1};
 
-		if(!ref.color)
+		if(!ref.hasOwnProperty("color"))
 			ref.color = {r:0,g:255,b:0,a:255};
 
-		if(!ref.active)
+		if(!ref.hasOwnProperty("active"))
 			ref.active = true;
 
-		if(!ref.visible)
-			ref.visible = true;
+		if(!ref.hasOwnProperty("visible"))
+			ref.visible = false;
+		
+		if(!ref.hasOwnProperty("collision"))
+			ref.collision = 'static';
 		
 		if(ref.model[0])
 		{
 			ref.currentFrame = 0;
 			ref.currentProgression = 1;
+			ref.frame = function()
+			{
+				if(this.currentFrame + this.currentProgression > this.model.length-1)
+				{
+					this.currentFrame = 0;
+				}
+				else if(this.currentFrame + this.currentProgression < 0)
+				{
+					this.currentFrame = this.model.length-1;
+				}
+				else
+				{
+					this.currentFrame += this.currentProgression;
+				}
+			}
 		}
 
 		ref.drawHitbox = function() 
 		{
 			scene.gfx.push();
-	
-			if(CheckCollisionBoxes(ref.hitbox,{min:{x:-2,y:-2,z:-2},max:{x:2,y:2,z:2}}))
-			{
-				console.log("colidiu");
-			}
 				
 			scene.gfx.fill(0,255,0,100);
 			scene.gfx.translate(this.hitbox.min.x,this.hitbox.min.y*(-1),this.hitbox.min.z);
@@ -273,22 +257,39 @@ function sceneStartup()
 			scene.gfx.pop();
 		}
 		
-		ref.getHitbox = function()//this get the ref 
+		ref.getHitbox = function(cPosition)//if a vector3 provided will use it instead
 		{
 			let tempb;
 			
 			if(!ref.model[0])
 				tempb = (GetMeshBoundingBox(ref.model));
 			else
+			{
+				if(!ref.model[ref.currentFrame])
+					ref.frame();
 				tempb = (GetMeshBoundingBox(ref.model[ref.currentFrame]))
-
+			}
+			
+			tempb.min = RotateVerticeSelf(this.rotation.x, tempb.min);
+			tempb.max = RotateVerticeSelf(this.rotation.x, tempb.max);
 			tempb.min = RotateVerticeSelf(this.rotation.y, tempb.min);
 			tempb.max = RotateVerticeSelf(this.rotation.y, tempb.max);
-
-			//if(tempb.min.x > tempb.max.x && tempb.min.y > tempb.max.y && tempb.min.z > tempb.max.z)
+			tempb.min = RotateVerticeSelf(this.rotation.z, tempb.min);
+			tempb.max = RotateVerticeSelf(this.rotation.z, tempb.max);
+			
 			tempb = {max:Vector3Max(tempb.min,tempb.max),min:Vector3Min(tempb.min,tempb.max)};
-			tempb.min = Vector3Add(tempb.min,this.position);
-			tempb.max = Vector3Add(tempb.max,this.position);
+			
+			if(cPosition)
+			{
+				tempb.min = Vector3Add(tempb.min,cPosition);
+				tempb.max = Vector3Add(tempb.max,cPosition);
+			}
+			else
+			{
+				tempb.min = Vector3Add(tempb.min,this.position);
+				tempb.max = Vector3Add(tempb.max,this.position);
+			}
+			
 			return(tempb);
 		}
 		
@@ -298,10 +299,68 @@ function sceneStartup()
 			hitbox.min = temp.min;
 			hitbox.max = temp.max;
 		}
+
+		ref.boxCheckCollisions = function(cPosition)
+		{
+			for(i = 0;i<scene.model.length;i++)
+			{
+				if(scene.model[i] != this)
+				{	
+					if(scene.model[i].collision == 'static')
+					{
+						if(cPosition)
+						{
+							if(CheckCollisionBoxes(this.getHitbox(cPosition),scene.model[i].getHitbox()))
+								return true;
+						}
+						else if(CheckCollisionBoxes(this.getHitbox(),scene.model[i].getHitbox()))
+							return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		ref.pointCheckCollisions = function(cPosition)
+		{
+			for(i = 0;i<scene.model.length;i++)
+			{
+				if(scene.model[i] != this)
+				{	
+					if(scene.model[i].collision == 'static')
+					{
+						if(cPosition)
+						{
+							if(CheckCollisionPointBox(Vector3Add(this.position, cPosition),scene.model[i].getHitbox()))
+								return true;
+						}
+						else if(CheckCollisionPointBox(this.position,scene.model[i].getHitbox()))
+							return true;
+					}
+				}
+			}
+			return false;
+		}
+		
 		ref.hitbox = ref.getHitbox();
 		
 		this[ref.name] = ref;
 		this.push(ref);
+	}
+	
+	scene.model.addAllFrames = function(ref)
+	{
+		let temp;
+		
+		for(i=0;i<ref.length;i++)
+		{	
+			temp = {...ref};
+			
+			temp = [];//clear array but keeps properties
+			temp.name = ref.name + "_" + i;
+			temp.model = ref[i];
+			this.add(temp);
+		}
 	}
 	
 	scene.text.add = function(ref)
@@ -369,24 +428,14 @@ function sceneStartup()
 		}
 		//MODEL RENDERING
 		for(i=0;i<this.model.length;i++)
-			if(this.model[i].active)
+		{
+			if(this.model[i].visible && this.model[i].active)
 			{
 				if(frameCount%floor(60/24)==0 || this.model[i].currentFrame > this.model[i].model.length)
 				{
 					if(this.model[i].model[0])//IF ANIMATED
 					{
-						if(this.model[i].currentFrame + this.model[i].currentProgression > this.model[i].model.length-1)
-						{
-							this.model[i].currentFrame = 0;
-						}
-						else if(this.model[i].currentFrame + this.model[i].currentProgression < 0)
-						{
-							this.model[i].currentFrame = this.model[i].model.length-1;
-						}
-						else
-						{
-							this.model[i].currentFrame += this.model[i].currentProgression;
-						}
+						this.model[i].frame();
 					}
 				}
 				
@@ -409,13 +458,10 @@ function sceneStartup()
 				this.gfx.pop();
 
 				if(this.model[i].hitbox)
-				{
-					this.model[i].drawHitbox();
 					this.model[i].hitbox = this.model[i].getHitbox();
-				}
-				
-				scene.gfx.box(4,4,4);//PLEASE REMOVE THIS
 			}
+			this.model[i].drawHitbox();
+		}
 		//TEXT RENDERING
 		for(i=0;i<this.text.length;i++)
 			if(this.text[i].active)

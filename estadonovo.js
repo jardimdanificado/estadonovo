@@ -11,7 +11,6 @@ function getLength(input)
 			tempn++;
 		else
 			return tempn;
-		
 	}
 }
 
@@ -20,7 +19,7 @@ function deg2rad(angle)
 	return(angle * PI/180);
 }
 
-function RotateVerticeSelf( angle, vertice)
+function RotateVerticeSelf(angle, vertice)
 {
     let NewVertice = {};
     NewVertice.y = vertice.y;
@@ -165,6 +164,54 @@ function CheckCollisionBoxes(a, b)
 	return(result);
 }
 
+function move3D(position,rotation,speed)
+{
+	if(rotation.y >= 360)
+		rotation.y -= 360;
+	else if(rotation.y < 0)
+		rotation.y += 360;
+	
+	let  valorZ, valorX;
+	let giro = (rotation.y / 90);
+	let resto = rotation.y - (90 * Math.trunc(giro));
+	let restodoresto = 90 - resto;
+	valorZ = speed - resto * (speed / 90);
+	valorX = speed - (restodoresto * (speed / 90));
+	
+	if(giro>=3)
+	{
+		return{//if return is alone in a line it returns undefined
+			x:position.x - valorZ,
+			y:position.y,
+			z:position.z - valorX
+		}
+	}
+	else if(giro>=2)
+	{
+		return{		
+			x:position.x - valorX,
+			y:position.y,
+			z:position.z + valorZ
+		}
+	}
+	else if(giro>=1)
+	{
+		return{
+			x:position.x + valorZ,
+			y:position.y,
+			z:position.z + valorX
+		}
+	}
+	else if(giro<1)
+	{
+		return{		
+			x:position.x + valorX,
+			y:position.y,
+			z:position.z - valorZ
+		}
+	}
+}
+
 //------------------------------------------
 //KEYBOARD
 //------------------------------------------
@@ -173,12 +220,14 @@ function keyDown()
 {
 	if (keyIsDown(LEFT_ARROW) || keyIsDown(65))
 		player.rotation.y -= 6;
-	if (keyIsDown(RIGHT_ARROW)|| keyIsDown(68))
+	if (keyIsDown(RIGHT_ARROW) || keyIsDown(68))
 		player.rotation.y += 6;
 	if (keyIsDown(DOWN_ARROW) || keyIsDown(83))
-		player.move(true);
-	if (keyIsDown(UP_ARROW)|| keyIsDown(87))
-		player.move(false);
+		if(player.boxCheckCollisions(move3D(player.position,player.rotation,player.speed)) === false)
+			player.move(true);
+	if (keyIsDown(UP_ARROW) || keyIsDown(87))
+		if(player.boxCheckCollisions(move3D(player.position,player.rotation,player.speed*(-1))) === false)
+			player.move(false);
 }
 
 function keyPressed()
@@ -210,10 +259,10 @@ function keyPressed()
 function keyReleased()
 {
 	if (
-		keyCode == 83 || 
+		keyCode == 83 ||
 		keyCode == 87 ||
- 		keyCode == UP_ARROW || 
-		keyCode == DOWN_ARROW 
+ 		keyCode == UP_ARROW ||
+		keyCode == DOWN_ARROW
 	   ) 
 	{
 		player.model = sistema.file.model['player-idle'];
@@ -264,6 +313,7 @@ function preload()
 		ext:'.obj',
 		path:'assets/models/player/walk/'
 	});
+	
 	arrayTemporario = range(1,239);
 	sistema.file.model.load
 	({
@@ -272,14 +322,17 @@ function preload()
 		ext:'.obj',
 		path:'assets/models/player/idle/'
 	});
+	
 	arrayTemporario = range(0,9);//PLEASE CHANGE THIS FROM 9 TO 10 TO INCLUDE THE FLOOR
 	sistema.file.model.load
 	({
 		...arrayTemporario,
 		name:'lvl0hitboxes',
 		ext:'.obj',
-		path:'assets/models/map/level0/hitbox/'
+		path:'assets/models/map/level0/hitbox/',
+		visible: false
 	});
+	
 	sistema.file.image.load('assets/models/map/level0/texture_0.png','map0');//single-file image import example
 }
 
@@ -294,10 +347,11 @@ function setup()
 	({
 		name:'joao',
 		color:{r:140,g:100,b:0,a:255},
-		position:{x:0,y:0,z:0.5},
+		position:{x:1,y:0,z:0},
 		scale:{x:1,y:1,z:1},
 		model:sistema.file.model['player-idle'],
-		hitbox:{}
+		visible:true,
+		collision: 'free'
 	});
 	
 	player = sistema.world.creature['joao'];
@@ -309,10 +363,13 @@ function setup()
 		position:{x:0,y:0,z:0},
 		scale:{x:1,y:1,z:1},
 		model:sistema.file.model['map0'],
-		texture:sistema.file.image['map0']
+		texture:sistema.file.image['map0'],
+		visible:true,
+		collision: 'none'//as this is only visual, no collision will be used
 	}
 	sistema.scene.model.add(map);
 	sistema.scene.model.add(player);
+	sistema.scene.model.addAllFrames(sistema.file.model['lvl0hitboxes']);
 }
 
 function draw() 
