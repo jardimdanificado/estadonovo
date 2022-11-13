@@ -1,3 +1,4 @@
+
 //------------------------------------------
 //SISTEMA.FILE
 //------------------------------------------
@@ -11,7 +12,7 @@ function fileStartup()
 
 	file.model.load= function (filepath, iname) 
 	{
-		if (typeof filepath === 'object')
+		if (typeof filepath === 'object') 
 		{
 			/*
    			when importing a animation
@@ -24,8 +25,6 @@ function fileStartup()
 			}
 			*/
 			let lobj = [];
-			lobj.name = filepath.name;
-			
 			let tempn = getLength(filepath);
 
 			if(!filepath.ext)
@@ -34,7 +33,6 @@ function fileStartup()
 			for (k = 0; k < tempn; k++)
 			{
 				lobj.push(loadModel(filepath.path + filepath[k] + filepath.ext));
-				lobj[k].name = filepath.name + "_" + filepath[k];
 				this.push(lobj[k]);
 			}
 			this[filepath.name] = lobj;
@@ -42,7 +40,6 @@ function fileStartup()
 		else if (iname) 
 		{
 			this[iname] = loadModel(filepath);
-			this[iname].name = iname;
 			this.push(this[iname]);
 		}
 		else
@@ -133,13 +130,47 @@ function worldStartup()
 
 		ref.move = function(backwards)
 		{
-			if(backwards)
-				temp = move3D(this.position,this.rotation,this.speed*(-1));
+			if(this.rotation.y >= 360)
+				this.rotation.y -= 360;
+			else if(this.rotation.y < 0)
+				this.rotation.y += 360;
+			
+			let  valorZ, valorX;
+			let giro = (this.rotation.y / 90);
+			let resto = this.rotation.y - (90 * Math.trunc(giro));
+			let restodoresto = 90 - resto;
+			
+			if(backwards==false)
+			{
+				valorZ = this.speed - resto * (this.speed / 90);
+				valorX = this.speed - (restodoresto * (this.speed / 90));
+			}
 			else
-				temp = move3D(this.position,this.rotation,this.speed);
-
-			this.position.x = temp.x;
-			this.position.z = temp.z;
+			{
+				valorZ = (this.speed - resto * (this.speed / 90))*(-1);
+				valorX = (this.speed - (restodoresto * (this.speed / 90)))*(-1);
+			}
+			
+			if(giro>=3)
+			{
+				this.position.x -= valorZ;
+				this.position.z -= valorX;
+			}
+			else if(giro>=2)
+			{
+				this.position.x -= valorX;
+				this.position.z += valorZ;
+			}
+			else if(giro>=1)
+			{
+				this.position.x += valorZ;
+				this.position.z += valorX;
+			}
+			else if(giro<1)
+			{
+				this.position.z -= valorZ;
+				this.position.x += valorX;
+			}
 		}
 		
 		if(ref.name)
@@ -182,10 +213,9 @@ function sceneStartup()
 			rotation:{x:180,y:180,z:0},//ROTATION IS OPTIONAL THE DEFAULT IS {x:180,y:180,z:0}
 			scale:{x:10,y:10,z:10},//SCALE S OPTIONAL THE DEFAULT IS {x:1,y:1,z:1}
 			model:sistema.file.model['model name'],
-			texture:sistema.file.image['text name'], //TEXTURE IS OPTIONAL
+			texture:sistema.file.image['text name']//TEXTURE IS OPTIONAL,
    			active: true, //active is optional DEFAULT IS TRUE
-	  		visible: true, // visible is optional DEFAULT IS FALSE
-	 		collsion: 'static'// collision is option DEFAULT IS static
+	  		visible: true // visible is optional DEFAULT IS TRUE
 		}
 		*/
 		if(this[ref.name])
@@ -193,51 +223,38 @@ function sceneStartup()
 			delete this[ref.name];
 		}
 
-		if(!ref.hasOwnProperty("position"))
+		if(!ref.position)
 			ref.position = {x:0,y:0,z:0};
 		
-		if(!ref.hasOwnProperty("rotation"))
+		if(!ref.rotation)
 			ref.rotation = {x:180,y:180,z:0};
 
-		if(!ref.hasOwnProperty("scale"))
+		if(!ref.scale)
 			ref.scale = {x:1,y:1,z:1};
 
-		if(!ref.hasOwnProperty("color"))
+		if(!ref.color)
 			ref.color = {r:0,g:255,b:0,a:255};
 
-		if(!ref.hasOwnProperty("active"))
+		if(!ref.active)
 			ref.active = true;
 
-		if(!ref.hasOwnProperty("visible"))
-			ref.visible = false;
-		
-		if(!ref.hasOwnProperty("collision"))
-			ref.collision = 'static';
+		if(!ref.visible)
+			ref.visible = true;
 		
 		if(ref.model[0])
 		{
 			ref.currentFrame = 0;
 			ref.currentProgression = 1;
-			ref.frame = function()
-			{
-				if(this.currentFrame + this.currentProgression > this.model.length-1)
-				{
-					this.currentFrame = 0;
-				}
-				else if(this.currentFrame + this.currentProgression < 0)
-				{
-					this.currentFrame = this.model.length-1;
-				}
-				else
-				{
-					this.currentFrame += this.currentProgression;
-				}
-			}
 		}
 
 		ref.drawHitbox = function() 
 		{
 			scene.gfx.push();
+	
+			if(CheckCollisionBoxes(ref.hitbox,{min:{x:-2,y:-2,z:-2},max:{x:2,y:2,z:2}}))
+			{
+				console.log("colidiu");
+			}
 				
 			scene.gfx.fill(0,255,0,100);
 			scene.gfx.translate(this.hitbox.min.x,this.hitbox.min.y*(-1),this.hitbox.min.z);
@@ -257,39 +274,22 @@ function sceneStartup()
 			scene.gfx.pop();
 		}
 		
-		ref.getHitbox = function(cPosition)//if a vector3 provided will use it instead
+		ref.getHitbox = function()//this get the ref 
 		{
 			let tempb;
 			
 			if(!ref.model[0])
 				tempb = (GetMeshBoundingBox(ref.model));
 			else
-			{
-				if(!ref.model[ref.currentFrame])
-					ref.frame();
 				tempb = (GetMeshBoundingBox(ref.model[ref.currentFrame]))
-			}
-			
-			tempb.min = RotateVerticeSelf(this.rotation.x, tempb.min);
-			tempb.max = RotateVerticeSelf(this.rotation.x, tempb.max);
+
 			tempb.min = RotateVerticeSelf(this.rotation.y, tempb.min);
 			tempb.max = RotateVerticeSelf(this.rotation.y, tempb.max);
-			tempb.min = RotateVerticeSelf(this.rotation.z, tempb.min);
-			tempb.max = RotateVerticeSelf(this.rotation.z, tempb.max);
-			
+
+			//if(tempb.min.x > tempb.max.x && tempb.min.y > tempb.max.y && tempb.min.z > tempb.max.z)
 			tempb = {max:Vector3Max(tempb.min,tempb.max),min:Vector3Min(tempb.min,tempb.max)};
-			
-			if(cPosition)
-			{
-				tempb.min = Vector3Add(tempb.min,cPosition);
-				tempb.max = Vector3Add(tempb.max,cPosition);
-			}
-			else
-			{
-				tempb.min = Vector3Add(tempb.min,this.position);
-				tempb.max = Vector3Add(tempb.max,this.position);
-			}
-			
+			tempb.min = Vector3Add(tempb.min,this.position);
+			tempb.max = Vector3Add(tempb.max,this.position);
 			return(tempb);
 		}
 		
@@ -299,68 +299,10 @@ function sceneStartup()
 			hitbox.min = temp.min;
 			hitbox.max = temp.max;
 		}
-
-		ref.boxCheckCollisions = function(cPosition)
-		{
-			for(i = 0;i<scene.model.length;i++)
-			{
-				if(scene.model[i] != this)
-				{	
-					if(scene.model[i].collision == 'static')
-					{
-						if(cPosition)
-						{
-							if(CheckCollisionBoxes(this.getHitbox(cPosition),scene.model[i].getHitbox()))
-								return true;
-						}
-						else if(CheckCollisionBoxes(this.getHitbox(),scene.model[i].getHitbox()))
-							return true;
-					}
-				}
-			}
-			return false;
-		}
-
-		ref.pointCheckCollisions = function(cPosition)
-		{
-			for(i = 0;i<scene.model.length;i++)
-			{
-				if(scene.model[i] != this)
-				{	
-					if(scene.model[i].collision == 'static')
-					{
-						if(cPosition)
-						{
-							if(CheckCollisionPointBox(Vector3Add(this.position, cPosition),scene.model[i].getHitbox()))
-								return true;
-						}
-						else if(CheckCollisionPointBox(this.position,scene.model[i].getHitbox()))
-							return true;
-					}
-				}
-			}
-			return false;
-		}
-		
 		ref.hitbox = ref.getHitbox();
 		
 		this[ref.name] = ref;
 		this.push(ref);
-	}
-	
-	scene.model.addAllFrames = function(ref)
-	{
-		let temp;
-		
-		for(i=0;i<ref.length;i++)
-		{	
-			temp = {...ref};
-			
-			temp = [];//clear array but keeps properties
-			temp.name = ref.name + "_" + i;
-			temp.model = ref[i];
-			this.add(temp);
-		}
 	}
 	
 	scene.text.add = function(ref)
@@ -428,14 +370,24 @@ function sceneStartup()
 		}
 		//MODEL RENDERING
 		for(i=0;i<this.model.length;i++)
-		{
-			if(this.model[i].visible && this.model[i].active)
+			if(this.model[i].active)
 			{
 				if(frameCount%floor(60/24)==0 || this.model[i].currentFrame > this.model[i].model.length)
 				{
 					if(this.model[i].model[0])//IF ANIMATED
 					{
-						this.model[i].frame();
+						if(this.model[i].currentFrame + this.model[i].currentProgression > this.model[i].model.length-1)
+						{
+							this.model[i].currentFrame = 0;
+						}
+						else if(this.model[i].currentFrame + this.model[i].currentProgression < 0)
+						{
+							this.model[i].currentFrame = this.model[i].model.length-1;
+						}
+						else
+						{
+							this.model[i].currentFrame += this.model[i].currentProgression;
+						}
 					}
 				}
 				
@@ -458,10 +410,13 @@ function sceneStartup()
 				this.gfx.pop();
 
 				if(this.model[i].hitbox)
+				{
+					this.model[i].drawHitbox();
 					this.model[i].hitbox = this.model[i].getHitbox();
+				}
+				
+				scene.gfx.box(4,4,4);//PLEASE REMOVE THIS
 			}
-			this.model[i].drawHitbox();
-		}
 		//TEXT RENDERING
 		for(i=0;i<this.text.length;i++)
 			if(this.text[i].active)
@@ -551,4 +506,177 @@ class Sistema
 	{
 		
 	}
+}
+
+//------------------------------------------
+//KEYBOARD
+//KEYBOARD
+//KEYBOARD
+//------------------------------------------
+
+function keyDown()
+{
+	if (keyIsDown(LEFT_ARROW) || keyIsDown(65))
+		player.rotation.y -= 6;
+	if (keyIsDown(RIGHT_ARROW)|| keyIsDown(68))
+		player.rotation.y += 6;
+	if (keyIsDown(DOWN_ARROW) || keyIsDown(83))
+		player.move(true);
+	if (keyIsDown(UP_ARROW)|| keyIsDown(87))
+		player.move(false);
+}
+
+function keyPressed()
+{
+	if (keyCode == 71)//G
+	{
+		console.log(sistema);
+	}
+	else if	(keyCode == 119)//F8
+	{
+		console.log(frameRate());
+	}
+	else if (keyCode == 83 || keyCode == DOWN_ARROW ) //S
+	{
+		player.model = sistema.file.model['player-walk'];
+		player.currentProgression = -1;
+		if(frameCount%10)
+			sistema.scene.camera.update();
+	}
+	else if (keyCode == 87 || keyCode == UP_ARROW ) //W
+	{
+		player.model = sistema.file.model['player-walk'];
+		player.currentProgression = 1;
+		if(frameCount%10)
+			sistema.scene.camera.update();
+	}
+}
+
+function keyReleased()
+{
+	if (
+		keyCode == 83 || 
+		keyCode == 87 ||
+ 		keyCode == UP_ARROW || 
+		keyCode == DOWN_ARROW 
+	   ) 
+	{
+		player.model = sistema.file.model['player-idle'];
+	}
+}
+
+//------------------------------------------
+//MOUSE
+//------------------------------------------
+
+//function mouseClicked() 
+//{
+	
+	//for(i = 0; i < resma.length; i++)
+		//if(Check2DCollision(resma[i],{x:mouseX-4,y:mouseY-4,h:8,w:8}))
+		//{
+			//if(resma[i].playable == true)
+		//		player = resma[i];
+		//	else 
+		//		player.text.say("o objeto selecionado nao pode ser controlado",2);
+		//	return 0;
+		//}
+	//player.target.x = mouseX;
+	//player.target.y = mouseY;
+//}
+
+//------------------------------------------
+//MAIN
+//MAIN
+//MAIN
+//------------------------------------------
+
+var sistema;
+var player;
+var camera;
+var map;
+var canvas;
+function preload()
+{
+	sistema = new Sistema();
+	sistema.file.font.load("assets/font/acentos/KyrillaSansSerif-Bold.ttf");//sistema.file.font[0] as no name given
+	sistema.file.font.load("assets/font/Mockery.ttf");//sistema.file.font[1] as no name given
+	sistema.file.model.load('assets/models/map/level0/0.obj','map0');//single-file model import example
+	let arrayTemporario = range(1,24);//temp numbers array for animation initialization
+	//multi-file model(ANIMATION) import example
+	sistema.file.model.load
+	({
+		...arrayTemporario,
+		name:'player-walk',
+		ext:'.obj',
+		path:'assets/models/player/walk/'
+	});
+	arrayTemporario = range(1,239);
+	sistema.file.model.load
+	({
+		...arrayTemporario,
+		name:'player-idle',
+		ext:'.obj',
+		path:'assets/models/player/idle/'
+	});
+	arrayTemporario = range(0,9);//PLEASE CHANGE THIS FROM 9 TO 10 TO INCLUDE THE FLOOR
+	sistema.file.model.load
+	({
+		...arrayTemporario,
+		name:'lvl0hitboxes',
+		ext:'.obj',
+		path:'assets/models/map/level0/hitbox/'
+	});
+	sistema.file.image.load('assets/models/map/level0/texture_0.png','map0');//single-file image import example
+}
+
+function setup()
+{
+	//canvas
+	sistema.setup();
+	delete sistema.setup();
+	//delete sistema._cameraSetup();
+	
+	sistema.world.creature.new
+	({
+		name:'joao',
+		color:{r:140,g:100,b:0,a:255},
+		position:{x:0,y:0,z:0.5},
+		scale:{x:1,y:1,z:1},
+		model:sistema.file.model['player-idle'],
+		hitbox:{}
+	});
+	
+	player = sistema.world.creature['joao'];
+	sistema.scene.camera.target = player.position;
+	map = 
+	{
+		name:'mapa0',
+		color:{r:0,g:0,b:0,a:0},
+		position:{x:0,y:0,z:0},
+		scale:{x:1,y:1,z:1},
+		model:sistema.file.model['map0'],
+		texture:sistema.file.image['map0']
+	}
+	sistema.scene.model.add(map);
+	sistema.scene.model.add(player);
+}
+
+function draw() 
+{
+	sistema.gfx.clear();
+	sistema.gfx.noStroke();
+	keyDown();
+	
+	sistema.scene.render();
+	image(sistema.gfx, 0, 0, sistema.screen.w, sistema.screen.h);
+	
+	//mouse
+	push();
+	stroke(0,0,0);
+	strokeWeight(1);
+	noFill();
+	circle(mouseX,mouseY,6);
+	pop();
+	
 }
