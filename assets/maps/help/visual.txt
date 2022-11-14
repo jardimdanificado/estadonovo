@@ -1,0 +1,21 @@
+this file defines what will be rendered for every-tile
+
+//: the presence of this indicates multi level ambient(multi-floor map, Z axis)
+
+- this has no default reference like collision.txt, you must write every reference on the reference.txt file
+- you are discouraged to use symbols, please use only numbers and chars
+- you can use multi-sized objects, but be wise with the "code" chosen, it can scramble the namespace very quickly
+
+the default syntax is = 
+
+	111111111111111111111111
+	1ggYKLggggggggggggggggg1
+	1ggZXUggggggggggggggggg1
+	1gggggggggggggggggggggg1
+	111111111111111111111111
+	//
+	111111111111111111111111
+	100000000000000000000001
+	100000000000000000000001
+	100000000000000000000001
+	111111111111111111111111

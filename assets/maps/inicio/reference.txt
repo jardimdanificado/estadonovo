@@ -1,0 +1,5 @@
+1: none
+8 : rgb>122,010,241
+j : rgba>0,0,0,0
+c : model> default-chair
+t : model>default-table

@@ -1,0 +1,16 @@
+this file creates references, mainly used for tile translation, 
+but of course can be use as well for anything else
+
+- spaces are ignored, dont expect well formated texts as values or names
+- the only operator is : which means equity
+- must only one equity(:) each line, otherwise you will get an error
+- every line must have a name followed by an equity operator followed by a value e.g: name:value
+- everything is text
+- each line is a reference, dont try to minify the file or put more than one reference per line
+- you are discouraged to use symbols except for math formulas
+- dont use '//' in any reference, '//' is not a operator here but it can still break the visual and collision
+
+the default syntax is = 
+	name1:value1
+	name:value
+	name3:value3
