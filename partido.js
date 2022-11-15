@@ -25,7 +25,7 @@ function fileStartup()
 			}
 			*/
 			let lobj = [];
-			let tempn = getLength(filepath);
+			let tempn = GetLength(filepath);
 
 			if(!filepath.ext)
 				filepath.ext = '.obj';
@@ -60,7 +60,7 @@ function fileStartup()
 			}
 			*/
 			let lobj = [];
-			let tempn = getLength(filepath);
+			let tempn = GetLength(filepath);
 
 			if(!filepath.ext)
 				filepath.ext = '.png';
@@ -533,13 +533,13 @@ var map;
 
 function preload()
 {
-	estado = new Estado('assets/maps/inicio/');
+	estado = new Estado('assets/maps/inicio.json');
 	//console.log(estado)
 	partido = new Partido();
 	partido.file.font.load("assets/font/acentos/KyrillaSansSerif-Bold.ttf");//partido.file.font[0] as no name given
 	partido.file.font.load("assets/font/Mockery.ttf");//partido.file.font[1] as no name given
 	partido.file.model.load('assets/models/map/level0/0.obj','map0');//single-file model import example
-	let arrayTemporario = range(1,24);//temp numbers array for animation initialization
+	let arrayTemporario = Range(1,24);//temp numbers array for animation initialization
 	//multi-file model(ANIMATION) import example
 	partido.file.model.load
 	({
@@ -548,7 +548,7 @@ function preload()
 		ext:'.obj',
 		path:'assets/models/player/walk/'
 	});
-	arrayTemporario = range(1,239);
+	arrayTemporario = Range(1,239);
 	partido.file.model.load
 	({
 		...arrayTemporario,
@@ -561,10 +561,11 @@ function preload()
 
 function setup()
 {
-	//canvas
-	partido.setup();
-	delete partido.setup();
-	//delete partido._cameraSetup();
+	estado.setup();//backend setup
+	delete estado.setup;
+	
+	partido.setup();//frontend setup
+	delete partido.setup;
 	
 	partido.world.creature.new
 	({
@@ -577,7 +578,9 @@ function setup()
 	});
 	
 	player = partido.world.creature['joao'];
+	
 	partido.scene.camera.target = player.position;
+	
 	map = 
 	{
 		name:'mapa0',
