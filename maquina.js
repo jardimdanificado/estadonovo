@@ -160,7 +160,9 @@ const _Data =
             if(!link.includes('.iqm') && !link.includes('.obj') && !link.includes('.glb') && !link.includes('.gltf'))
             {
                 const files = fs.readdirSync(link);
+				files.sort((a,b)=>parseInt(a)-parseInt(b));
                 this.model[name].model = [];
+				console.log(files)
                 if(files[0].includes('.glb') || files[0].includes('.obj') || files[0].includes('.iqm') || files[0].includes('.gltf'))
                     for(let i = 0;i<files.length;i++)
                         if(fs.existsSync(link+files[i]))
@@ -201,7 +203,6 @@ const _Data =
 			addCreature:function(crt,specime)
 			{
 				specime = defsto(specime,'human');
-				console.log(specime)
 				if(specime === 'human')
 					this.addModel(crt.name,'player-walk',0,r.BLUE,crt.position,crt.rotation,Vector3(1,1,1));
 			},

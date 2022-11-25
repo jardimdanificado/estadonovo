@@ -1,31 +1,11 @@
 {
   "name": "EstadoNovo",
-  "version": 0.06900000000000005,
   "description": "A minimal Electron application",
   "main": "main.js",
+  "build": 33,
   "scripts": {
     "start": "electron . --no-sandbox"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/electron/electron-quick-start.git"
-  },
-  "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
-  ],
-  "author": "GitHub",
-  "license": "MIT",
-  "devDependencies": {
-    "electron": "^19.0.4"
-  },
-  "bugs": {
-    "url": "https://github.com/electron/electron-quick-start/issues"
-  },
-  "homepage": "https://github.com/electron/electron-quick-start#readme",
   "dependencies": {
     "json": "^11.0.0",
     "raylib": "^0.12.0",
