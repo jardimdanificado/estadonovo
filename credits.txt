@@ -1,0 +1,15 @@
+
+“Here’s to those who inspire you and don’t even know it.” —Anonymous
+
+
+My especial thanks to:
+
+Leonardo Reis (https://github.com/reonardoleis) - Wrote the windows build files, and built Estado Novo for windows the first time.
+
+Kayoa (https://www.instagram.com/_kayoa_/) - Composed main theme music.
+
+assblasterplastered (https://sketchfab.com/assblasterplastered) - Made the base mesh used for player and npcs. License is included in path assets/models/player/license.txt
+
+raylib (https://www.raylib.com/) - Robust OpenGL manipulation and game devlib.
+
+RobLoach (https://github.com/RobLoach/node-raylib) - Made the raylib bindings for nodejs. 
