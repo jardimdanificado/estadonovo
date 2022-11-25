@@ -1,0 +1,6 @@
+run = "./node_modules/.bin/json -I -f package.json -e 'this.version = parseFloat(this.version)+0.001'&&electron main.js --no-sandbox"
+hidden = [".config",".git","node_modules","package-lock.json"]
+[env]
+XDG_CONFIG_HOME="/home/runner/${REPL_SLUG}/.config"
+[nix]
+channel = "stable-21_11"

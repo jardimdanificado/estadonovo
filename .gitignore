@@ -1,9 +1,2 @@
-*.keystore
-*.apk
-*.a
-*.appimage
-.vscode
-.replit
-replit.nix
-.config
-.git
+package-lock.json
+node_modules
