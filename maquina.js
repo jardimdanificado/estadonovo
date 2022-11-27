@@ -93,50 +93,6 @@ function DifferenceVec3(vec1, vec2)
 }
 
 //-----------------------------------
-//FONT&STRING
-//-----------------------------------
-
-function FontStart(FontLoc, FontSize)
-{
-	
-    var fileize = 0;
-    var fileData = r.LoadFileData(FontLoc, fileize);
-    // Default font generation from TTF font
-    var fontDefault = {};
-    fontDefault.baseSize = FontSize;
-    fontDefault.glyphCount = 95;
-	
-    // Loading font data from memory data
-    // Parameters > font size: FontSize, no glyphs array provided (0), glyphs count: 95 (autogenerate chars array)
-    fontDefault.glyphs = r.LoadFontData(fileData, fileize, FontSize, 0, 95, r.FONT_DEFAULT);
-
-    fontDefault.glyphs = r.LoadFontData(fileData, fileize, FontSize, 0, 95, r.FONT_DEFAULT);
-    // Parameters > glyphs count: 95, font size: FontSize, glyphs padding in image: 4 px, pack method: 0 (default)
-    var atlas = r.GenImageFontAtlas(fontDefault.glyphs, fontDefault.recs, 95, FontSize, 14, 0);
-    fontDefault.texture = r.LoadTextureFromImage(atlas);
-    r.UnloadImage(atlas);
-
-    // SDF font generation from TTF font
-    let fontSDF = {  };
-    fontSDF.baseSize = FontSize;
-    fontSDF.glyphCount = 95;
-    // Parameters > font size: FontSize, no glyphs array provided (0), glyphs count: 0 (defaults to 95)
-    fontSDF.glyphs = r.LoadFontData(fileData, fileize, FontSize, 0, 0, FONT_SDF);
-    // Parameters > glyphs count: 95, font size: FontSize, glyphs padding in image: 0 px, pack method: 1 (Skyline algorythm)
-    atlas = r.GenImageFontAtlas(fontSDF.glyphs, fontSDF.recs, 95, FontSize, 0, 1);
-    fontSDF.texture = r.LoadTextureFromImage(atlas);
-    r.UnloadImage(atlas);
-
-    r.UnloadFileData(fileData);      // Free memory from loaded file
-
-    // Load SDF required shader (we use default vertex shader)
-    //Shader shader = LoadShader(0, TextFormat("data/shaders/sdf.fs", 330));
-    r.SetTextureFilter(fontSDF.texture, r.TEXTURE_FILTER_POINT);    // Required for SDF font
-
-    return (fontDefault);
-}
-
-//-----------------------------------
 //3D && CAMERA
 //-----------------------------------
 
@@ -189,7 +145,6 @@ function Move3D(position, rotation, speed)
         }
         break;
     }
-	console.log(rotation)
     return position;
 }
 
@@ -236,6 +191,7 @@ const _Data =
             {
                 this.hitbox[name] = {};
                 this.hitbox[name].hitbox = r.GetModelBoundingBox(this.model[name].model);
+				this.hitbox[name].name = name;
                 this.hitbox.push(this.hitbox[name]);
             }
             this.model.push(this.model[name]);
@@ -262,7 +218,7 @@ const _Data =
 			{
 				specime = defsto(specime,'human');
 				if(specime === 'human')
-					this.addModel(crt.name,'player-idle',0,r.BLUE,crt.position,crt.rotation);
+					this.addModel(crt.name,'player-idle',0,RGBA(153,100,0,255),crt.position,crt.rotation);
 			},
 			addModel:function(name,modelid,frame,color,position,rotation,scale,visible,progression)
 			{
@@ -360,4 +316,4 @@ function Start(data)
 	data.scene.map.currentLevel = 0;
 };
 
-module.exports = {Data,Start,CameraStart,FontStart,Move3D,DefaultsTo,defsto,LimitItTo,limito};
+module.exports = {Data,Start,CameraStart,Move3D,DefaultsTo,defsto,LimitItTo,limito};
