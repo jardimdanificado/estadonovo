@@ -148,6 +148,47 @@ function Move3D(position, rotation, speed)
     return position;
 }
 
+function UpdateGravityRay(targetobj)
+{
+    targetobj.ray.gravity.position = Vector3(targetobj.position.x,targetobj.position.y-(0.005*(targetobj.fallTime)),targetobj.position.z);
+    targetobj.ray.gravity.direction = Vector3(0,1,0);
+}
+
+function Gravity(targetobj, gravidade)
+{
+    return(targetobj.position.y - gravidade*((targetobj.fallTime*(targetobj.fallTime/5)))/60);
+}
+
+function Gravit(data, targetobj)
+{
+	UpdateGravityRay(targetobj);
+	var gravityraiocolisao = {hit:false};
+    for(let i=0;i<data.scene.render.hitbox.length;i++)
+    {
+		if(data.scene.render.hitbox[i].active == true)
+		{
+			gravityraiocolisao = r.GetRayCollisionBox(targetobj.ray.gravity,data.scene.render.hitbox[i].hitbox);
+			if(gravityraiocolisao.hit == true)
+				break;
+			gravityraiocolisao.hit = false;
+		}
+    }
+	
+    if(gravityraiocolisao.hit == false)
+    {
+        targetobj.position.y = Gravity(targetobj, 0.1);
+        targetobj.fallTime++;
+    }
+    else
+    {
+        if(gravityraiocolisao.distance<0.7)
+        {   
+            targetobj.position.y = gravityraiocolisao.point.y;
+            targetobj.fallTime = 0;
+        }
+    }
+}
+
 //-----------------------------------
 //DATA_FILE
 //-----------------------------------
@@ -228,23 +269,26 @@ const _Data =
 				frame = defsto(frame,0);
 				color = defsto(color,RGBA(255,255,255,255));
 				visible = defsto(visible,true);
+				ray = {gravity:{position:position, direction: {x:0,y:1,z:0}}};
+				fallTime = 0;
 				if(this.file.model[modelid].model[0])
 					progression = defsto(progression,1);
 				else
 					progression = defsto(progression,0);
 				
-				let temp = {name:name,id:modelid,position:position,rotation:rotation,scale:scale,frame:frame,color:color,visible:visible,progression:progression};
+				let temp = {name:name,id:modelid,position:position,rotation:rotation,scale:scale,frame:frame,color:color,visible:visible,progression:progression,ray:ray,fallTime:0};
 				this.model[name] = temp;
 				this.model.push(temp);
 			},
-			addHitbox:function(name,hitboxid,position,rotation,frame,color,visible)
+			addHitbox:function(name,hitbox,position,rotation,frame,color,visible)
 			{
 				position = DefaultsTo(position,{x:0,y:0,z:0});
 				rotation = defsto(rotation,Vector3(0,0,0));//Same as DefaultsTo
 				frame = defsto(frame,0);
 				color = defsto(color,RGBA(0,0,0,0));
 				visible = defsto(visible,true);
-				let temp = {name:name,id:hitboxid,position:position,rotation:rotation,frame:frame,color:color,visible:visible};//color stands for wireframe color
+				active = true;
+				let temp = {name:name,hitbox:hitbox,position:position,rotation:rotation,frame:frame,color:color,active:active,visible:visible};//color stands for wireframe color
 				this.hitbox[name] = temp;
 				this.hitbox.push(temp);
 			},
@@ -316,4 +360,4 @@ function Start(data)
 	data.scene.map.currentLevel = 0;
 };
 
-module.exports = {Data,Start,CameraStart,Move3D,DefaultsTo,defsto,LimitItTo,limito};
+module.exports = {Data,Start,CameraStart,Move3D,Gravit,DefaultsTo,defsto,LimitItTo,limito};

@@ -85,10 +85,9 @@ function main()
 		{
 			name:"joao451",
 			type:"human",
-			position:{x:0,y:0,z:0},
+			position:{x:0,y:4,z:0},
 			rotation:{x:0,y:0,z:0},
 			speed:0.1,
-			ray:{position:this.position, direction: {x:0,y:1,z:0}},
 			alive:true,
 			active:true
 		}
@@ -102,11 +101,11 @@ function main()
 	r.UpdateCamera(data.scene.camera);
     data.scene.camera.target = data.scene.creature[0].position;
     data.scene.camera.position = {x:0.4375, y:10, z:11.0625};
+	
 	for(let i = 0;i<data.file.hitbox.length;i++)
 		if(data.file.hitbox[i].name.includes('lvl0_hitbox'))
 		{
-			data.scene.render.hitbox.push(data.file.hitbox[i].hitbox);
-			data.scene.render.hitbox[data.file.hitbox[i].name] = data.file.hitbox[i].hitbox;
+			data.scene.render.addHitbox(data.file.hitbox[i].name,data.file.hitbox[i].hitbox);
 		}
     while(!r.WindowShouldClose()/* && data.session.exit == false*/)
     {
@@ -128,10 +127,9 @@ function main()
 				data.scene.render.model[i].frame = mqq.limito(data.scene.render.model[i].frame,0,data.file.model[data.scene.render.model[i].id].model.length-2);
 			}
 			data.scene.render.model[i].rotation.y = mqq.limito(data.scene.render.model[i].rotation.y,0,359);
-			
+			mqq.Gravit(data,data.scene.render.model[0]);
 			if(data.scene.render.model[i].visible == true)
 			{
-				//console.log(data.file.model[data.scene.render.model[i].id])
 				if(typeof data.file.model[data.scene.render.model[i].id].model[0] != 'undefined')
 					r.DrawModelEx(
 						data.file.model[data.scene.render.model[i].id].model[data.scene.render.model[i].frame], 
