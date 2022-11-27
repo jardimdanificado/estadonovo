@@ -62,6 +62,22 @@ function DefaultsTo(target,def)
 }
 var defsto = DefaultsTo;
 
+function LimitItTo(value,min,max)
+{
+	if(value > max)
+	{
+		while(value > max)
+			value -= max;
+	}
+	if(value < min)
+	{
+		while(value < min)
+			value += max;
+	}
+	return value;
+}
+var limito = LimitItTo;
+
 //-----------------------------------
 //CALCULATE
 //-----------------------------------
@@ -82,13 +98,14 @@ function DifferenceVec3(vec1, vec2)
 
 function FontStart(FontLoc, FontSize)
 {
+	
     var fileize = 0;
     var fileData = r.LoadFileData(FontLoc, fileize);
     // Default font generation from TTF font
     var fontDefault = {};
     fontDefault.baseSize = FontSize;
     fontDefault.glyphCount = 95;
-
+	
     // Loading font data from memory data
     // Parameters > font size: FontSize, no glyphs array provided (0), glyphs count: 95 (autogenerate chars array)
     fontDefault.glyphs = r.LoadFontData(fileData, fileize, FontSize, 0, 95, r.FONT_DEFAULT);
@@ -120,7 +137,7 @@ function FontStart(FontLoc, FontSize)
 }
 
 //-----------------------------------
-//CAMERA
+//3D && CAMERA
 //-----------------------------------
 
 function CameraStart()
@@ -133,6 +150,47 @@ function CameraStart()
     camera.projection = r.CAMERA_PERSPECTIVE;
     r.SetCameraMode(camera, r.CAMERA_CUSTOM);
     return (camera);
+}
+
+function Move3D(position, rotation, speed)
+{
+    //z+ frente
+    //x+ esquerda
+    let  valorZ, valorX;
+    let giro = Math.floor(rotation / 90.0);
+    let resto = rotation - (90.0 * giro);
+    let restodoresto = 90.0 - resto;
+    valorZ = speed - (resto * (speed / 90.0));
+    valorX = (speed - (restodoresto * (speed / 90)));
+	switch(giro)
+    {
+        case 0:
+        {
+            position.z += valorZ;
+            position.x += valorX;
+        }
+        break;
+        case 1:
+        {
+            position.z -= valorX;
+            position.x += valorZ;
+        }
+        break;
+        case 2:
+        {
+            position.z -= valorZ;
+            position.x -= valorX;
+        }
+        break;
+        case 3:
+        {
+            position.z += valorX;
+            position.x -= valorZ;
+        }
+        break;
+    }
+	console.log(rotation)
+    return position;
 }
 
 //-----------------------------------
@@ -204,46 +262,54 @@ const _Data =
 			{
 				specime = defsto(specime,'human');
 				if(specime === 'human')
-					this.addModel(crt.name,'player-walk',0,r.BLUE,crt.position,crt.rotation,Vector3(1,1,1));
+					this.addModel(crt.name,'player-idle',0,r.BLUE,crt.position,crt.rotation);
 			},
-			addModel:function(name,modelid,frame,color,position,rotation,scale)
+			addModel:function(name,modelid,frame,color,position,rotation,scale,visible,progression)
 			{
 				position = DefaultsTo(position,{x:0,y:0,z:0});
 				rotation = defsto(rotation,Vector3(0,0,0));//Same as DefaultsTo
 				scale = defsto(scale,Vector3(1,1,1));
 				frame = defsto(frame,0);
-				color = defsto(color,RGBA(0,0,0,0));
-				let temp = {name:name,id:modelid,position:position,rotation:rotation,scale:scale,frame:frame,color:color};
-				this.model[name] = temp;
+				color = defsto(color,RGBA(255,255,255,255));
+				visible = defsto(visible,true);
+				if(this.file.model[modelid].model[0])
+					progression = defsto(progression,1);
+				else
+					progression = defsto(progression,0);
 				
+				let temp = {name:name,id:modelid,position:position,rotation:rotation,scale:scale,frame:frame,color:color,visible:visible,progression:progression};
+				this.model[name] = temp;
 				this.model.push(temp);
 			},
-			addHitbox:function(name,hitboxid,position,rotation,frame,color)
+			addHitbox:function(name,hitboxid,position,rotation,frame,color,visible)
 			{
 				position = DefaultsTo(position,{x:0,y:0,z:0});
 				rotation = defsto(rotation,Vector3(0,0,0));//Same as DefaultsTo
 				frame = defsto(frame,0);
 				color = defsto(color,RGBA(0,0,0,0));
-				let temp = {name:name,id:hitboxid,position:position,rotation:rotation,frame:frame,color:color};//color stands for wireframe color
+				visible = defsto(visible,true);
+				let temp = {name:name,id:hitboxid,position:position,rotation:rotation,frame:frame,color:color,visible:visible};//color stands for wireframe color
 				this.hitbox[name] = temp;
 				this.hitbox.push(temp);
 			},
-			addText:function(name,fontid,msg,position,scale,color)
+			addText:function(name,fontid,msg,position,scale,color,visible)
 			{
 				position = DefaultsTo(position,{x:0,y:0});
 				msg = defsto(msg,"empty");
 				scale = defsto(scale,1);
 				color = defsto(color,RGBA(0,0,0,0));
-				let temp = {name:name,id:fontid,msg:msg,position:position,rotation:rotation,frame:frame,color:color};//color stands for wireframe color
+				visible = defsto(visible,true);
+				let temp = {name:name,id:fontid,msg:msg,position:position,rotation:rotation,frame:frame,color:color,visible:visible};//color stands for wireframe color
 				this.text[name] = temp;
 				this.text.push(temp);
 			},
-			addImage:function(name,imageid,msg,position,scale,color)
+			addImage:function(name,imageid,msg,position,scale,color,visible)
 			{
 				position = DefaultsTo(position,{x:0,y:0});
 				msg = defsto(msg,"empty");
 				color = defsto(color,RGBA(0,0,0,0));
-				let temp = {name:name,id:imageid,position:position,rotation:rotation,frame:frame,color:color};//color stands for wireframe color
+				visible = defsto(visible,true);
+				let temp = {name:name,id:imageid,position:position,rotation:rotation,frame:frame,color:color,visible:visible};//color stands for wireframe color
 				this.image[name] = temp;
 				this.image.push(temp);
 			},
@@ -263,7 +329,7 @@ class Data
 		this.scene = {..._Data.scene};
 		this.file = {..._Data.file};
 		this.config = require("./config.json");
-		this.scene.render.file = this.file;
+		this.scene.render.file = this.file;//just a link
 	}
 }
 
@@ -279,18 +345,14 @@ function Start(data)
 	r.InitWindow(data.config.screen.x, data.config.screen.y, data.config.title);
 	r.SetTargetFPS(data.config.framerate);
 	r.SetExitKey(r.KEY_END);
-	//load.c
-	//MQLoadAll(data);
-	//SESSION_RENDER
-	data.config.upscale = data.config.upscale;
 	data.session.rendertexture = r.LoadRenderTexture(data.config.screen.x/data.config.upscale, data.config.screen.y/data.config.upscale);
 	data.scene.background = {r:115, g:105, b:97, a:255};
 	data.scene.creature = [];
 	data.session.frame = 0;
 	//FONTS
-	//data.file.font.push(FontStart("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16));
-	//data.file.font.push(FontStart("data/font/Mockery.ttf", 48));
-	//data.file.font.push(FontStart("data/font/Mockery.ttf", 24));
+	data.file.font.push(r.LoadFontEx("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16, 0, 0));
+	data.file.font.push(r.LoadFontEx("data/font/acentos/Mockery.ttf", 48, 0, 0));
+	data.file.font.push(r.LoadFontEx("data/font/acentos/Mockery.ttf", 24, 0, 0));
 	//MUSIC
 	data.file.music.push(r.LoadMusicStream("data/audio/music/maintheme_by_kayoa.mp3"));
     
@@ -298,4 +360,4 @@ function Start(data)
 	data.scene.map.currentLevel = 0;
 };
 
-module.exports = {Data,Start,CameraStart,FontStart,DefaultsTo,defsto};
+module.exports = {Data,Start,CameraStart,FontStart,Move3D,DefaultsTo,defsto,LimitItTo,limito};
