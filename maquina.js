@@ -23,6 +23,7 @@ function Vector3Zero()
     return({x:0,y:0,z:0});
 }
 
+
 function Vector2(xx,yy)
 {
     return({x:xx,y:yy});
@@ -31,6 +32,11 @@ function Vector2(xx,yy)
 function Vector2Zero()
 {
     return({x:0,y:0});
+}
+
+function BoundingBox(min,max)
+{
+    return({min:{x:min.x,y:min.y,z:min.z},max:{x:max.x,y:max.y,z:max.z}});
 }
 
 const COR_VERMELHO = RGBA(235, 64, 52,255);
@@ -154,6 +160,68 @@ function UpdateGravityRay(targetobj)
     targetobj.ray.gravity.direction = Vector3(0,1,0);
 }
 
+function UpdateHorizontalRay(ref,backwards)
+{
+    //z+ frente
+    //x+ esquerda
+    let valorZ;
+    let valorX;
+    if(ref.rotation.y<=90.0)
+    {
+        if(backwards)
+        {
+            valorZ = -1.0+((1.0/90.0)*ref.rotation.y);
+            valorX = 0.0-(1.0/90.0)*ref.rotation.y;
+        }
+        else
+        {
+            valorZ = 1.0-((1.0/90.0)*ref.rotation.y);
+            valorX = 0.0+(1.0/90.0)*ref.rotation.y;
+        }
+    }
+    else if(ref.rotation.y<=180)
+    {
+        if(backwards)
+        {
+            valorZ = 0.0+((1.0/90.0)*(ref.rotation.y-90.0));
+            valorX = -1.0+((1.0/90.0)*(ref.rotation.y-90.0));
+        }
+        else
+        {
+            valorZ = 0.0-((1.0/90.0)*(ref.rotation.y-90.0));
+            valorX = 1.0-((1.0/90.0)*(ref.rotation.y-90.0));
+        }
+    }
+    else if(ref.rotation.y<=270)
+    {
+        if(backwards)
+        {
+            valorZ = 1.0-((1.0/90.0)*(ref.rotation.y-180.0));
+            valorX = 0.0+((1.0/90.0)*(ref.rotation.y-180.0));
+        }
+        else
+        {
+            valorZ = -1.0+((1.0/90.0)*(ref.rotation.y-180.0));
+            valorX = 0.0-((1.0/90.0)*(ref.rotation.y-180.0));
+        }
+    }
+    else 
+    {
+        if(backwards)
+        {
+            valorZ = 0.0-((1.0/90.0)*(ref.rotation.y-270.0));
+            valorX = 1.0-((1.0/90.0)*(ref.rotation.y-270.0));
+        }
+        else
+        {
+            valorZ = 0.0+((1.0/90.0)*(ref.rotation.y-270.0));
+            valorX = -1.0+((1.0/90.0)*(ref.rotation.y-270.0));
+        }
+    }
+    ref.ray.horizontal.position = Vector3(ref.position.x,ref.position.y+0.7,ref.position.z);
+   	ref.ray.horizontal.direction = Vector3(valorX,0,valorZ);
+}
+
 function Gravity(targetobj, gravidade)
 {
     return((targetobj.position.y) - gravidade*((targetobj.fallTime*(targetobj.fallTime/10)))/60);
@@ -182,11 +250,61 @@ function Gravit(data, targetobj)
     else
     {
         if(gravityraiocolisao.distance<0.7)
-        {   
+        {
             targetobj.position.y = gravityraiocolisao.point.y;
             targetobj.fallTime = 0;
         }
     }
+}
+
+function PlayerCollider(data,ref, backwards)
+{
+    var directionraiocolisao = {hit:false};
+    UpdateHorizontalRay(ref,backwards);
+    for(let i=0;i<data.scene.render.hitbox.length;i++)
+		if(data.scene.render.hitbox[i].active == true)
+		{
+			directionraiocolisao = r.GetRayCollisionBox(ref.ray.horizontal,data.scene.render.hitbox[i].hitbox);
+			if(directionraiocolisao.hit == true)
+			{
+				break;
+			}
+			directionraiocolisao.hit = false;
+		}
+    if(directionraiocolisao.hit == true)
+    {
+        if(directionraiocolisao.distance<0.5)
+        {
+            return true;
+        }
+        else
+        {
+            let caixa = {max:{...ref.position},min:{...ref.position}};
+            caixa.max.x += 0.2;
+            caixa.max.y += 1.2;
+            caixa.max.z += 0.2;
+            caixa.min.x += -0.2;
+            caixa.min.y += 0.8;
+            caixa.min.z += -0.2;
+            if(backwards)
+            {
+                Move3D(caixa.max,ref.rotation.y,-0.1);
+                Move3D(caixa.min,ref.rotation.y,-0.1);
+            }
+            else
+            {
+                Move3D(caixa.max,ref.rotation.y,0.1);
+                Move3D(caixa.min,ref.rotation.y,0.1);
+            }
+            for(let i = 0;i<data.scene.render.hitbox.length;i++)
+				if(data.scene.render.hitbox[i].active == true)
+					if(r.CheckCollisionBoxes(caixa,data.scene.render.hitbox[i].hitbox)==true)
+					{
+						return true;
+					}
+        }
+    }
+    return false;
 }
 
 //-----------------------------------
@@ -216,7 +334,6 @@ const _Data =
                 const files = fs.readdirSync(link);
 				files.sort((a,b)=>parseInt(a)-parseInt(b));
                 this.model[name].model = [];
-				console.log(files)
                 if(files[0].includes('.glb') || files[0].includes('.obj') || files[0].includes('.iqm') || files[0].includes('.gltf'))
                     for(let i = 0;i<files.length;i++)
                         if(fs.existsSync(link+files[i]))
@@ -254,7 +371,7 @@ const _Data =
         creature:[],
 		render:
 		{	
-			file:{},//is set then, in the 
+			file:{},//is set then, in the constructor
 			addCreature:function(crt,specime)
 			{
 				specime = defsto(specime,'human');
@@ -269,7 +386,11 @@ const _Data =
 				frame = defsto(frame,0);
 				color = defsto(color,RGBA(255,255,255,255));
 				visible = defsto(visible,true);
-				ray = {gravity:{position:Vector3(0,0,0), direction: {x:0,y:1,z:0}}};
+				ray = 
+				{
+					gravity:{position:Vector3(0,0,0), direction: {x:0,y:1,z:0}},
+					horizontal:{position:Vector3(0,0,0), direction: {x:0,y:0,z:0}}
+				};
 				fallTime = 0;
 				if(this.file.model[modelid].model[0])
 					progression = defsto(progression,1);
@@ -330,34 +451,23 @@ class Data
 		this.file = {..._Data.file};
 		this.config = require("./config.json");
 		this.scene.render.file = this.file;//just a link
+		if(this.config.resizebleWindow == true)
+			r.SetConfigFlags(r.FLAG_WINDOW_RESIZABLE);
+		//r.InitAudioDevice();
+		r.InitWindow(this.config.screen.x, this.config.screen.y, this.config.title);
+		r.SetTargetFPS(this.config.framerate);
+		r.SetExitKey(r.KEY_END);
+		this.session.rendertexture = r.LoadRenderTexture(this.config.screen.x/this.config.upscale, this.config.screen.y/this.config.upscale);
+		this.scene.background = {r:115, g:105, b:97, a:255};
+		this.scene.creature = [];
+		this.session.frame = 0;
+		//CURRENT_LEVEL
+		this.scene.map.currentLevel = 0;
 	}
 }
 
 //-----------------------------------
-//STARTUP
+//exports
 //-----------------------------------
 
-function Start(data)
-{
-	if(data.config.resizebleWindow == true)
-		r.SetConfigFlags(r.FLAG_WINDOW_RESIZABLE);
-	//r.InitAudioDevice();
-	r.InitWindow(data.config.screen.x, data.config.screen.y, data.config.title);
-	r.SetTargetFPS(data.config.framerate);
-	r.SetExitKey(r.KEY_END);
-	data.session.rendertexture = r.LoadRenderTexture(data.config.screen.x/data.config.upscale, data.config.screen.y/data.config.upscale);
-	data.scene.background = {r:115, g:105, b:97, a:255};
-	data.scene.creature = [];
-	data.session.frame = 0;
-	//FONTS
-	data.file.font.push(r.LoadFontEx("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16, 0, 0));
-	data.file.font.push(r.LoadFontEx("data/font/acentos/Mockery.ttf", 48, 0, 0));
-	data.file.font.push(r.LoadFontEx("data/font/acentos/Mockery.ttf", 24, 0, 0));
-	//MUSIC
-	data.file.music.push(r.LoadMusicStream("data/audio/music/maintheme_by_kayoa.mp3"));
-    
-	//CURRENT_LEVEL
-	data.scene.map.currentLevel = 0;
-};
-
-module.exports = {Data,Start,CameraStart,Move3D,Gravit,DefaultsTo,defsto,LimitItTo,limito};
+module.exports = {Data,CameraStart,Move3D,PlayerCollider,Gravit,DefaultsTo,defsto,LimitItTo,limito};

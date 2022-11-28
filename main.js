@@ -13,7 +13,10 @@ function Teclado(data)
 	}
 	if(r.IsKeyDown(r.KEY_W))
 	{
-		mqq.Move3D(data.scene.creature['joao451'].position,data.scene.creature['joao451'].rotation.y,0.1);
+		if(mqq.PlayerCollider(data,data.scene.render.model['joao451'],false)==false)
+		{
+			mqq.Move3D(data.scene.creature['joao451'].position,data.scene.creature['joao451'].rotation.y,0.1);
+		}
 	}
 	if(r.IsKeyReleased(r.KEY_W))
 	{
@@ -28,7 +31,10 @@ function Teclado(data)
 	}
 	if(r.IsKeyDown(r.KEY_S))
 	{
-		mqq.Move3D(data.scene.creature['joao451'].position,data.scene.creature['joao451'].rotation.y,-0.1);
+		if(mqq.PlayerCollider(data,data.scene.render.model['joao451'],true)==false)
+		{
+			mqq.Move3D(data.scene.creature['joao451'].position,data.scene.creature['joao451'].rotation.y,-0.1);
+		}
 	}
 	if(r.IsKeyReleased(r.KEY_S))
 	{
@@ -53,10 +59,16 @@ function Teclado(data)
 
 function main()
 {
-	data = new mqq.Data();
-	mqq.Start(data);
+	data = new mqq.Data();//all startup needs are in the constructor
 	function load()
 	{
+		//FONTS
+		data.file.font.push(r.LoadFontEx("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16, 0, 0));
+		data.file.font.push(r.LoadFontEx("data/font/acentos/Mockery.ttf", 48, 0, 0));
+		data.file.font.push(r.LoadFontEx("data/font/acentos/Mockery.ttf", 24, 0, 0));
+		//MUSIC
+		data.file.music.push(r.LoadMusicStream("data/audio/music/maintheme_by_kayoa.mp3"));
+		//MODELS
 		data.file.loadModel("lvl0_map0","data/models/map/level0/0.glb",false);
 		data.file.loadModel("lvl0_props0","data/models/map/level0/props/0.glb",true);
 		data.file.loadModel("lvl0_hitbox0","data/models/map/level0/hitbox/hitbox0.glb",true);
@@ -99,7 +111,6 @@ function main()
 	data.scene.creature['joao451'] = data.scene.creature[0];
 	data.scene.render.addCreature(data.scene.creature['joao451']);
 	data.scene.render.addModel('map0','lvl0_map0');
-	//data.scene.render.addModel(data.scene.creature['joao451']);
     //start menu
     //MQMenu(data,0);
 	r.UpdateCamera(data.scene.camera);
