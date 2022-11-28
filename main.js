@@ -45,6 +45,10 @@ function Teclado(data)
 	{
 		data.scene.creature['joao451'].rotation.y -= 6;
 	}
+	if(r.IsKeyDown(r.KEY_SPACE))
+	{
+		data.scene.creature['joao451'].position.y += 0.1;
+	}
 }
 
 function main()

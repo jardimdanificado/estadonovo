@@ -150,13 +150,13 @@ function Move3D(position, rotation, speed)
 
 function UpdateGravityRay(targetobj)
 {
-    targetobj.ray.gravity.position = Vector3(targetobj.position.x,targetobj.position.y-(0.005*(targetobj.fallTime)),targetobj.position.z);
+    targetobj.ray.gravity.position = Vector3(targetobj.position.x,(targetobj.position.y+0.00001)-(0.005*(targetobj.fallTime)),targetobj.position.z);
     targetobj.ray.gravity.direction = Vector3(0,1,0);
 }
 
 function Gravity(targetobj, gravidade)
 {
-    return(targetobj.position.y - gravidade*((targetobj.fallTime*(targetobj.fallTime/5)))/60);
+    return((targetobj.position.y) - gravidade*((targetobj.fallTime*(targetobj.fallTime/10)))/60);
 }
 
 function Gravit(data, targetobj)
@@ -176,7 +176,7 @@ function Gravit(data, targetobj)
 	
     if(gravityraiocolisao.hit == false)
     {
-        targetobj.position.y = Gravity(targetobj, 0.1);
+        targetobj.position.y = (Gravity(targetobj, 0.1));
         targetobj.fallTime++;
     }
     else
@@ -269,7 +269,7 @@ const _Data =
 				frame = defsto(frame,0);
 				color = defsto(color,RGBA(255,255,255,255));
 				visible = defsto(visible,true);
-				ray = {gravity:{position:position, direction: {x:0,y:1,z:0}}};
+				ray = {gravity:{position:Vector3(0,0,0), direction: {x:0,y:1,z:0}}};
 				fallTime = 0;
 				if(this.file.model[modelid].model[0])
 					progression = defsto(progression,1);
