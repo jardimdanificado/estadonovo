@@ -1,4 +1,4 @@
-run = "./node_modules/.bin/json -I -f package.json -e 'this.build = parseInt(this.build)+1'&&npm start"
+run = "./node_modules/.bin/json -I -f package.json -e 'this.build = parseInt(this.build)+1'&&./node_modules/.bin/json -I -f config.json -e 'this.build = parseInt(this.build)+1'&&npm start"
 hidden = [".config",".git","node_modules","package-lock.json"]
 [env]
 XDG_CONFIG_HOME="/home/runner/${REPL_SLUG}/.config"

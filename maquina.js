@@ -440,6 +440,78 @@ const _Data =
 			image:[]
 		}
     },
+	keyboard:
+	{
+		key:{},
+		set:function(id,type,infunc,args)
+		{
+			if(!this.key[id])
+			{
+				this.key[id] = {id:id,pressed:{func:{},args:{}},down:{func:{},args:{}},released:{func:{},args:{}}};
+				this.key[id].push(this.key[id].pressed);
+				this.key[id].push(this.key[id].down);
+				this.key[id].push(this.key[id].released);
+				this.key.push(this.key[id]);
+			}
+			this.key[id][type].func = infunc;
+			if(args)
+			{
+				this.key[id][type].args = args;
+			}
+		},
+		run:function()
+		{
+			for(let i = 0; i< this.key.length; i++)
+				for(let type = 0; type< 3; type++)
+				{		
+					var isk;
+					switch(type)
+					{
+						case 0:
+						{
+							isk = IsKeyPressed;
+						}
+						break;
+						case 1:
+						{
+							isk = IsKeyDown;
+						}
+						break;
+						case 2:
+						{
+							isk = IsKeyReleased;
+						}
+						break;
+					}
+					if(this.key[i][type].id)//existence check
+						if(isk(this.key[i].id))//check if key is pressed/down/released
+							if(!this.key[i][type].args[0])
+							{
+								this.key[i][type].func();
+							}
+							else if(!this.key[i][type].args[1])
+							{
+								this.key[i][type].func(this.key[i][type].args[0]);
+							}
+							else if(!this.key[i][type].args[2])
+							{
+								this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1]);
+							}
+							else if(!this.key[i][type].args[3])
+							{
+								this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2]);
+							}
+							else if(!this.key[i][type].args[4])
+							{
+								this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2],this.key[i][type].args[3]);
+							}
+							else
+							{
+								this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2],this.key[i][type].args[3],this.key[i][type].args[4]);
+							}
+				}
+		}
+	}
 }
 
 class Data	
@@ -449,6 +521,7 @@ class Data
 		this.session = {..._Data.session};
 		this.scene = {..._Data.scene};
 		this.file = {..._Data.file};
+		this.keyboard = {..._Data.keyboard};
 		this.config = require("./config.json");
 		this.scene.render.file = this.file;//just a link
 		if(this.config.resizebleWindow == true)
