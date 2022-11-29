@@ -333,6 +333,8 @@ function Menu(ref,data)
   	*/
 	ref.offload = defsto(ref.offload,false);
 	ref.currentOption = defsto(ref.currentOption,0);
+	ref.logo = defsto(ref.logo,false);
+	var locframe = 0;
 	if(typeof data != 'undefined')
 		ref.data = defsto(ref.data,data);
 	
@@ -347,7 +349,17 @@ function Menu(ref,data)
 			if(ref.currentOption != i)
 				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, 16*i), 16, 0, COR_PRETO);
 			else
-				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, 16*i), 16, 0, COR_SELECIONADO);
+				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, 16*i), 16, 0, COR_SELECIONADO2);
+
+		if(ref.logo == true)
+		{
+			//console.log('teste')
+			r.DrawTextEx(ref.data.file.font[1],ref.data.config.title, r.Vector2(0,ref.data.config.screen.y-64), 48, 0, COR_PRETO);
+			if(locframe%331 == 0)
+				r.DrawTextEx(ref.data.file.font[2],ref.data.config.subtitle, r.Vector2(0,ref.data.config.screen.y-24), 24, 0, COR_SELECIONADO);
+			else
+				r.DrawTextEx(ref.data.file.font[2],ref.data.config.subtitle, r.Vector2(0,ref.data.config.screen.y-24), 24, 0, COR_PRETO);
+		}
 		
 		if(r.IsKeyPressed(r.KEY_ENTER)||r.IsKeyPressed(r.KEY_E))
 		{	
@@ -371,6 +383,7 @@ function Menu(ref,data)
 				ref.currentOption = ref.length-1;
 		}
 		r.EndDrawing();
+		locframe++;
 	}
 	ref.offload = false;
 }

@@ -8,8 +8,8 @@ function load()
 {
 	//FONTS
 	data.file.font.push(r.LoadFontEx("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16, 0, 0));
-	data.file.font.push(r.LoadFontEx("data/font/acentos/Mockery.ttf", 48, 0, 0));
-	data.file.font.push(r.LoadFontEx("data/font/acentos/Mockery.ttf", 24, 0, 0));
+	data.file.font.push(r.LoadFontEx("data/font/Mockery.ttf", 48, 0, 0));
+	data.file.font.push(r.LoadFontEx("data/font/Mockery.ttf", 24, 0, 0));
 	//MUSIC
 	data.file.music.push(r.LoadMusicStream("data/audio/music/maintheme_by_kayoa.mp3"));
 	//MODELS
@@ -142,6 +142,7 @@ function main()
 			func:function(){startMenu.data.session.exit = true;startMenu.offload = true;}, 
 		},
 	];
+	startMenu.logo = true;
 	mqq.Menu(startMenu,data);
 	delete startMenu;
 	
