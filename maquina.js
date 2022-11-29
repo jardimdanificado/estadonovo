@@ -311,13 +311,63 @@ function PlayerCollider(data,ref, backwards)
 //MENU
 //-----------------------------------
 
-function Menu(input)
+function Menu(ref)
 {
 	/*
  		{
-   			fs.writeFileSync('/tmp/test-sync', 'Hey there!');
+   			offload:false,
+	  		currentOption:0,
+	 		data:data,
+   			options:
+ 			[
+		   		{//exit the current menu(possibly go back to another menu, or go back to the game)
+			  		text:"return",
+	 				func:function(){this.offload = true;}, 
+	  				args:
+				},
+	 			{//exit(to OS)
+		  			text:"exit",
+	 				func:function(){data.session.exit = true;this.offload = true;}, 
+				},
+	  		]
+ 		}
+  	*/
+	defsto(ref.offload,false);
+	defsto(ref.currentOption,0);
+	
+	while(ref.offload == false)
+	{
+		r.BeginDrawing();
+		r.ClearBackground(COR_BRANCO);
+		for(let i = 0;i<ref.length;i++)
+			if(ref.currentOption != i)
+				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, 16*i), 16, 0, COR_PRETO);
+			else
+				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, 16*i), 16, 0, COR_SELECIONADO);
+		
+		if(r.IsKeyPressed(r.KEY_ENTER)||r.IsKeyPressed(r.KEY_E))
+		{	
+			if(ref[ref.currentOption].args != 'undefined')
+				ref[ref.currentOption].func(ref[ref.currentOption].args);
+			else
+				ref[ref.currentOption].func();
 		}
-	*/
+		else if(r.IsKeyPressed(r.KEY_DOWN)||r.IsKeyPressed(r.KEY_S))
+		{	
+			if(ref.currentOption<ref.length)
+				ref.currentOption++;
+			else 
+				ref.currentOption = 0;
+		}
+		else if(r.IsKeyPressed(r.KEY_UP)||r.IsKeyPressed(r.KEY_W))
+		{
+			if(ref.currentOption>0)
+				ref.currentOption--;
+			else 
+				ref.currentOption = ref.length-1;
+		}
+		r.EndDrawing();
+	}
 }
 
 //-----------------------------------
@@ -581,4 +631,4 @@ class Data
 //exports
 //-----------------------------------
 
-module.exports = {Data,CameraStart,Move3D,PlayerCollider,Gravit,Save,Load,DefaultsTo,defsto,LimitItTo,limito};
+module.exports = {Data,Menu,CameraStart,Move3D,PlayerCollider,Gravit,Save,Load,DefaultsTo,defsto,LimitItTo,limito};

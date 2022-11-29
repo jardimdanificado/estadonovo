@@ -119,6 +119,22 @@ function main()
 {
 	data = new mqq.Data();//all startup needs are in the constructor
 	load();
+	var startMenu = 
+	[
+		{//exit the current menu(possibly go back to another menu, or go back to the game)
+			text:"return",
+			func:function(){startMenu.offload = true;}
+		},
+		{//exit(to OS)
+			text:"exit",
+			func:function(){startMenu.data.session.exit = true;startMenu.offload = true;}, 
+		},
+	];
+	startMenu.data = data;
+	startMenu.offload = false;
+	startMenu.currentOption = 0;
+	console.log(startMenu)
+	mqq.Menu(startMenu);
 	data.scene.creature.push
 	(
 		{
@@ -148,13 +164,13 @@ function main()
 			data.scene.render.addHitbox(data.file.hitbox[i].name,data.file.hitbox[i].hitbox);
 		}
 	Teclado.gameplay.useThis(data);
-    while(!r.WindowShouldClose())
+    while(!r.WindowShouldClose() && data.session.exit == false)
     {
         data.session.frame++;
 		data.keyboard.run();
         
 		r.BeginDrawing();
-		r.ClearBackground(r.RAYWHITE);
+		r.ClearBackground(data.scene.background);
 		r.BeginMode3D(data.scene.camera);
 		for(let i = 0; i< data.scene.render.model.length;i++)
 		{	
