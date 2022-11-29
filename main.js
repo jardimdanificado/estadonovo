@@ -4,97 +4,120 @@ const fs = require('fs');
 var mqq = require("./maquina");
 var data;
 
-function Teclado(data)
+function load()
 {
-	if(r.IsKeyPressed(r.KEY_W))
+	//FONTS
+	data.file.font.push(r.LoadFontEx("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16, 0, 0));
+	data.file.font.push(r.LoadFontEx("data/font/acentos/Mockery.ttf", 48, 0, 0));
+	data.file.font.push(r.LoadFontEx("data/font/acentos/Mockery.ttf", 24, 0, 0));
+	//MUSIC
+	data.file.music.push(r.LoadMusicStream("data/audio/music/maintheme_by_kayoa.mp3"));
+	//MODELS
+	data.file.loadModel("lvl0_map0","data/models/map/level0/0.glb",false);
+	data.file.loadModel("lvl0_props0","data/models/map/level0/props/0.glb",true);
+	data.file.loadModel("lvl0_hitbox0","data/models/map/level0/hitbox/hitbox0.glb",true);
+	data.file.loadModel("lvl0_hitbox1","data/models/map/level0/hitbox/hitbox1.glb",true);
+	data.file.loadModel("lvl0_hitbox2","data/models/map/level0/hitbox/hitbox2.glb",true);
+	data.file.loadModel("lvl0_hitbox3","data/models/map/level0/hitbox/hitbox3.glb",true);
+	data.file.loadModel("lvl0_hitbox4","data/models/map/level0/hitbox/hitbox4.glb",true);
+	data.file.loadModel("lvl0_hitbox5","data/models/map/level0/hitbox/hitbox5.glb",true);
+	data.file.loadModel("lvl0_hitbox6","data/models/map/level0/hitbox/hitbox6.glb",true);
+	data.file.loadModel("lvl0_hitbox7","data/models/map/level0/hitbox/hitbox7.glb",true);
+	data.file.loadModel("lvl0_hitbox8","data/models/map/level0/hitbox/hitbox8.glb",true);
+	data.file.loadModel("lvl0_hitbox9","data/models/map/level0/hitbox/hitbox9.glb",true);
+	data.file.loadModel("lvl0_hitbox10","data/models/map/level0/hitbox/chao.glb",true);
+	data.file.loadModel("lvl0_map0item0","data/models/map/level0/item/0.glb",true);
+	data.file.loadModel("lvl0_map0item1","data/models/map/level0/item/1.glb",true);
+	data.file.loadModel("lvl0_map0item2","data/models/map/level0/item/2.glb",true);
+	data.file.loadModel("lvl0_map0item3","data/models/map/level0/item/3.glb",true);
+	data.file.loadModel("lvl0_area0","data/models/map/level0/area/0.glb",true);
+	data.file.loadModel("lvl0_area1","data/models/map/level0/area/1.glb",true);
+	data.file.loadModel("lvl0_area2","data/models/map/level0/area/2.glb",true);
+	data.file.loadModel("lvl0_area3","data/models/map/level0/area/3.glb",true);
+	data.file.loadModel("lvl0_area4","data/models/map/level0/area/4.glb",true);
+	data.file.loadModel("lvl0_area5","data/models/map/level0/area/5.glb",true);
+	data.file.loadModel("player-idle","data/models/player/idle/",false);
+	data.file.loadModel("player-walk","data/models/player/walk/",false);
+}
+
+const Teclado =
+{
+	gameplay: 
 	{
-		data.scene.render.model['joao451'].progression = 1;
-		data.scene.render.model['joao451'].id = 'player-walk';
-	}
-	if(r.IsKeyDown(r.KEY_W))
-	{
-		if(mqq.PlayerCollider(data,data.scene.render.model['joao451'],false)==false)
+		pressed:
 		{
-			mqq.Move3D(data.scene.creature['joao451'].position,data.scene.creature['joao451'].rotation.y,0.1);
-		}
-	}
-	if(r.IsKeyReleased(r.KEY_W))
-	{
-		data.scene.render.model['joao451'].progression = 1;
-		data.scene.render.model['joao451'].id = 'player-idle';
-	}
-	
-	if(r.IsKeyPressed(r.KEY_S))
-	{
-		data.scene.render.model['joao451'].progression = -1;
-		data.scene.render.model['joao451'].id = 'player-walk';
-	}
-	if(r.IsKeyDown(r.KEY_S))
-	{
-		if(mqq.PlayerCollider(data,data.scene.render.model['joao451'],true)==false)
+			w:function(data)
+			{
+				data.scene.render.model['joao451'].progression = 1;
+				data.scene.render.model['joao451'].id = 'player-walk';
+			},
+			s:function(data)
+			{
+				data.scene.render.model['joao451'].progression = -1;
+				data.scene.render.model['joao451'].id = 'player-walk';
+			},
+		},
+		down:
 		{
-			mqq.Move3D(data.scene.creature['joao451'].position,data.scene.creature['joao451'].rotation.y,-0.1);
+			w:function(data)
+			{
+				if(mqq.PlayerCollider(data,data.scene.render.model['joao451'],false)==false)
+				{
+					mqq.Move3D(data.scene.creature['joao451'].position,data.scene.creature['joao451'].rotation.y,0.1);
+				}
+			},
+			s:function(data)
+			{
+				if(mqq.PlayerCollider(data,data.scene.render.model['joao451'],true)==false)
+				{
+					mqq.Move3D(data.scene.creature['joao451'].position,data.scene.creature['joao451'].rotation.y,-0.1);
+				}
+			},
+			a:function(data)
+			{
+				data.scene.creature['joao451'].rotation.y += 6;
+			},
+			d:function(data)
+			{
+				data.scene.creature['joao451'].rotation.y -= 6;
+			},
+			space:function(data)
+			{
+				data.scene.creature['joao451'].position.y += 0.1;
+			},
+		},
+		released:
+		{
+			w:function(data)
+			{
+				data.scene.render.model['joao451'].progression = 1;
+				data.scene.render.model['joao451'].id = 'player-idle';
+			},
+			s:function(data)
+			{
+				data.scene.render.model['joao451'].progression = 1;
+				data.scene.render.model['joao451'].id = 'player-idle';
+			},
+		},
+		useThis:function(data)
+		{
+			data.keyboard.set(r.KEY_W,'down',this.down.w,[data]);
+			data.keyboard.set(r.KEY_W,'pressed',this.pressed.w,[data]);
+			data.keyboard.set(r.KEY_W,'released',this.released.w,[data]);
+			data.keyboard.set(r.KEY_S,'down',this.down.s,[data]);
+			data.keyboard.set(r.KEY_S,'pressed',this.pressed.s,[data]);
+			data.keyboard.set(r.KEY_S,'released',this.released.s,[data]);
+			data.keyboard.set(r.KEY_A,'down',this.down.a,[data]);
+			data.keyboard.set(r.KEY_D,'down',this.down.d,[data]);
+			data.keyboard.set(r.KEY_SPACE,'down',this.down.space,[data]);
+			data.keyboard.set(r.KEY_G,'pressed',mqq.Save,[data]);
 		}
-	}
-	if(r.IsKeyReleased(r.KEY_S))
-	{
-		data.scene.render.model['joao451'].progression = 1;
-		data.scene.render.model['joao451'].id = 'player-idle';
-	}
-	
-	if(r.IsKeyDown(r.KEY_A))
-	{
-		data.scene.creature['joao451'].rotation.y += 6;
-	}
-	
-	if(r.IsKeyDown(r.KEY_D))
-	{
-		data.scene.creature['joao451'].rotation.y -= 6;
-	}
-	if(r.IsKeyDown(r.KEY_SPACE))
-	{
-		data.scene.creature['joao451'].position.y += 0.1;
 	}
 }
 
 function main()
 {
 	data = new mqq.Data();//all startup needs are in the constructor
-	function load()
-	{
-		//FONTS
-		data.file.font.push(r.LoadFontEx("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16, 0, 0));
-		data.file.font.push(r.LoadFontEx("data/font/acentos/Mockery.ttf", 48, 0, 0));
-		data.file.font.push(r.LoadFontEx("data/font/acentos/Mockery.ttf", 24, 0, 0));
-		//MUSIC
-		data.file.music.push(r.LoadMusicStream("data/audio/music/maintheme_by_kayoa.mp3"));
-		//MODELS
-		data.file.loadModel("lvl0_map0","data/models/map/level0/0.glb",false);
-		data.file.loadModel("lvl0_props0","data/models/map/level0/props/0.glb",true);
-		data.file.loadModel("lvl0_hitbox0","data/models/map/level0/hitbox/hitbox0.glb",true);
-		data.file.loadModel("lvl0_hitbox1","data/models/map/level0/hitbox/hitbox1.glb",true);
-		data.file.loadModel("lvl0_hitbox2","data/models/map/level0/hitbox/hitbox2.glb",true);
-		data.file.loadModel("lvl0_hitbox3","data/models/map/level0/hitbox/hitbox3.glb",true);
-		data.file.loadModel("lvl0_hitbox4","data/models/map/level0/hitbox/hitbox4.glb",true);
-		data.file.loadModel("lvl0_hitbox5","data/models/map/level0/hitbox/hitbox5.glb",true);
-		data.file.loadModel("lvl0_hitbox6","data/models/map/level0/hitbox/hitbox6.glb",true);
-		data.file.loadModel("lvl0_hitbox7","data/models/map/level0/hitbox/hitbox7.glb",true);
-		data.file.loadModel("lvl0_hitbox8","data/models/map/level0/hitbox/hitbox8.glb",true);
-		data.file.loadModel("lvl0_hitbox9","data/models/map/level0/hitbox/hitbox9.glb",true);
-		data.file.loadModel("lvl0_hitbox10","data/models/map/level0/hitbox/chao.glb",true);
-		data.file.loadModel("lvl0_map0item0","data/models/map/level0/item/0.glb",true);
-		data.file.loadModel("lvl0_map0item1","data/models/map/level0/item/1.glb",true);
-		data.file.loadModel("lvl0_map0item2","data/models/map/level0/item/2.glb",true);
-		data.file.loadModel("lvl0_map0item3","data/models/map/level0/item/3.glb",true);
-		data.file.loadModel("lvl0_area0","data/models/map/level0/area/0.glb",true);
-		data.file.loadModel("lvl0_area1","data/models/map/level0/area/1.glb",true);
-		data.file.loadModel("lvl0_area2","data/models/map/level0/area/2.glb",true);
-		data.file.loadModel("lvl0_area3","data/models/map/level0/area/3.glb",true);
-		data.file.loadModel("lvl0_area4","data/models/map/level0/area/4.glb",true);
-		data.file.loadModel("lvl0_area5","data/models/map/level0/area/5.glb",true);
-		data.file.loadModel("player-idle","data/models/player/idle/",false);
-		data.file.loadModel("player-walk","data/models/player/walk/",false);
-	}
 	load();
 	data.scene.creature.push
 	(
@@ -108,11 +131,13 @@ function main()
 			active:true
 		}
 	);
+	
 	data.scene.creature['joao451'] = data.scene.creature[0];
 	data.scene.render.addCreature(data.scene.creature['joao451']);
 	data.scene.render.addModel('map0','lvl0_map0');
     //start menu
     //MQMenu(data,0);
+	
 	r.UpdateCamera(data.scene.camera);
     data.scene.camera.target = data.scene.creature[0].position;
     data.scene.camera.position = {x:0.4375, y:10, z:11.0625};
@@ -122,11 +147,11 @@ function main()
 		{
 			data.scene.render.addHitbox(data.file.hitbox[i].name,data.file.hitbox[i].hitbox);
 		}
-    while(!r.WindowShouldClose()/* && data.session.exit == false*/)
+	Teclado.gameplay.useThis(data);
+    while(!r.WindowShouldClose())
     {
         data.session.frame++;
-		Teclado(data);
-		//console.log(data.session.frame)
+		data.keyboard.run();
         
 		r.BeginDrawing();
 		r.ClearBackground(r.RAYWHITE);

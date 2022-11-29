@@ -308,6 +308,34 @@ function PlayerCollider(data,ref, backwards)
 }
 
 //-----------------------------------
+//MENU
+//-----------------------------------
+
+function Menu(input)
+{
+	/*
+ 		{
+   			fs.writeFileSync('/tmp/test-sync', 'Hey there!');
+		}
+	*/
+}
+
+//-----------------------------------
+//SAVE
+//-----------------------------------
+function Save(data)
+{
+	fs.writeFileSync('./data/save/save.json', JSON.stringify(data.scene));
+}
+
+function Load(data,link)
+{
+	let tempLoad = require("./data/save/save.json")
+	data.scene = Object.assign(data.scene, tempLoad);
+	data.scene.render.file = data.file;
+}
+
+//-----------------------------------
 //DATA_FILE
 //-----------------------------------
 
@@ -442,15 +470,17 @@ const _Data =
     },
 	keyboard:
 	{
-		key:{},
+		key:[],
 		set:function(id,type,infunc,args)
 		{
-			if(!this.key[id])
+			if(typeof this.key[id] == 'undefined')
 			{
-				this.key[id] = {id:id,pressed:{func:{},args:{}},down:{func:{},args:{}},released:{func:{},args:{}}};
-				this.key[id].push(this.key[id].pressed);
-				this.key[id].push(this.key[id].down);
-				this.key[id].push(this.key[id].released);
+				id += "k";
+				this.key[id] = [];
+				this.key[id] = {id:id,pressed:{},down:{},released:{}};
+				this.key[id][0] = (this.key[id].pressed);
+				this.key[id][1] = (this.key[id].down);
+				this.key[id][2] = (this.key[id].released);
 				this.key.push(this.key[id]);
 			}
 			this.key[id][type].func = infunc;
@@ -463,28 +493,29 @@ const _Data =
 		{
 			for(let i = 0; i< this.key.length; i++)
 				for(let type = 0; type< 3; type++)
-				{		
+				{
 					var isk;
 					switch(type)
 					{
 						case 0:
 						{
-							isk = IsKeyPressed;
+							isk = r.IsKeyPressed;
 						}
 						break;
 						case 1:
 						{
-							isk = IsKeyDown;
+							isk = r.IsKeyDown;
 						}
 						break;
 						case 2:
 						{
-							isk = IsKeyReleased;
+							isk = r.IsKeyReleased;
 						}
 						break;
 					}
-					if(this.key[i][type].id)//existence check
-						if(isk(this.key[i].id))//check if key is pressed/down/released
+					if(typeof this.key[i][type].func == "function")//existence check
+						if(isk(parseInt(this.key[i].id)) == true)//check if key is pressed/down/released
+						{	
 							if(!this.key[i][type].args[0])
 							{
 								this.key[i][type].func();
@@ -509,6 +540,7 @@ const _Data =
 							{
 								this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2],this.key[i][type].args[3],this.key[i][type].args[4]);
 							}
+						}
 				}
 		}
 	}
@@ -519,7 +551,13 @@ class Data
 	constructor()
 	{
 		this.session = {..._Data.session};
-		this.scene = {..._Data.scene};
+		if(fs.existsSync('./data/save/save.json'))
+		{
+			let temp = require('./data/save/save.json');
+			this.scene = {..._Data.scene,temp}
+		}
+		else
+			this.scene = {..._Data.scene};
 		this.file = {..._Data.file};
 		this.keyboard = {..._Data.keyboard};
 		this.config = require("./config.json");
@@ -543,4 +581,4 @@ class Data
 //exports
 //-----------------------------------
 
-module.exports = {Data,CameraStart,Move3D,PlayerCollider,Gravit,DefaultsTo,defsto,LimitItTo,limito};
+module.exports = {Data,CameraStart,Move3D,PlayerCollider,Gravit,Save,Load,DefaultsTo,defsto,LimitItTo,limito};
