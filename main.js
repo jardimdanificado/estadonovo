@@ -44,6 +44,17 @@ const Teclado =
 {
 	gameplay: 
 	{
+		escMenu: 
+		[
+			{//exit the current menu(possibly go back to another menu, or go back to the game)
+				text:"return",
+				func:function(){Teclado.gameplay.escMenu.offload = true;}
+			},
+			{//exit(to OS)
+				text:"exit",
+				func:function(){Teclado.gameplay.escMenu.data.session.exit = true;Teclado.gameplay.escMenu.offload = true;}, 
+			},
+		],
 		pressed:
 		{
 			w:function(data)
@@ -101,6 +112,7 @@ const Teclado =
 		},
 		useThis:function(data)
 		{
+			data.keyboard.set(r.KEY_ESCAPE,'pressed',mqq.Menu,[Teclado.gameplay.escMenu,data]);
 			data.keyboard.set(r.KEY_W,'down',this.down.w,[data]);
 			data.keyboard.set(r.KEY_W,'pressed',this.pressed.w,[data]);
 			data.keyboard.set(r.KEY_W,'released',this.released.w,[data]);
@@ -122,7 +134,7 @@ function main()
 	var startMenu = 
 	[
 		{//exit the current menu(possibly go back to another menu, or go back to the game)
-			text:"return",
+			text:"play",
 			func:function(){startMenu.offload = true;}
 		},
 		{//exit(to OS)
@@ -130,11 +142,9 @@ function main()
 			func:function(){startMenu.data.session.exit = true;startMenu.offload = true;}, 
 		},
 	];
-	startMenu.data = data;
-	startMenu.offload = false;
-	startMenu.currentOption = 0;
-	console.log(startMenu)
-	mqq.Menu(startMenu);
+	mqq.Menu(startMenu,data);
+	delete startMenu;
+	
 	data.scene.creature.push
 	(
 		{
@@ -151,9 +161,7 @@ function main()
 	data.scene.creature['joao451'] = data.scene.creature[0];
 	data.scene.render.addCreature(data.scene.creature['joao451']);
 	data.scene.render.addModel('map0','lvl0_map0');
-    //start menu
-    //MQMenu(data,0);
-	
+
 	r.UpdateCamera(data.scene.camera);
     data.scene.camera.target = data.scene.creature[0].position;
     data.scene.camera.position = {x:0.4375, y:10, z:11.0625};

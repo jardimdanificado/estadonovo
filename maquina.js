@@ -311,7 +311,7 @@ function PlayerCollider(data,ref, backwards)
 //MENU
 //-----------------------------------
 
-function Menu(ref)
+function Menu(ref,data)
 {
 	/*
  		{
@@ -323,7 +323,6 @@ function Menu(ref)
 		   		{//exit the current menu(possibly go back to another menu, or go back to the game)
 			  		text:"return",
 	 				func:function(){this.offload = true;}, 
-	  				args:
 				},
 	 			{//exit(to OS)
 		  			text:"exit",
@@ -332,8 +331,13 @@ function Menu(ref)
 	  		]
  		}
   	*/
-	defsto(ref.offload,false);
-	defsto(ref.currentOption,0);
+	ref.offload = defsto(ref.offload,false);
+	ref.currentOption = defsto(ref.currentOption,0);
+	if(typeof data != 'undefined')
+		ref.data = defsto(ref.data,data);
+	
+	if(typeof ref.data == 'undefined')
+		return false;
 	
 	while(ref.offload == false)
 	{
@@ -368,6 +372,7 @@ function Menu(ref)
 		}
 		r.EndDrawing();
 	}
+	ref.offload = false;
 }
 
 //-----------------------------------
