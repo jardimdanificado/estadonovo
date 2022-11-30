@@ -87,10 +87,12 @@ const Teclado =
 			a:function(data)
 			{
 				data.scene.creature['joao451'].rotation.y += 6;
+				data.scene.creature['joao451'].rotation.y = mqq.limito(data.scene.creature['joao451'].rotation.y,0,359);
 			},
 			d:function(data)
 			{
 				data.scene.creature['joao451'].rotation.y -= 6;
+				data.scene.creature['joao451'].rotation.y = mqq.limito(data.scene.creature['joao451'].rotation.y,0,359);
 			},
 			space:function(data)
 			{
@@ -162,7 +164,7 @@ function main()
 	data.scene.creature['joao451'] = data.scene.creature[0];
 	data.scene.render.addCreature(data.scene.creature['joao451']);
 	data.scene.render.addModel('map0','lvl0_map0');
-
+	data.scene.render.addText('build',0,data.config.title + " v" + (data.config.build/10000),r.Vector2(0,data.config.screen.y-16),mqq.COR_PRETO,true);
 	r.UpdateCamera(data.scene.camera);
     data.scene.camera.target = data.scene.creature[0].position;
     data.scene.camera.position = {x:0.4375, y:10, z:11.0625};
@@ -176,23 +178,25 @@ function main()
     while(!r.WindowShouldClose() && data.session.exit == false)
     {
         data.session.frame++;
-		data.keyboard.run();
-        
+		data.keyboard.run(data);
+		if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
+		{
+			mqq.Gravit(data,data.scene.render.model[0]);
+		}
+		
 		r.BeginDrawing();
 		r.ClearBackground(data.scene.background);
 		r.BeginMode3D(data.scene.camera);
 		for(let i = 0; i< data.scene.render.model.length;i++)
-		{	
+		{
 			if(data.scene.render.model[i].progression != 0)
 			{
 				if(data.session.frame % Math.floor(data.config.framerate/24) == 0)//setten up for 24fps
 				{
 					data.scene.render.model[i].frame += data.scene.render.model[i].progression;
 				}
-				data.scene.render.model[i].frame = mqq.limito(data.scene.render.model[i].frame,0,data.file.model[data.scene.render.model[i].id].model.length-2);
 			}
-			data.scene.render.model[i].rotation.y = mqq.limito(data.scene.render.model[i].rotation.y,0,359);
-			mqq.Gravit(data,data.scene.render.model[0]);
+			data.scene.render.model[i].frame = mqq.limito(data.scene.render.model[i].frame,0,data.file.model[data.scene.render.model[i].id].model.length-2);
 			if(data.scene.render.model[i].visible == true)
 			{
 				if(typeof data.file.model[data.scene.render.model[i].id].model[0] != 'undefined')
@@ -216,7 +220,13 @@ function main()
 			}
 		}
 		r.EndMode3D();
-		r.DrawTextEx(data.file.font[0],"Congrats! You created your first node-raylib window!", r.Vector2(0, 0), 16, 0, r.BLACK);
+		for(let i = 0; i< data.scene.render.text.length;i++)
+		{
+			if(data.scene.render.text[i].visible == true)
+			{
+				r.DrawTextEx(data.file.font[0],data.scene.render.text[i].text,data.scene.render.text[i].position, 16, 0, data.scene.render.text[i].color);
+			}
+		}
 		r.EndDrawing();
     }
     //CloseAudioDevice();--------------------------------------------------------------------------------------

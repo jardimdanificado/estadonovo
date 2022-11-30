@@ -543,24 +543,22 @@ const _Data =
 				this.hitbox[name] = temp;
 				this.hitbox.push(temp);
 			},
-			addText:function(name,fontid,msg,position,scale,color,visible)
+			addText:function(name,fontid,text,position,color,visible)
 			{
 				position = DefaultsTo(position,{x:0,y:0});
-				msg = defsto(msg,"empty");
-				scale = defsto(scale,1);
+				text = defsto(text,"empty");
 				color = defsto(color,RGBA(0,0,0,0));
 				visible = defsto(visible,true);
-				let temp = {name:name,id:fontid,msg:msg,position:position,rotation:rotation,frame:frame,color:color,visible:visible};//color stands for wireframe color
+				let temp = {name:name,id:fontid,text:text,position:position,color:color,visible:visible};//color stands for wireframe color
 				this.text[name] = temp;
 				this.text.push(temp);
 			},
-			addImage:function(name,imageid,msg,position,scale,color,visible)
+			addImage:function(name,imageid,position,scale,color,visible)
 			{
 				position = DefaultsTo(position,{x:0,y:0});
-				msg = defsto(msg,"empty");
 				color = defsto(color,RGBA(0,0,0,0));
 				visible = defsto(visible,true);
-				let temp = {name:name,id:imageid,position:position,rotation:rotation,frame:frame,color:color,visible:visible};//color stands for wireframe color
+				let temp = {name:name,id:imageid,position:position,color:color,visible:visible};//color stands for wireframe color
 				this.image[name] = temp;
 				this.image.push(temp);
 			},
@@ -591,7 +589,7 @@ const _Data =
 				this.key[id][type].args = args;
 			}
 		},
-		run:function()
+		run:function(data)
 		{
 			for(let i = 0; i< this.key.length; i++)
 				for(let type = 0; type< 3; type++)
@@ -620,27 +618,63 @@ const _Data =
 						{	
 							if(!this.key[i][type].args[0])
 							{
-								this.key[i][type].func();
+								if(type == 1)
+								{
+									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
+										this.key[i][type].func();
+								}
+								else
+									this.key[i][type].func();
 							}
 							else if(!this.key[i][type].args[1])
 							{
-								this.key[i][type].func(this.key[i][type].args[0]);
+								if(type == 1)
+								{
+									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
+										this.key[i][type].func(this.key[i][type].args[0]);
+								}
+								else
+									this.key[i][type].func(this.key[i][type].args[0]);
 							}
 							else if(!this.key[i][type].args[2])
 							{
-								this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1]);
+								if(type == 1)
+								{
+									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
+										this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1]);
+								}
+								else
+									this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1]);
 							}
 							else if(!this.key[i][type].args[3])
 							{
-								this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2]);
+								if(type == 1)
+								{
+									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
+										this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2]);
+								}
+								else
+									this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2]);
 							}
 							else if(!this.key[i][type].args[4])
 							{
-								this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2],this.key[i][type].args[3]);
+								if(type == 1)
+								{
+									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
+										this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2],this.key[i][type].args[3]);
+								}
+								else
+									this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2],this.key[i][type].args[3]);
 							}
 							else
 							{
-								this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2],this.key[i][type].args[3],this.key[i][type].args[4]);
+								if(type == 1)
+								{
+									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
+										this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2],this.key[i][type].args[3],this.key[i][type].args[4]);
+								}
+								else
+									this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2],this.key[i][type].args[3],this.key[i][type].args[4]);
 							}
 						}
 				}
@@ -683,4 +717,11 @@ class Data
 //exports
 //-----------------------------------
 
-module.exports = {Data,Menu,CameraStart,Move3D,PlayerCollider,Gravit,Save,Load,DefaultsTo,defsto,LimitItTo,limito};
+module.exports = 
+{
+	COR_VERMELHO,COR_SELECIONADO,COR_SELECIONADO2,COR_PRETO,COR_VAZIO,
+	COR_BRANCO,COR_CINZA,COR_LARANJA,COR_PELE0,COR_ROUPA0,COR_ROUPA1,
+	Vector2,Vector2Zero,Vector3,Vector3Zero,RGBA,BoundingBox,
+	LimitItTo,limito,DefaultsTo,defsto,
+	Data,Menu,CameraStart,Move3D,PlayerCollider,Gravit,Save,Load,
+};
