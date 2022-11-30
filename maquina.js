@@ -23,7 +23,6 @@ function Vector3Zero()
     return({x:0,y:0,z:0});
 }
 
-
 function Vector2(xx,yy)
 {
     return({x:xx,y:yy});
@@ -340,11 +339,34 @@ function Menu(ref,data)
 	
 	if(typeof ref.data == 'undefined')
 		return false;
+
+	var locframe = 0;
+	var logoimg = r.ImageTextEx(ref.data.file.font[1], ref.data.config.title,48, 0, COR_PRETO)
+	var txtimg = [];
+	var mouse = {};
+	for(let i = 0; i< ref.length;i++)
+	{
+		txtimg.push(r.ImageTextEx(ref.data.file.font[0], ref[i].text,16, 0, COR_PRETO));
+	}
+	
 	
 	while(ref.offload == false)
 	{
 		r.BeginDrawing();
 		r.ClearBackground(COR_BRANCO);
+		
+		mouse = r.GetMousePosition();
+
+		for(let i = 0;i<ref.length;i++)
+			if(mouse.x>0&&
+			   mouse.x<txtimg[i].width&&
+			   mouse.y>16*i&&
+			   mouse.y<16*i+txtimg[i].height)
+			{
+				ref.currentOption = i;
+				break;
+			}
+		
 		for(let i = 0;i<ref.length;i++)
 			if(ref.currentOption != i)
 				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, 16*i), 16, 0, COR_PRETO);
@@ -353,15 +375,27 @@ function Menu(ref,data)
 
 		if(ref.logo == true)
 		{
-			//console.log('teste')
-			r.DrawTextEx(ref.data.file.font[1],ref.data.config.title, r.Vector2(0,ref.data.config.screen.y-64), 48, 0, COR_PRETO);
+			if(mouse.x>0&&
+			   mouse.x<logoimg.width&&
+			   mouse.y>ref.data.config.screen.y-64&&
+			   mouse.y<ref.data.config.screen.y-64+logoimg.height)
+				r.DrawTextEx(ref.data.file.font[1],ref.data.config.title, r.Vector2(0,ref.data.config.screen.y-64), 48, 0, COR_SELECIONADO2);
+			else
+				r.DrawTextEx(ref.data.file.font[1],ref.data.config.title, r.Vector2(0,ref.data.config.screen.y-64), 48, 0, COR_PRETO);
+			
 			if(locframe%331 == 0)
 				r.DrawTextEx(ref.data.file.font[2],ref.data.config.subtitle, r.Vector2(0,ref.data.config.screen.y-24), 24, 0, COR_SELECIONADO);
 			else
 				r.DrawTextEx(ref.data.file.font[2],ref.data.config.subtitle, r.Vector2(0,ref.data.config.screen.y-24), 24, 0, COR_PRETO);
 		}
 		
-		if(r.IsKeyPressed(r.KEY_ENTER)||r.IsKeyPressed(r.KEY_E))
+		if(r.IsKeyPressed(r.KEY_ENTER)||
+		   r.IsKeyPressed(r.KEY_E)||
+		   (r.IsMouseButtonPressed(r.MOUSE_BUTTON_LEFT)&&
+			mouse.x>0&&
+			mouse.x<txtimg[ref.currentOption].width&&
+			mouse.y>16*ref.currentOption&&
+			mouse.y<16*ref.currentOption+txtimg[ref.currentOption].height))
 		{	
 			if(ref[ref.currentOption].args != 'undefined')
 				ref[ref.currentOption].func(ref[ref.currentOption].args);

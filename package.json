@@ -2,7 +2,7 @@
   "name": "EstadoNovo",
   "description": "A minimal Electron application",
   "main": "main.js",
-  "build": 499,
+  "build": 508,
   "scripts": {
     "start": "electron . --no-sandbox"
   },
