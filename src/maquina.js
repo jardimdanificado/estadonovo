@@ -39,13 +39,13 @@ function BoundingBox(min,max)
 }
 
 const COR_VERMELHO = RGBA(235, 64, 52,255);
-const COR_SELECIONADO   = RGBA(202,137,109,255);
+const COR_SELECIONADO = RGBA(202,137,109,255);
 const COR_SELECIONADO2 = RGBA(145, 39, 32,255);
 const COR_PRETO = RGBA(31, 9, 7,255);
-const COR_VAZIO   = RGBA(55,55,55,255);
-const COR_BRANCO   = RGBA(250,239,229,255);
-const COR_CINZA   = RGBA(115,105,97,255);
-const COR_LARANJA   = RGBA(202,137,109,255);
+const COR_VAZIO = RGBA(55,55,55,255);
+const COR_BRANCO = RGBA(250,239,229,255);
+const COR_CINZA = RGBA(115,105,97,255);
+const COR_LARANJA = RGBA(202,137,109,255);
 
 const COR_PELE0 = RGBA(240, 199, 156,255);
 const COR_ROUPA0 = RGBA(103, 122, 137,255);
@@ -311,8 +311,9 @@ function PlayerCollider(data,ref, backwards)
 //-----------------------------------
 function Render(data)
 {
-	r.BeginTextureMode(data.session.rendertexture);
 	r.BeginDrawing();
+	r.BeginTextureMode(data.session.rendertexture);
+	
 	r.ClearBackground(data.scene.background);
 	r.BeginMode3D(data.scene.camera);
 	for(let i = 0; i< data.scene.render.model.length;i++)
@@ -348,7 +349,6 @@ function Render(data)
 		}
 	}
 	r.EndMode3D();
-	r.EndDrawing();
 	r.EndTextureMode();
 	r.DrawTexturePro(
 		data.session.rendertexture.texture,
@@ -363,7 +363,6 @@ function Render(data)
 		,0,
 		r.WHITE
 	);
-	r.BeginDrawing();
 	for(let i = 0; i< data.scene.render.text.length;i++)
 	{
 		if(data.scene.render.text[i].visible == true)
@@ -414,11 +413,11 @@ function Menu(ref,data)
 	var logoimg = r.ImageTextEx(ref.data.file.font[1], ref.data.config.title,48, 0, COR_PRETO)
 	var txtimg = [];
 	var mouse = {};
-	
 	for(let i = 0; i< ref.length;i++)
 	{
 		txtimg.push(r.ImageTextEx(ref.data.file.font[0], ref[i].text,16, 0, COR_PRETO));
 	}
+	
 	
 	while(ref.offload == false)
 	{
@@ -439,19 +438,9 @@ function Menu(ref,data)
 		
 		for(let i = 0;i<ref.length;i++)
 			if(ref.currentOption != i)
-				r.DrawTextEx(ref.data.file.font[0],
-							 ref[i].text, 
-							 r.Vector2(0, 16*i), 
-							 16,
-							 0, 
-							 COR_PRETO);
+				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, 16*i), 16, 0, COR_PRETO);
 			else
-				r.DrawTextEx(ref.data.file.font[0],
-							 ref[i].text,
-							 r.Vector2(0, 16*i),
-							 16,
-							 0,
-							 COR_SELECIONADO2);
+				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, 16*i), 16, 0, COR_SELECIONADO2);
 
 		if(ref.logo == true)
 		{
@@ -459,34 +448,14 @@ function Menu(ref,data)
 			   mouse.x<logoimg.width&&
 			   mouse.y>ref.data.config.screen.y-64&&
 			   mouse.y<ref.data.config.screen.y-64+logoimg.height)
-				r.DrawTextEx(ref.data.file.font[1],
-							 ref.data.config.title, 
-							 r.Vector2(0,ref.data.config.screen.y-64),
-							 48, 
-							 0, 
-							 COR_SELECIONADO2);
+				r.DrawTextEx(ref.data.file.font[1],ref.data.config.title, r.Vector2(0,ref.data.config.screen.y-64), 48, 0, COR_SELECIONADO2);
 			else
-				r.DrawTextEx(ref.data.file.font[1],
-							 ref.data.config.title, 
-							 r.Vector2(0,ref.data.config.screen.y-64), 
-							 48, 
-							 0, 
-							 COR_PRETO);
+				r.DrawTextEx(ref.data.file.font[1],ref.data.config.title, r.Vector2(0,ref.data.config.screen.y-64), 48, 0, COR_PRETO);
 			
 			if(locframe%331 == 0)
-				r.DrawTextEx(ref.data.file.font[2],
-							 ref.data.config.subtitle,
-							 r.Vector2(0,ref.data.config.screen.y-24), 
-							 24, 
-							 0,
-							 COR_SELECIONADO);
+				r.DrawTextEx(ref.data.file.font[2],ref.data.config.subtitle, r.Vector2(0,ref.data.config.screen.y-24), 24, 0, COR_SELECIONADO);
 			else
-				r.DrawTextEx(ref.data.file.font[2],
-							 ref.data.config.subtitle,
-							 r.Vector2(0,ref.data.config.screen.y-24),
-							 24, 
-							 0,
-							 COR_PRETO);
+				r.DrawTextEx(ref.data.file.font[2],ref.data.config.subtitle, r.Vector2(0,ref.data.config.screen.y-24), 24, 0, COR_PRETO);
 		}
 		
 		if(r.IsKeyPressed(r.KEY_ENTER)||
@@ -527,12 +496,12 @@ function Menu(ref,data)
 //-----------------------------------
 function Save(data)
 {
-	fs.writeFileSync('./data/save/save.json', JSON.stringify(data.scene));
+	fs.writeFileSync('./assets/save/save.json', JSON.stringify(data.scene));
 }
 
 function Load(data,link)
 {
-	let tempLoad = require("./data/save/save.json")
+	let tempLoad = require("./assets/save/save.json")
 	data.scene = Object.assign(data.scene, tempLoad);
 	data.scene.render.file = data.file;
 }
@@ -718,7 +687,7 @@ const _Data =
 						{	
 							if(!this.key[i][type].args[0])
 							{
-								if(type === 1)
+								if(type == 1)
 								{
 									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
 										this.key[i][type].func();
@@ -728,7 +697,7 @@ const _Data =
 							}
 							else if(!this.key[i][type].args[1])
 							{
-								if(type === 1)
+								if(type == 1)
 								{
 									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
 										this.key[i][type].func(this.key[i][type].args[0]);
@@ -738,7 +707,7 @@ const _Data =
 							}
 							else if(!this.key[i][type].args[2])
 							{
-								if(type === 1)
+								if(type == 1)
 								{
 									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
 										this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1]);
@@ -787,13 +756,7 @@ class Data
 	constructor()
 	{
 		this.session = {..._Data.session};
-		if(fs.existsSync('./data/save/save.json'))
-		{
-			let temp = require('./data/save/save.json');
-			this.scene = {..._Data.scene,temp}
-		}
-		else
-			this.scene = {..._Data.scene};
+		this.scene = {..._Data.scene};
 		this.file = {..._Data.file};
 		this.keyboard = {..._Data.keyboard};
 		this.config = require("./config.json");
@@ -803,8 +766,6 @@ class Data
 		r.InitWindow(this.config.screen.x, this.config.screen.y, this.config.title);
 		r.SetTargetFPS(this.config.framerate);
 		r.SetExitKey(r.KEY_END);
-		if(this.config.resizebleWindow == true)
-			r.SetConfigFlags(r.FLAG_WINDOW_RESIZABLE);
 		this.session.rendertexture = r.LoadRenderTexture(this.config.screen.x/this.config.pixelsize, this.config.screen.y/this.config.pixelsize);
 		this.scene.background = {r:115, g:105, b:97, a:255};
 		this.scene.creature = [];

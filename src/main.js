@@ -7,37 +7,37 @@ var data;
 function load()
 {
 	//FONTS
-	data.file.font.push(r.LoadFontEx("data/font/acentos/KyrillaSansSerif-Bold.ttf", 16, 0, 0));
-	data.file.font.push(r.LoadFontEx("data/font/Mockery.ttf", 48, 0, 0));
-	data.file.font.push(r.LoadFontEx("data/font/Mockery.ttf", 24, 0, 0));
+	data.file.font.push(r.LoadFontEx("assets/font/acentos/KyrillaSansSerif-Bold.ttf", 16, 0, 0));
+	data.file.font.push(r.LoadFontEx("assets/font/Mockery.ttf", 48, 0, 0));
+	data.file.font.push(r.LoadFontEx("assets/font/Mockery.ttf", 24, 0, 0));
 	//MUSIC
-	data.file.music.push(r.LoadMusicStream("data/audio/music/maintheme_by_kayoa.mp3"));
+	data.file.music.push(r.LoadMusicStream("assets/audio/music/maintheme_by_kayoa.mp3"));
 	//MODELS
-	data.file.loadModel("lvl0_map0","data/models/map/level0/0.glb",false);
-	data.file.loadModel("lvl0_props0","data/models/map/level0/props/0.glb",true);
-	data.file.loadModel("lvl0_hitbox0","data/models/map/level0/hitbox/hitbox0.glb",true);
-	data.file.loadModel("lvl0_hitbox1","data/models/map/level0/hitbox/hitbox1.glb",true);
-	data.file.loadModel("lvl0_hitbox2","data/models/map/level0/hitbox/hitbox2.glb",true);
-	data.file.loadModel("lvl0_hitbox3","data/models/map/level0/hitbox/hitbox3.glb",true);
-	data.file.loadModel("lvl0_hitbox4","data/models/map/level0/hitbox/hitbox4.glb",true);
-	data.file.loadModel("lvl0_hitbox5","data/models/map/level0/hitbox/hitbox5.glb",true);
-	data.file.loadModel("lvl0_hitbox6","data/models/map/level0/hitbox/hitbox6.glb",true);
-	data.file.loadModel("lvl0_hitbox7","data/models/map/level0/hitbox/hitbox7.glb",true);
-	data.file.loadModel("lvl0_hitbox8","data/models/map/level0/hitbox/hitbox8.glb",true);
-	data.file.loadModel("lvl0_hitbox9","data/models/map/level0/hitbox/hitbox9.glb",true);
-	data.file.loadModel("lvl0_hitbox10","data/models/map/level0/hitbox/chao.glb",true);
-	data.file.loadModel("lvl0_map0item0","data/models/map/level0/item/0.glb",true);
-	data.file.loadModel("lvl0_map0item1","data/models/map/level0/item/1.glb",true);
-	data.file.loadModel("lvl0_map0item2","data/models/map/level0/item/2.glb",true);
-	data.file.loadModel("lvl0_map0item3","data/models/map/level0/item/3.glb",true);
-	data.file.loadModel("lvl0_area0","data/models/map/level0/area/0.glb",true);
-	data.file.loadModel("lvl0_area1","data/models/map/level0/area/1.glb",true);
-	data.file.loadModel("lvl0_area2","data/models/map/level0/area/2.glb",true);
-	data.file.loadModel("lvl0_area3","data/models/map/level0/area/3.glb",true);
-	data.file.loadModel("lvl0_area4","data/models/map/level0/area/4.glb",true);
-	data.file.loadModel("lvl0_area5","data/models/map/level0/area/5.glb",true);
-	data.file.loadModel("player-idle","data/models/player/idle/",false);
-	data.file.loadModel("player-walk","data/models/player/walk/",false);
+	data.file.loadModel("lvl0_map0","assets/models/map/level0/0.glb",false);
+	data.file.loadModel("lvl0_props0","assets/models/map/level0/props/0.glb",true);
+	data.file.loadModel("lvl0_hitbox0","assets/models/map/level0/hitbox/hitbox0.glb",true);
+	data.file.loadModel("lvl0_hitbox1","assets/models/map/level0/hitbox/hitbox1.glb",true);
+	data.file.loadModel("lvl0_hitbox2","assets/models/map/level0/hitbox/hitbox2.glb",true);
+	data.file.loadModel("lvl0_hitbox3","assets/models/map/level0/hitbox/hitbox3.glb",true);
+	data.file.loadModel("lvl0_hitbox4","assets/models/map/level0/hitbox/hitbox4.glb",true);
+	data.file.loadModel("lvl0_hitbox5","assets/models/map/level0/hitbox/hitbox5.glb",true);
+	data.file.loadModel("lvl0_hitbox6","assets/models/map/level0/hitbox/hitbox6.glb",true);
+	data.file.loadModel("lvl0_hitbox7","assets/models/map/level0/hitbox/hitbox7.glb",true);
+	data.file.loadModel("lvl0_hitbox8","assets/models/map/level0/hitbox/hitbox8.glb",true);
+	data.file.loadModel("lvl0_hitbox9","assets/models/map/level0/hitbox/hitbox9.glb",true);
+	data.file.loadModel("lvl0_hitbox10","assets/models/map/level0/hitbox/chao.glb",true);
+	data.file.loadModel("lvl0_map0item0","assets/models/map/level0/item/0.glb",true);
+	data.file.loadModel("lvl0_map0item1","assets/models/map/level0/item/1.glb",true);
+	data.file.loadModel("lvl0_map0item2","assets/models/map/level0/item/2.glb",true);
+	data.file.loadModel("lvl0_map0item3","assets/models/map/level0/item/3.glb",true);
+	data.file.loadModel("lvl0_area0","assets/models/map/level0/area/0.glb",true);
+	data.file.loadModel("lvl0_area1","assets/models/map/level0/area/1.glb",true);
+	data.file.loadModel("lvl0_area2","assets/models/map/level0/area/2.glb",true);
+	data.file.loadModel("lvl0_area3","assets/models/map/level0/area/3.glb",true);
+	data.file.loadModel("lvl0_area4","assets/models/map/level0/area/4.glb",true);
+	data.file.loadModel("lvl0_area5","assets/models/map/level0/area/5.glb",true);
+	data.file.loadModel("player-idle","assets/models/player/idle/",false);
+	data.file.loadModel("player-walk","assets/models/player/walk/",false);
 }
 
 const Teclado =
@@ -164,7 +164,7 @@ function main()
 	data.scene.creature['joao451'] = data.scene.creature[0];
 	data.scene.render.addCreature(data.scene.creature['joao451']);
 	data.scene.render.addModel('map0','lvl0_map0');
-	data.scene.render.addText('build',0,data.config.title + " versão " + (data.config.build/10000),r.Vector2(0,(data.config.screen.y)-16),mqq.COR_PRETO,true);
+	data.scene.render.addText('build',0,data.config.title + " v" + (data.config.build/10000),r.Vector2(0,(data.config.screen.y)-16),mqq.COR_PRETO,true);
 	r.UpdateCamera(data.scene.camera);
     data.scene.camera.target = data.scene.creature[0].position;
     data.scene.camera.position = {x:0.4375, y:10, z:11.0625};
@@ -177,8 +177,9 @@ function main()
 	Teclado.gameplay.useThis(data);
     while(!r.WindowShouldClose() && data.session.exit == false)
     {
-        data.session.frame++;
 		data.keyboard.run(data);
+        data.session.frame++;
+		
 		if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
 		{
 			mqq.Gravit(data,data.scene.render.model[0]);
