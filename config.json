@@ -1,12 +1,12 @@
 {
   "title": "Estado Novo",
-  "subtitle": "Uma obra por Jardel Torres",
-  "build": 545,
+  "subtitle": "Uma obra por jardimdanificado",
+  "build": 561,
   "screen": {
     "x": 600,
     "y": 480
   },
   "resizableWindow": "true",
-  "framerate": 60,
-  "upscale": 1
+  "framerate": 75,
+  "pixelsize": 2
 }

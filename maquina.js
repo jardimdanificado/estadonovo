@@ -698,13 +698,14 @@ class Data
 		this.keyboard = {..._Data.keyboard};
 		this.config = require("./config.json");
 		this.scene.render.file = this.file;//just a link
-		if(this.config.resizebleWindow == true)
-			r.SetConfigFlags(r.FLAG_WINDOW_RESIZABLE);
+		
 		//r.InitAudioDevice();
 		r.InitWindow(this.config.screen.x, this.config.screen.y, this.config.title);
 		r.SetTargetFPS(this.config.framerate);
 		r.SetExitKey(r.KEY_END);
-		this.session.rendertexture = r.LoadRenderTexture(this.config.screen.x/this.config.upscale, this.config.screen.y/this.config.upscale);
+		if(this.config.resizebleWindow == true)
+			r.SetConfigFlags(r.FLAG_WINDOW_RESIZABLE);
+		this.session.rendertexture = r.LoadRenderTexture(this.config.screen.x/this.config.pixelsize, this.config.screen.y/this.config.pixelsize);
 		this.scene.background = {r:115, g:105, b:97, a:255};
 		this.scene.creature = [];
 		this.session.frame = 0;

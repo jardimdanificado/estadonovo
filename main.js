@@ -164,7 +164,7 @@ function main()
 	data.scene.creature['joao451'] = data.scene.creature[0];
 	data.scene.render.addCreature(data.scene.creature['joao451']);
 	data.scene.render.addModel('map0','lvl0_map0');
-	data.scene.render.addText('build',0,data.config.title + " v" + (data.config.build/10000),r.Vector2(0,data.config.screen.y-16),mqq.COR_PRETO,true);
+	data.scene.render.addText('build',0,data.config.title + " v" + (data.config.build/10000),r.Vector2(0,(data.config.screen.y/data.config.pixelsize)-16),mqq.COR_PRETO,true);
 	r.UpdateCamera(data.scene.camera);
     data.scene.camera.target = data.scene.creature[0].position;
     data.scene.camera.position = {x:0.4375, y:10, z:11.0625};
@@ -183,7 +183,7 @@ function main()
 		{
 			mqq.Gravit(data,data.scene.render.model[0]);
 		}
-		
+		r.BeginTextureMode(data.session.rendertexture);
 		r.BeginDrawing();
 		r.ClearBackground(data.scene.background);
 		r.BeginMode3D(data.scene.camera);
@@ -228,6 +228,20 @@ function main()
 			}
 		}
 		r.EndDrawing();
+		r.EndTextureMode();
+    	r.DrawTexturePro(
+			data.session.rendertexture.texture,
+			{
+				x:0,
+				y:0,
+				width:data.config.screen.x/data.config.pixelsize,
+				height:(data.config.screen.y/data.config.pixelsize)*-1
+			},
+			{x:0,y:0,width:data.config.screen.x,height:data.config.screen.y},
+			{x:0,y:0}
+			,0,
+			r.WHITE
+		);
     }
     //CloseAudioDevice();--------------------------------------------------------------------------------------
 	r.CloseWindow();
