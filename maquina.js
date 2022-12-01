@@ -307,8 +307,78 @@ function PlayerCollider(data,ref, backwards)
 }
 
 //-----------------------------------
-//MENU
+//RENDER && MENU
 //-----------------------------------
+function Render(data)
+{
+	r.BeginTextureMode(data.session.rendertexture);
+	r.BeginDrawing();
+	r.ClearBackground(data.scene.background);
+	r.BeginMode3D(data.scene.camera);
+	for(let i = 0; i< data.scene.render.model.length;i++)
+	{
+		if(data.scene.render.model[i].progression != 0)
+		{
+			if(data.session.frame % Math.floor(data.config.framerate/24) == 0)//setten up for 24fps
+			{
+				data.scene.render.model[i].frame += data.scene.render.model[i].progression;
+			}
+		}
+		data.scene.render.model[i].frame = limito(data.scene.render.model[i].frame,0,data.file.model[data.scene.render.model[i].id].model.length-2);
+		if(data.scene.render.model[i].visible == true)
+		{
+			if(typeof data.file.model[data.scene.render.model[i].id].model[0] != 'undefined')
+				r.DrawModelEx(
+					data.file.model[data.scene.render.model[i].id].model[data.scene.render.model[i].frame], 
+					data.scene.render.model[i].position, 
+					r.Vector3(0,1,0), 
+					data.scene.render.model[i].rotation.y, 
+					data.scene.render.model[i].scale, 
+					data.scene.render.model[i].color
+				);
+			else
+				r.DrawModelEx(
+					data.file.model[data.scene.render.model[i].id].model, 
+					data.scene.render.model[i].position,
+					r.Vector3(0,1,0), 
+					data.scene.render.model[i].rotation.y, 
+					data.scene.render.model[i].scale, 
+					data.scene.render.model[i].color
+				);
+		}
+	}
+	r.EndMode3D();
+	r.EndDrawing();
+	r.EndTextureMode();
+	r.DrawTexturePro(
+		data.session.rendertexture.texture,
+		{
+			x:0,
+			y:0,
+			width:data.config.screen.x/data.config.pixelsize,
+			height:(data.config.screen.y/data.config.pixelsize)*-1
+		},
+		{x:0,y:0,width:data.config.screen.x,height:data.config.screen.y},
+		{x:0,y:0}
+		,0,
+		r.WHITE
+	);
+	r.BeginDrawing();
+	for(let i = 0; i< data.scene.render.text.length;i++)
+	{
+		if(data.scene.render.text[i].visible == true)
+		{
+			r.DrawTextEx(
+				data.file.font[0],data.scene.render.text[i].text,
+				data.scene.render.text[i].position, 
+				16, 
+				0, 
+				data.scene.render.text[i].color
+			);
+		}
+	}
+	r.EndDrawing();
+}
 
 function Menu(ref,data)
 {
@@ -344,11 +414,11 @@ function Menu(ref,data)
 	var logoimg = r.ImageTextEx(ref.data.file.font[1], ref.data.config.title,48, 0, COR_PRETO)
 	var txtimg = [];
 	var mouse = {};
+	
 	for(let i = 0; i< ref.length;i++)
 	{
 		txtimg.push(r.ImageTextEx(ref.data.file.font[0], ref[i].text,16, 0, COR_PRETO));
 	}
-	
 	
 	while(ref.offload == false)
 	{
@@ -369,9 +439,19 @@ function Menu(ref,data)
 		
 		for(let i = 0;i<ref.length;i++)
 			if(ref.currentOption != i)
-				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, 16*i), 16, 0, COR_PRETO);
+				r.DrawTextEx(ref.data.file.font[0],
+							 ref[i].text, 
+							 r.Vector2(0, 16*i), 
+							 16,
+							 0, 
+							 COR_PRETO);
 			else
-				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, 16*i), 16, 0, COR_SELECIONADO2);
+				r.DrawTextEx(ref.data.file.font[0],
+							 ref[i].text,
+							 r.Vector2(0, 16*i),
+							 16,
+							 0,
+							 COR_SELECIONADO2);
 
 		if(ref.logo == true)
 		{
@@ -379,14 +459,34 @@ function Menu(ref,data)
 			   mouse.x<logoimg.width&&
 			   mouse.y>ref.data.config.screen.y-64&&
 			   mouse.y<ref.data.config.screen.y-64+logoimg.height)
-				r.DrawTextEx(ref.data.file.font[1],ref.data.config.title, r.Vector2(0,ref.data.config.screen.y-64), 48, 0, COR_SELECIONADO2);
+				r.DrawTextEx(ref.data.file.font[1],
+							 ref.data.config.title, 
+							 r.Vector2(0,ref.data.config.screen.y-64),
+							 48, 
+							 0, 
+							 COR_SELECIONADO2);
 			else
-				r.DrawTextEx(ref.data.file.font[1],ref.data.config.title, r.Vector2(0,ref.data.config.screen.y-64), 48, 0, COR_PRETO);
+				r.DrawTextEx(ref.data.file.font[1],
+							 ref.data.config.title, 
+							 r.Vector2(0,ref.data.config.screen.y-64), 
+							 48, 
+							 0, 
+							 COR_PRETO);
 			
 			if(locframe%331 == 0)
-				r.DrawTextEx(ref.data.file.font[2],ref.data.config.subtitle, r.Vector2(0,ref.data.config.screen.y-24), 24, 0, COR_SELECIONADO);
+				r.DrawTextEx(ref.data.file.font[2],
+							 ref.data.config.subtitle,
+							 r.Vector2(0,ref.data.config.screen.y-24), 
+							 24, 
+							 0,
+							 COR_SELECIONADO);
 			else
-				r.DrawTextEx(ref.data.file.font[2],ref.data.config.subtitle, r.Vector2(0,ref.data.config.screen.y-24), 24, 0, COR_PRETO);
+				r.DrawTextEx(ref.data.file.font[2],
+							 ref.data.config.subtitle,
+							 r.Vector2(0,ref.data.config.screen.y-24),
+							 24, 
+							 0,
+							 COR_PRETO);
 		}
 		
 		if(r.IsKeyPressed(r.KEY_ENTER)||
@@ -618,7 +718,7 @@ const _Data =
 						{	
 							if(!this.key[i][type].args[0])
 							{
-								if(type == 1)
+								if(type === 1)
 								{
 									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
 										this.key[i][type].func();
@@ -628,7 +728,7 @@ const _Data =
 							}
 							else if(!this.key[i][type].args[1])
 							{
-								if(type == 1)
+								if(type === 1)
 								{
 									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
 										this.key[i][type].func(this.key[i][type].args[0]);
@@ -638,7 +738,7 @@ const _Data =
 							}
 							else if(!this.key[i][type].args[2])
 							{
-								if(type == 1)
+								if(type === 1)
 								{
 									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
 										this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1]);
@@ -724,5 +824,5 @@ module.exports =
 	COR_BRANCO,COR_CINZA,COR_LARANJA,COR_PELE0,COR_ROUPA0,COR_ROUPA1,
 	Vector2,Vector2Zero,Vector3,Vector3Zero,RGBA,BoundingBox,
 	LimitItTo,limito,DefaultsTo,defsto,
-	Data,Menu,CameraStart,Move3D,PlayerCollider,Gravit,Save,Load,
+	Data,Render,Menu,CameraStart,Move3D,PlayerCollider,Gravit,Save,Load,
 };

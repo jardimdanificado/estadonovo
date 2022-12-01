@@ -1,12 +1,11 @@
 {
   "title": "Estado Novo",
   "subtitle": "Uma obra por jardimdanificado",
-  "build": 561,
+  "build": 580,
   "screen": {
     "x": 600,
     "y": 480
   },
-  "resizableWindow": "true",
-  "framerate": 75,
+  "framerate": 60,
   "pixelsize": 2
 }

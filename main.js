@@ -136,11 +136,11 @@ function main()
 	var startMenu = 
 	[
 		{//exit the current menu(possibly go back to another menu, or go back to the game)
-			text:"play",
+			text:"jogar",
 			func:function(){startMenu.offload = true;}
 		},
 		{//exit(to OS)
-			text:"exit",
+			text:"sair",
 			func:function(){startMenu.data.session.exit = true;startMenu.offload = true;}, 
 		},
 	];
@@ -164,7 +164,7 @@ function main()
 	data.scene.creature['joao451'] = data.scene.creature[0];
 	data.scene.render.addCreature(data.scene.creature['joao451']);
 	data.scene.render.addModel('map0','lvl0_map0');
-	data.scene.render.addText('build',0,data.config.title + " v" + (data.config.build/10000),r.Vector2(0,(data.config.screen.y/data.config.pixelsize)-16),mqq.COR_PRETO,true);
+	data.scene.render.addText('build',0,data.config.title + " versão " + (data.config.build/10000),r.Vector2(0,(data.config.screen.y)-16),mqq.COR_PRETO,true);
 	r.UpdateCamera(data.scene.camera);
     data.scene.camera.target = data.scene.creature[0].position;
     data.scene.camera.position = {x:0.4375, y:10, z:11.0625};
@@ -183,65 +183,7 @@ function main()
 		{
 			mqq.Gravit(data,data.scene.render.model[0]);
 		}
-		r.BeginTextureMode(data.session.rendertexture);
-		r.BeginDrawing();
-		r.ClearBackground(data.scene.background);
-		r.BeginMode3D(data.scene.camera);
-		for(let i = 0; i< data.scene.render.model.length;i++)
-		{
-			if(data.scene.render.model[i].progression != 0)
-			{
-				if(data.session.frame % Math.floor(data.config.framerate/24) == 0)//setten up for 24fps
-				{
-					data.scene.render.model[i].frame += data.scene.render.model[i].progression;
-				}
-			}
-			data.scene.render.model[i].frame = mqq.limito(data.scene.render.model[i].frame,0,data.file.model[data.scene.render.model[i].id].model.length-2);
-			if(data.scene.render.model[i].visible == true)
-			{
-				if(typeof data.file.model[data.scene.render.model[i].id].model[0] != 'undefined')
-					r.DrawModelEx(
-						data.file.model[data.scene.render.model[i].id].model[data.scene.render.model[i].frame], 
-						data.scene.render.model[i].position, 
-						r.Vector3(0,1,0), 
-						data.scene.render.model[i].rotation.y, 
-						data.scene.render.model[i].scale, 
-						data.scene.render.model[i].color
-					);
-				else
-					r.DrawModelEx(
-						data.file.model[data.scene.render.model[i].id].model, 
-						data.scene.render.model[i].position,
-						r.Vector3(0,1,0), 
-						data.scene.render.model[i].rotation.y, 
-						data.scene.render.model[i].scale, 
-						data.scene.render.model[i].color
-					);
-			}
-		}
-		r.EndMode3D();
-		for(let i = 0; i< data.scene.render.text.length;i++)
-		{
-			if(data.scene.render.text[i].visible == true)
-			{
-				r.DrawTextEx(data.file.font[0],data.scene.render.text[i].text,data.scene.render.text[i].position, 16, 0, data.scene.render.text[i].color);
-			}
-		}
-		r.EndDrawing();
-		r.EndTextureMode();
-    	r.DrawTexturePro(
-			data.session.rendertexture.texture,
-			{
-				x:0,
-				y:0,
-				width:data.config.screen.x/data.config.pixelsize,
-				height:(data.config.screen.y/data.config.pixelsize)*-1
-			},
-			{x:0,y:0,width:data.config.screen.x,height:data.config.screen.y},
-			{x:0,y:0}
-			,0,
-			r.WHITE
-		);
+		mqq.Render(data);
     }
     //CloseAudioDevice();--------------------------------------------------------------------------------------
 	r.CloseWindow();
