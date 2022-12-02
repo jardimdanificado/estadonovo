@@ -223,18 +223,18 @@ function UpdateHorizontalRay(ref,backwards)
 
 function Gravity(targetobj, gravidade)
 {
-    return((targetobj.position.y) - gravidade*((targetobj.fallTime*(targetobj.fallTime/10)))/60);
+    return((targetobj.position.y) - gravidade*((targetobj.fallTime*(targetobj.fallTime/10)))/30);
 }
 
 function Gravit(data, targetobj)
 {
 	UpdateGravityRay(targetobj);
 	var gravityraiocolisao = {hit:false};
-    for(let i=0;i<data.scene.render.hitbox.length;i++)
+    for(let i=0;i<data.scene.hitbox.length;i++)
     {
-		if(data.scene.render.hitbox[i].active == true)
+		if(data.scene.hitbox[i].active == true)
 		{
-			gravityraiocolisao = r.GetRayCollisionBox(targetobj.ray.gravity,data.scene.render.hitbox[i].hitbox);
+			gravityraiocolisao = r.GetRayCollisionBox(targetobj.ray.gravity,data.scene.hitbox[i].hitbox);
 			if(gravityraiocolisao.hit == true)
 				break;
 			gravityraiocolisao.hit = false;
@@ -243,7 +243,7 @@ function Gravit(data, targetobj)
 	
     if(gravityraiocolisao.hit == false)
     {
-        targetobj.position.y = (Gravity(targetobj, 0.1));
+        targetobj.position.y = (Gravity(targetobj, 1));
         targetobj.fallTime++;
     }
     else
@@ -260,10 +260,10 @@ function PlayerCollider(data,ref, backwards)
 {
     var directionraiocolisao = {hit:false};
     UpdateHorizontalRay(ref,backwards);
-    for(let i=0;i<data.scene.render.hitbox.length;i++)
-		if(data.scene.render.hitbox[i].active == true)
+    for(let i=0;i<data.scene.hitbox.length;i++)
+		if(data.scene.hitbox[i].active == true)
 		{
-			directionraiocolisao = r.GetRayCollisionBox(ref.ray.horizontal,data.scene.render.hitbox[i].hitbox);
+			directionraiocolisao = r.GetRayCollisionBox(ref.ray.horizontal,data.scene.hitbox[i].hitbox);
 			if(directionraiocolisao.hit == true)
 			{
 				break;
@@ -295,9 +295,9 @@ function PlayerCollider(data,ref, backwards)
                 Move3D(caixa.max,ref.rotation.y,0.1);
                 Move3D(caixa.min,ref.rotation.y,0.1);
             }
-            for(let i = 0;i<data.scene.render.hitbox.length;i++)
-				if(data.scene.render.hitbox[i].active == true)
-					if(r.CheckCollisionBoxes(caixa,data.scene.render.hitbox[i].hitbox)==true)
+            for(let i = 0;i<data.scene.hitbox.length;i++)
+				if(data.scene.hitbox[i].active == true)
+					if(r.CheckCollisionBoxes(caixa,data.scene.hitbox[i].hitbox)==true)
 					{
 						return true;
 					}
@@ -311,9 +311,9 @@ function PlayerCollider(data,ref, backwards)
 //-----------------------------------
 function Render(data)
 {
+	data.session.frame++;
 	r.BeginDrawing();
 	r.BeginTextureMode(data.session.rendertexture);
-	
 	r.ClearBackground(data.scene.background);
 	r.BeginMode3D(data.scene.camera);
 	for(let i = 0; i< data.scene.render.model.length;i++)
@@ -413,14 +413,14 @@ function Menu(ref,data)
 	var logoimg = r.ImageTextEx(ref.data.file.font[1], ref.data.config.title,48, 0, COR_PRETO)
 	var txtimg = [];
 	var mouse = {};
+	
 	for(let i = 0; i< ref.length;i++)
-	{
 		txtimg.push(r.ImageTextEx(ref.data.file.font[0], ref[i].text,16, 0, COR_PRETO));
-	}
-	
-	
+	r.StopMusicStream(ref.data.file.music[0]);
+	r.PlayMusicStream(ref.data.file.music[0]);
 	while(ref.offload == false)
 	{
+		r.UpdateMusicStream(ref.data.file.music[0]);
 		r.BeginDrawing();
 		r.ClearBackground(COR_BRANCO);
 		
@@ -491,154 +491,9 @@ function Menu(ref,data)
 	ref.offload = false;
 }
 
-//-----------------------------------
-//SAVE
-//-----------------------------------
-function Save(data)
+function CreateDynamicKeyboard()
 {
-	fs.writeFileSync('./assets/save/save.json', JSON.stringify(data.scene));
-}
-
-function Load(data,link)
-{
-	let tempLoad = require("./assets/save/save.json")
-	data.scene = Object.assign(data.scene, tempLoad);
-	data.scene.render.file = data.file;
-}
-
-//-----------------------------------
-//DATA_FILE
-//-----------------------------------
-
-const _Data = 
-{
-    file:
-    {
-        model:[],
-        hitbox:[],
-        eventbox:[],
-        font:[],
-        text:[],
-        lang:[],
-        music:[],
-        sound:[],
-        loadModel:function(name, link, isHitbox)
-        {
-            var LocalIndex;
-            this.model[name] = {};
-            
-            //this.loading.push("(model) " + name);
-            if(!link.includes('.iqm') && !link.includes('.obj') && !link.includes('.glb') && !link.includes('.gltf'))
-            {
-                const files = fs.readdirSync(link);
-				files.sort((a,b)=>parseInt(a)-parseInt(b));
-                this.model[name].model = [];
-                if(files[0].includes('.glb') || files[0].includes('.obj') || files[0].includes('.iqm') || files[0].includes('.gltf'))
-                    for(let i = 0;i<files.length;i++)
-                        if(fs.existsSync(link+files[i]))
-                            this.model[name].model.push(r.LoadModel(link+files[i]));
-                this.model[name].name = name;
-            }
-            else
-            {
-                this.model[name].model = r.LoadModel(link);
-                this.model[name].name = name;
-            }
-            if(isHitbox === true)
-            {
-                this.hitbox[name] = {};
-                this.hitbox[name].hitbox = r.GetModelBoundingBox(this.model[name].model);
-				this.hitbox[name].name = name;
-                this.hitbox.push(this.hitbox[name]);
-            }
-            this.model.push(this.model[name]);
-        }
-    },
-    session:
-    {
-        frame:0,
-        resizableWindow:true,
-        exit:false,
-        rendertexture:{},
-    },
-    scene:
-    {
-        background:RGBA(0,0,0,0),
-        camera:CameraStart(),
-        event:[],
-        map:{},
-        creature:[],
-		render:
-		{	
-			file:{},//is set then, in the constructor
-			addCreature:function(crt,specime)
-			{
-				specime = defsto(specime,'human');
-				if(specime === 'human')
-					this.addModel(crt.name,'player-idle',0,RGBA(153,100,0,255),crt.position,crt.rotation);
-			},
-			addModel:function(name,modelid,frame,color,position,rotation,scale,visible,progression)
-			{
-				position = DefaultsTo(position,{x:0,y:0,z:0});
-				rotation = defsto(rotation,Vector3(0,0,0));//Same as DefaultsTo
-				scale = defsto(scale,Vector3(1,1,1));
-				frame = defsto(frame,0);
-				color = defsto(color,RGBA(255,255,255,255));
-				visible = defsto(visible,true);
-				ray = 
-				{
-					gravity:{position:Vector3(0,0,0), direction: {x:0,y:1,z:0}},
-					horizontal:{position:Vector3(0,0,0), direction: {x:0,y:0,z:0}}
-				};
-				fallTime = 0;
-				if(this.file.model[modelid].model[0])
-					progression = defsto(progression,1);
-				else
-					progression = defsto(progression,0);
-				
-				let temp = {name:name,id:modelid,position:position,rotation:rotation,scale:scale,frame:frame,color:color,visible:visible,progression:progression,ray:ray,fallTime:0};
-				this.model[name] = temp;
-				this.model.push(temp);
-			},
-			addHitbox:function(name,hitbox,position,rotation,frame,color,visible)
-			{
-				position = DefaultsTo(position,{x:0,y:0,z:0});
-				rotation = defsto(rotation,Vector3(0,0,0));//Same as DefaultsTo
-				frame = defsto(frame,0);
-				color = defsto(color,RGBA(0,0,0,0));
-				visible = defsto(visible,true);
-				active = true;
-				let temp = {name:name,hitbox:hitbox,position:position,rotation:rotation,frame:frame,color:color,active:active,visible:visible};//color stands for wireframe color
-				this.hitbox[name] = temp;
-				this.hitbox.push(temp);
-			},
-			addText:function(name,fontid,text,position,color,visible)
-			{
-				position = DefaultsTo(position,{x:0,y:0});
-				text = defsto(text,"empty");
-				color = defsto(color,RGBA(0,0,0,0));
-				visible = defsto(visible,true);
-				let temp = {name:name,id:fontid,text:text,position:position,color:color,visible:visible};//color stands for wireframe color
-				this.text[name] = temp;
-				this.text.push(temp);
-			},
-			addImage:function(name,imageid,position,scale,color,visible)
-			{
-				position = DefaultsTo(position,{x:0,y:0});
-				color = defsto(color,RGBA(0,0,0,0));
-				visible = defsto(visible,true);
-				let temp = {name:name,id:imageid,position:position,color:color,visible:visible};//color stands for wireframe color
-				this.image[name] = temp;
-				this.image.push(temp);
-			},
-			model:[],
-			hitbox:[],
-			text:[],
-			image:[]
-		}
-    },
-	keyboard:
-	{
+	return {
 		key:[],
 		set:function(id,type,infunc,args)
 		{
@@ -689,7 +544,7 @@ const _Data =
 							{
 								if(type == 1)
 								{
-									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
+									if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
 										this.key[i][type].func();
 								}
 								else
@@ -699,7 +554,7 @@ const _Data =
 							{
 								if(type == 1)
 								{
-									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
+									if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
 										this.key[i][type].func(this.key[i][type].args[0]);
 								}
 								else
@@ -709,7 +564,7 @@ const _Data =
 							{
 								if(type == 1)
 								{
-									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
+									if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
 										this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1]);
 								}
 								else
@@ -719,7 +574,7 @@ const _Data =
 							{
 								if(type == 1)
 								{
-									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
+									if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
 										this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2]);
 								}
 								else
@@ -729,7 +584,7 @@ const _Data =
 							{
 								if(type == 1)
 								{
-									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
+									if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
 										this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2],this.key[i][type].args[3]);
 								}
 								else
@@ -739,7 +594,7 @@ const _Data =
 							{
 								if(type == 1)
 								{
-									if(data.session.frame%(Math.floor(data.config.framerate/60.0))==0)
+									if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
 										this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2],this.key[i][type].args[3],this.key[i][type].args[4]);
 								}
 								else
@@ -751,9 +606,189 @@ const _Data =
 	}
 }
 
+//-----------------------------------
+//SAVE
+//-----------------------------------
+function Save(data)
+{
+	fs.writeFileSync('./assets/save/save.json', JSON.stringify(data.scene));
+}
+
+function Load(data,link)
+{
+	let tempLoad = require("./assets/save/save.json")
+	data.scene = Object.assign(data.scene, tempLoad);
+	data.scene.render.file = data.file;
+}
+
+//-----------------------------------
+//DATA_FILE
+//-----------------------------------
+
+const _Data = 
+{
+    file:
+    {
+        model:[],
+        hitbox:[],
+        font:[],
+        music:[],
+        sound:[],
+        loadModel:function(name, link, isHitbox)
+        {
+            var LocalIndex;
+            this.model[name] = {};
+            
+            //this.loading.push("(model) " + name);
+            if(!link.includes('.iqm') && !link.includes('.obj') && !link.includes('.glb') && !link.includes('.gltf'))
+            {
+                const files = fs.readdirSync(link);
+				files.sort((a,b)=>parseInt(a)-parseInt(b));
+                this.model[name].model = [];
+                if(files[0].includes('.glb') || files[0].includes('.obj') || files[0].includes('.iqm') || files[0].includes('.gltf'))
+                    for(let i = 0;i<files.length;i++)
+                        if(fs.existsSync(link+files[i]))
+                            this.model[name].model.push(r.LoadModel(link+files[i]));
+                this.model[name].name = name;
+            }
+            else
+            {
+                this.model[name].model = r.LoadModel(link);
+                this.model[name].name = name;
+            }
+            if(isHitbox === true)
+            {
+                this.hitbox[name] = {};
+                this.hitbox[name].hitbox = r.GetModelBoundingBox(this.model[name].model);
+				this.hitbox[name].name = name;
+                this.hitbox.push(this.hitbox[name]);
+            }
+            this.model.push(this.model[name]);
+        }
+    },
+    session:
+    {
+        frame:0,
+        resizableWindow:true,
+        exit:false,
+        rendertexture:{},
+    },
+    scene:
+    {
+        background:RGBA(0,0,0,0),
+        camera:CameraStart(),
+        event:[],
+        map:{},
+        creature:[],
+		hitbox:[],
+		area:[],
+		addArea:function(name,hitbox,position,active,visible,color)
+		{
+			position = DefaultsTo(position,{x:0,y:0,z:0});
+			color = defsto(color,RGBA(0,0,0,0));
+			visible = defsto(visible,true);
+			active = true;
+			let temp = {name:name,hitbox:hitbox,position:position,color:color,active:active,visible:visible};//color stands for wireframe color
+			this.area[name] = temp;
+			this.area.push(temp);
+		},
+		addHitbox:function(name,hitbox,position,rotation,frame,color,visible,active)
+		{
+			position = DefaultsTo(position,{x:0,y:0,z:0});
+			rotation = defsto(rotation,Vector3(0,0,0));//Same as DefaultsTo
+			frame = defsto(frame,0);
+			color = defsto(color,RGBA(0,0,0,0));
+			visible = defsto(visible,true);
+			active = true;
+			let temp = {name:name,hitbox:hitbox,position:position,rotation:rotation,frame:frame,color:color,active:active,visible:visible};//color stands for wireframe color
+			this.hitbox[name] = temp;
+			this.hitbox.push(temp);
+		},
+		addCreature:function(name,type,position,rotation,speed,alive,active)
+		{
+			type = defsto(type,'human');
+			position = defsto(position,Vector3(0,0,0));
+			rotation = defsto(rotation,Vector3(0,0,0));
+			speed = defsto(speed,0.1);
+			alive = defsto(alive,true);
+			active = defsto(active,true);
+			this.creature[name] = {name:name,position:position,rotation:rotation,speed:speed,alive:alive,active:active};
+			this.creature.push(this.creature[name]);
+		},
+		addCreature2Render2:function(name,type,position,rotation,speed,alive,active)
+		{
+			type = defsto(type,'human');
+			position = defsto(position,Vector3(0,0,0));
+			rotation = defsto(rotation,Vector3(0,0,0));
+			speed = defsto(speed,0.1);
+			alive = defsto(alive,true);
+			active = defsto(active,true);
+			this.addCreature(name,type,position,rotation,speed,alive,active);
+			this.render.addCreature(this.creature[name], this.creature[name].type);
+		},
+		render:
+		{
+			file:{},//is set afterwards in the constructor
+			model:[],
+			text:[],
+			image:[],
+			addCreature:function(crt,specime)
+			{
+				specime = defsto(specime,'human');
+				if(specime === 'human')
+					this.addModel(crt.name,'player-idle',0,RGBA(153,100,0,255),crt.position,crt.rotation);
+			},
+			addModel:function(name,modelid,frame,color,position,rotation,scale,visible,progression)
+			{
+				position = DefaultsTo(position,{x:0,y:0,z:0});
+				rotation = defsto(rotation,Vector3(0,0,0));//Same as DefaultsTo
+				scale = defsto(scale,Vector3(1,1,1));
+				frame = defsto(frame,0);
+				color = defsto(color,RGBA(255,255,255,255));
+				visible = defsto(visible,true);
+				ray = 
+				{
+					gravity:{position:Vector3(0,0,0), direction: {x:0,y:1,z:0}},
+					horizontal:{position:Vector3(0,0,0), direction: {x:0,y:0,z:0}}
+				};
+				fallTime = 0;
+				if(this.file.model[modelid].model[0])
+					progression = defsto(progression,1);
+				else
+					progression = defsto(progression,0);
+				
+				let temp = {name:name,id:modelid,position:position,rotation:rotation,scale:scale,frame:frame,color:color,visible:visible,progression:progression,ray:ray,fallTime:0};
+				this.model[name] = temp;
+				this.model.push(temp);
+			},
+			addText:function(name,fontid,text,position,color,visible)
+			{
+				position = DefaultsTo(position,{x:0,y:0});
+				text = defsto(text,"empty");
+				color = defsto(color,RGBA(0,0,0,0));
+				visible = defsto(visible,true);
+				let temp = {name:name,id:fontid,text:text,position:position,color:color,visible:visible};//color stands for wireframe color
+				this.text[name] = temp;
+				this.text.push(temp);
+			},
+			addImage:function(name,imageid,position,scale,color,visible)
+			{
+				position = DefaultsTo(position,{x:0,y:0});
+				color = defsto(color,RGBA(0,0,0,0));
+				visible = defsto(visible,true);
+				let temp = {name:name,id:imageid,position:position,color:color,visible:visible};//color stands for wireframe color
+				this.image[name] = temp;
+				this.image.push(temp);
+			},
+
+		}
+    },
+	keyboard:CreateDynamicKeyboard(),
+}
+
 class Data	
 {
-	constructor()
+	constructor(loadCallback)
 	{
 		this.session = {..._Data.session};
 		this.scene = {..._Data.scene};
@@ -762,7 +797,7 @@ class Data
 		this.config = require("./config.json");
 		this.scene.render.file = this.file;//just a link
 		
-		//r.InitAudioDevice();
+		r.InitAudioDevice();
 		r.InitWindow(this.config.screen.x, this.config.screen.y, this.config.title);
 		r.SetTargetFPS(this.config.framerate);
 		r.SetExitKey(r.KEY_END);
@@ -770,8 +805,29 @@ class Data
 		this.scene.background = {r:115, g:105, b:97, a:255};
 		this.scene.creature = [];
 		this.session.frame = 0;
+		this.scene.render.addText('build',0,this.config.title + " v" + (this.config.build/10000),r.Vector2(0,(this.config.screen.y)-16),COR_PRETO,true);
 		//CURRENT_LEVEL
 		this.scene.map.currentLevel = 0;
+		if(typeof loadCallback != 'undefined')
+			loadCallback(this);
+		//start menu
+		if(typeof this.file.font[2] != 'undefined'&&typeof this.file.music[0] != 'undefined')
+		{
+			let startMenu = 
+			[
+				{//exit the current menu(possibly go back to another menu, or go back to the game)
+					text:"jogar",
+					func:function(){startMenu.offload = true;}
+				},
+				{//exit(to OS)
+					text:"sair",
+					func:function(){startMenu.data.session.exit = true;startMenu.offload = true;}, 
+				},
+			];
+			startMenu.logo = true;
+			startMenu.data = this;
+			Menu(startMenu);
+		}
 	}
 }
 
