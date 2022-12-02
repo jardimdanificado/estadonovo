@@ -9,16 +9,18 @@ const Teclado =
 	gameplay: 
 	{
 		escMenu: 
-		[
-			{//exit the current menu(possibly go back to another menu, or go back to the game)
+		{
+			0:{//exit the current menu(possibly go back to another menu, or go back to the game)
 				text:"voltar ao jogo",
 				func:function(){Teclado.gameplay.escMenu.offload = true;}
 			},
-			{//exit(to OS)
+			1:{//exit(to OS)
 				text:"sair",
 				func:function(){Teclado.gameplay.escMenu.data.session.exit = true;Teclado.gameplay.escMenu.offload = true;}, 
 			},
-		],
+			length:2,
+			offloadkey:r.KEY_ESCAPE
+		},
 		pressed:
 		{
 			w:function(data)
@@ -134,7 +136,6 @@ function main()
 	//if you provide the constructor a load function it will boot a start menu
 	//note that the menu will only showup if at least 3 fonts and a music are loaded 
 	data = new mqq.Data(load);//all startup needs are in the constructor
-	//load(data);//
 	
 	data.scene.addCreature('joao451','human',{x:1,y:4,z:0},{x:0,y:180,z:0},0.15,true,true);//create the creature in scene
 	data.scene.render.addCreature(data.scene.creature['joao451']);//add the just created creature in the render context

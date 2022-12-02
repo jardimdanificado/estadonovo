@@ -368,7 +368,8 @@ function Render(data)
 		if(data.scene.render.text[i].visible == true)
 		{
 			r.DrawTextEx(
-				data.file.font[0],data.scene.render.text[i].text,
+				data.file.font[0],
+				data.scene.render.text[i].text,
 				data.scene.render.text[i].position, 
 				16, 
 				0, 
@@ -376,6 +377,14 @@ function Render(data)
 			);
 		}
 	}
+	r.DrawTextEx(
+				data.file.font[0],
+				r.GetFPS() + "",
+				Vector2(0,0), 
+				16, 
+				0, 
+				COR_PRETO
+			);
 	r.EndDrawing();
 }
 
@@ -400,6 +409,7 @@ function Menu(ref,data)
  		}
   	*/
 	ref.offload = defsto(ref.offload,false);
+	ref.offloadkey = defsto(ref.offloadkey,r.KEY_NULL);
 	ref.currentOption = defsto(ref.currentOption,0);
 	ref.logo = defsto(ref.logo,false);
 	var locframe = 0;
@@ -484,6 +494,10 @@ function Menu(ref,data)
 				ref.currentOption--;
 			else 
 				ref.currentOption = ref.length-1;
+		}
+		else if(locframe>0&&r.IsKeyPressed(ref.offloadkey))
+		{
+			ref.offload = true;
 		}
 		r.EndDrawing();
 		locframe++;
