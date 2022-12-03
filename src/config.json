@@ -1,12 +1,15 @@
 {
   "title": "Estado Novo",
   "subtitle": "Uma obra por jardimdanificado",
-  "build": 651,
+  "build": 729,
   "screen": {
     "x": 600,
     "y": 480
   },
-  "framerate": 75,
+  "framerate": 30,
+  "showfps": true,
   "pixelsize": 2,
-  "rotationspeed": 12
+  "rotationspeed": 9,
+  "camerafollow": true,
+  "camerafov": 45
 }

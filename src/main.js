@@ -41,6 +41,8 @@ const Teclado =
 				if(mqq.PlayerCollider(data,data.scene.render.model['joao451'],false)==false)
 				{
 					mqq.Move3D(data.scene.creature['joao451'].position,data.scene.creature['joao451'].rotation.y,data.scene.creature['joao451'].speed);
+					if(data.config.camerafollow == true)
+						mqq.Move3D(data.scene.camera.position,data.scene.creature['joao451'].rotation.y,data.scene.creature['joao451'].speed);
 				}
 			},
 			s:function(data)
@@ -48,6 +50,8 @@ const Teclado =
 				if(mqq.PlayerCollider(data,data.scene.render.model['joao451'],true)==false)
 				{
 					mqq.Move3D(data.scene.creature['joao451'].position,data.scene.creature['joao451'].rotation.y,(-1)*data.scene.creature['joao451'].speed);
+					if(data.config.camerafollow == true)
+						mqq.Move3D(data.scene.camera.position,data.scene.creature['joao451'].rotation.y,data.scene.creature['joao451'].speed*(-1));
 				}
 			},
 			a:function(data)
@@ -59,6 +63,14 @@ const Teclado =
 			{
 				data.scene.creature['joao451'].rotation.y -= data.config.rotationspeed;
 				data.scene.creature['joao451'].rotation.y = mqq.limito(data.scene.creature['joao451'].rotation.y,0,359);
+			},
+			q:function(data)
+			{
+				data.scene.camera.position = mqq.RotateAroundPivot(data.scene.camera.position,data.scene.creature['joao451'].position,data.config.rotationspeed);
+			},
+			e:function(data)
+			{
+				data.scene.camera.position = mqq.RotateAroundPivot(data.scene.camera.position,data.scene.creature['joao451'].position,data.config.rotationspeed*(-1));
 			},
 			space:function(data)
 			{
@@ -89,6 +101,8 @@ const Teclado =
 			data.keyboard.set(r.KEY_S,'released',this.released.s,[data]);
 			data.keyboard.set(r.KEY_A,'down',this.down.a,[data]);
 			data.keyboard.set(r.KEY_D,'down',this.down.d,[data]);
+			data.keyboard.set(r.KEY_Q,'down',this.down.q,[data]);
+			data.keyboard.set(r.KEY_E,'down',this.down.e,[data]);
 			data.keyboard.set(r.KEY_SPACE,'down',this.down.space,[data]);
 			data.keyboard.set(r.KEY_G,'pressed',mqq.Save,[data]);
 		}
@@ -143,7 +157,7 @@ function main()
 	//data.scene.addCreature2Render2('joao451','human',{x:0,y:4,z:0},{x:0,y:0,z:0},0.1,true,true);
 	
 	data.scene.render.addModel('map0','lvl0_map0');//add the map model to the render scene
-	
+	console.log(data.file.model[0].meshes);
     data.scene.camera.target = data.scene.creature[0].position;
     data.scene.camera.position = {x:0.4375, y:10, z:11.0625};
 
@@ -155,11 +169,12 @@ function main()
 			data.scene.addArea(data.file.hitbox[i].name,data.file.hitbox[i].hitbox);
 	
 	Teclado.gameplay.useThis(data);//use the gameplay keyboard template
-	
+	var tempray = r.GetMouseRay(r.GetMousePosition(), data.scene.camera);
     while(!r.WindowShouldClose() && data.session.exit == false)
     {
 		data.keyboard.run(data);
-		
+		tempray = r.GetMouseRay(r.GetMousePosition(), data.scene.camera);
+		//r.GetRayCollisionMesh(tempray, data.file.model[0].meshes[0], data.file.model[0].model.transform)//a mesh loader must be written in order to make this work
 		if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
 		{
 			mqq.Gravit(data,data.scene.render.model[0]);

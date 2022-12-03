@@ -97,17 +97,26 @@ function DifferenceVec3(vec1, vec2)
     return(Vector3(DifferenceFloat(vec1.x, vec2.x),DifferenceFloat(vec1.y, vec2.y),DifferenceFloat(vec1.z, vec2.z)));
 }
 
+function RotateAroundPivot(point,center,angle)
+{
+	angle = (angle ) * (Math.PI/180); // Convert to radians
+	var rotatedX = Math.cos(angle) * (point.x - center.x) - Math.sin(angle) * (point.z-center.z) + center.x;
+	var rotatedZ = Math.sin(angle) * (point.x - center.x) + Math.cos(angle) * (point.z - center.z) + center.z;
+	return Vector3(rotatedX,point.y,rotatedZ);
+}
+
 //-----------------------------------
 //3D && CAMERA
 //-----------------------------------
 
-function CameraStart()
+function CameraStart(fov)
 {
+	
     let camera = {};
     camera.position = {x:10.0, y:10.0, z:10.0};
     camera.target = {x:0.0, y:10.0, z:0.0};
     camera.up = {x:0.0, y:1.0, z:0.0};
-    camera.fovy = 30.0;
+	camera.fovy = defsto(camera.fovy,30);
     camera.projection = r.CAMERA_PERSPECTIVE;
     r.SetCameraMode(camera, r.CAMERA_CUSTOM);
     return (camera);
@@ -377,14 +386,34 @@ function Render(data)
 			);
 		}
 	}
-	r.DrawTextEx(
+	for(let i = 0; i< data.scene.creature.length;i++)
+	{
+		if(typeof data.scene.render.model[data.scene.creature[i].name] != 'undefined')
+		{
+			let temp;
+			let trm = data.scene.render.model[data.scene.creature[i].name];//TEMP RENDER MODEL
+			if(typeof data.file.model[trm.id].model[0]!="undefined")
+				temp = r.GetModelBoundingBox(data.file.model[trm.id].model[trm.frame]);
+			else
+				temp = r.GetModelBoundingBox(data.file.model[trm.id].model);
+			temp.min = RotateAroundPivot(temp.min,Vector3(0,0,0),trm.rotation.y);
+			temp.max = RotateAroundPivot(temp.max,Vector3(0,0,0),trm.rotation.y);
+			temp = {x:Math.max(temp.min.x,temp.max.x),y:Math.max(temp.min.y,temp.max.y),z:Math.max(temp.min.z,temp.max.z)}
+			temp = r.Vector3Add(Vector3(temp.x + temp.x/2,temp.y,temp.z + temp.z/2),trm.position);
+			temp = r.GetWorldToScreen(temp, data.scene.camera);
+			r.DrawTextEx(
 				data.file.font[0],
-				r.GetFPS() + "",
-				Vector2(0,0), 
+				trm.name,
+				Vector2(temp.x - (r.ImageTextEx(data.file.font[0], trm.name,16, 0, COR_PRETO).width),temp.y - 24), 
 				16, 
 				0, 
-				COR_PRETO
+				data.scene.render.text[i].color
 			);
+		}
+	}
+	
+	if(data.config.showfps == true)
+		r.DrawFPS(0,0);
 	r.EndDrawing();
 }
 
@@ -420,7 +449,7 @@ function Menu(ref,data)
 		return false;
 
 	var locframe = 0;
-	var logoimg = r.ImageTextEx(ref.data.file.font[1], ref.data.config.title,48, 0, COR_PRETO)
+	var logoimg = r.ImageTextEx(ref.data.file.font[1], ref.data.config.title,48, 0, COR_PRETO);
 	var txtimg = [];
 	var mouse = {};
 	
@@ -690,7 +719,7 @@ const _Data =
     scene:
     {
         background:RGBA(0,0,0,0),
-        camera:CameraStart(),
+        camera:{},
         event:[],
         map:{},
         creature:[],
@@ -810,7 +839,7 @@ class Data
 		this.keyboard = {..._Data.keyboard};
 		this.config = require("./config.json");
 		this.scene.render.file = this.file;//just a link
-		
+		this.scene.camera = CameraStart(this.config.camerafov);
 		r.InitAudioDevice();
 		r.InitWindow(this.config.screen.x, this.config.screen.y, this.config.title);
 		r.SetTargetFPS(this.config.framerate);
@@ -853,7 +882,7 @@ module.exports =
 {
 	COR_VERMELHO,COR_SELECIONADO,COR_SELECIONADO2,COR_PRETO,COR_VAZIO,
 	COR_BRANCO,COR_CINZA,COR_LARANJA,COR_PELE0,COR_ROUPA0,COR_ROUPA1,
-	Vector2,Vector2Zero,Vector3,Vector3Zero,RGBA,BoundingBox,
+	Vector2,Vector2Zero,Vector3,Vector3Zero,RGBA,BoundingBox,RotateAroundPivot,
 	LimitItTo,limito,DefaultsTo,defsto,
 	Data,Render,Menu,CameraStart,Move3D,PlayerCollider,Gravit,Save,Load,
 };
