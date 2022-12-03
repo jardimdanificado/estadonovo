@@ -177,7 +177,7 @@ function main()
 		//r.GetRayCollisionMesh(tempray, data.file.model[0].meshes[0], data.file.model[0].model.transform)//a mesh loader must be written in order to make this work
 		if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
 		{
-			mqq.Gravit(data,data.scene.render.model[0]);
+			mqq.Gravit(data,data.scene.render.model['joao451']);
 		}
 		mqq.Render(data);
     }
