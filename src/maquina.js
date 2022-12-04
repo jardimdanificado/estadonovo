@@ -97,14 +97,24 @@ function DifferenceVec3(vec1, vec2)
     return(Vector3(DifferenceFloat(vec1.x, vec2.x),DifferenceFloat(vec1.y, vec2.y),DifferenceFloat(vec1.z, vec2.z)));
 }
 
-function RotateAroundPivot(point,center,angle)
+function RotateAroundPivot(point,pivot,angle)
 {
 	angle = (angle ) * (Math.PI/180); // Convert to radians
-	var rotatedX = Math.cos(angle) * (point.x - center.x) - Math.sin(angle) * (point.z-center.z) + center.x;
-	var rotatedZ = Math.sin(angle) * (point.x - center.x) + Math.cos(angle) * (point.z - center.z) + center.z;
+	var rotatedX = Math.cos(angle) * (point.x - pivot.x) - Math.sin(angle) * (point.z-pivot.z) + pivot.x;
+	var rotatedZ = Math.sin(angle) * (point.x - pivot.x) + Math.cos(angle) * (point.z -pivot.z) + pivot.z;
 	return Vector3(rotatedX,point.y,rotatedZ);
 }
 
+function RotateBoundingBox(hitbox,pivot,angle)
+{
+	let temp = {min:{...hitbox.min},max:{...hitbox.max}};
+	temp.min = RotateAroundPivot(temp.min,pivot,angle);
+	temp.max = RotateAroundPivot(temp.max,pivot,angle);
+	let result = {};
+	result.max = {x:Math.max(temp.min.x,temp.max.x),y:Math.max(temp.min.y,temp.max.y),z:Math.max(temp.min.z,temp.max.z)}
+	result.min = {x:Math.min(temp.min.x,temp.max.x),y:Math.min(temp.min.y,temp.max.y),z:Math.min(temp.min.z,temp.max.z)}
+	return result;
+}
 //-----------------------------------
 //3D && CAMERA
 //-----------------------------------
@@ -380,7 +390,7 @@ function Render(data)
 				data.file.font[0],
 				data.scene.render.text[i].text,
 				data.scene.render.text[i].position, 
-				16, 
+				data.config.fontsize, 
 				0, 
 				data.scene.render.text[i].color
 			);
@@ -396,19 +406,18 @@ function Render(data)
 				temp = r.GetModelBoundingBox(data.file.model[trm.id].model[trm.frame]);
 			else
 				temp = r.GetModelBoundingBox(data.file.model[trm.id].model);
-			temp.min = RotateAroundPivot(temp.min,Vector3(0,0,0),trm.rotation.y);
-			temp.max = RotateAroundPivot(temp.max,Vector3(0,0,0),trm.rotation.y);
-			temp = {x:Math.max(temp.min.x,temp.max.x),y:Math.max(temp.min.y,temp.max.y),z:Math.max(temp.min.z,temp.max.z)}
-			temp = r.Vector3Add(Vector3(temp.x + temp.x/2,temp.y,temp.z + temp.z/2),trm.position);
-			temp = r.GetWorldToScreen(temp, data.scene.camera);
-			r.DrawTextEx(
-				data.file.font[0],
-				trm.name,
-				Vector2(temp.x - (r.ImageTextEx(data.file.font[0], trm.name,16, 0, COR_PRETO).width),temp.y - 24), 
-				16, 
-				0, 
-				data.scene.render.text[i].color
-			);
+			temp = RotateBoundingBox(temp,Vector3(0,0,0),trm.rotation.y);
+			temp.min = r.Vector3Add(temp.min,trm.position);
+			temp.max = r.Vector3Add(temp.max,trm.position);
+			if(r.GetRayCollisionBox(r.GetMouseRay(r.GetMousePosition(),data.scene.camera),temp).hit == true)
+				r.DrawTextEx(
+					data.file.font[0],
+					trm.name,
+					Vector2(r.GetMouseX(),r.GetMouseY()-data.config.fontsize),
+					data.config.fontsize, 
+					0, 
+					data.scene.render.text[i].color
+				);
 		}
 	}
 	
@@ -454,7 +463,7 @@ function Menu(ref,data)
 	var mouse = {};
 	
 	for(let i = 0; i< ref.length;i++)
-		txtimg.push(r.ImageTextEx(ref.data.file.font[0], ref[i].text,16, 0, COR_PRETO));
+		txtimg.push(r.ImageTextEx(ref.data.file.font[0], ref[i].text,ref.data.config.fontsize, 0, COR_PRETO));
 	r.StopMusicStream(ref.data.file.music[0]);
 	r.PlayMusicStream(ref.data.file.music[0]);
 	while(ref.offload == false)
@@ -468,8 +477,8 @@ function Menu(ref,data)
 		for(let i = 0;i<ref.length;i++)
 			if(mouse.x>0&&
 			   mouse.x<txtimg[i].width&&
-			   mouse.y>16*i&&
-			   mouse.y<16*i+txtimg[i].height)
+			   mouse.y>ref.data.config.fontsize*i&&
+			   mouse.y<ref.data.config.fontsize*i+txtimg[i].height)
 			{
 				ref.currentOption = i;
 				break;
@@ -477,9 +486,9 @@ function Menu(ref,data)
 		
 		for(let i = 0;i<ref.length;i++)
 			if(ref.currentOption != i)
-				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, 16*i), 16, 0, COR_PRETO);
+				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, ref.data.config.fontsize*i), ref.data.config.fontsize, 0, COR_PRETO);
 			else
-				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, 16*i), 16, 0, COR_SELECIONADO2);
+				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, ref.data.config.fontsize*i), ref.data.config.fontsize, 0, COR_SELECIONADO2);
 
 		if(ref.logo == true)
 		{
@@ -487,14 +496,14 @@ function Menu(ref,data)
 			   mouse.x<logoimg.width&&
 			   mouse.y>ref.data.config.screen.y-64&&
 			   mouse.y<ref.data.config.screen.y-64+logoimg.height)
-				r.DrawTextEx(ref.data.file.font[1],ref.data.config.title, r.Vector2(0,ref.data.config.screen.y-64), 48, 0, COR_SELECIONADO2);
+				r.DrawTextEx(ref.data.file.font[1],ref.data.config.title, r.Vector2(0,ref.data.config.screen.y-64), (ref.data.config.fontsize*3), 0, COR_SELECIONADO2);
 			else
-				r.DrawTextEx(ref.data.file.font[1],ref.data.config.title, r.Vector2(0,ref.data.config.screen.y-64), 48, 0, COR_PRETO);
+				r.DrawTextEx(ref.data.file.font[1],ref.data.config.title, r.Vector2(0,ref.data.config.screen.y-64), (ref.data.config.fontsize*3), 0, COR_PRETO);
 			
-			if(locframe%331 == 0)
-				r.DrawTextEx(ref.data.file.font[2],ref.data.config.subtitle, r.Vector2(0,ref.data.config.screen.y-24), 24, 0, COR_SELECIONADO);
+			if(locframe%451 == 0)
+				r.DrawTextEx(ref.data.file.font[2],ref.data.config.subtitle, r.Vector2(0,ref.data.config.screen.y-24), ref.data.config.fontsize*1.5, 0, COR_SELECIONADO);
 			else
-				r.DrawTextEx(ref.data.file.font[2],ref.data.config.subtitle, r.Vector2(0,ref.data.config.screen.y-24), 24, 0, COR_PRETO);
+				r.DrawTextEx(ref.data.file.font[2],ref.data.config.subtitle, r.Vector2(0,ref.data.config.screen.y-24), ref.data.config.fontsize*1.5, 0, COR_PRETO);
 		}
 		
 		if(r.IsKeyPressed(r.KEY_ENTER)||
@@ -502,8 +511,8 @@ function Menu(ref,data)
 		   (r.IsMouseButtonPressed(r.MOUSE_BUTTON_LEFT)&&
 			mouse.x>0&&
 			mouse.x<txtimg[ref.currentOption].width&&
-			mouse.y>16*ref.currentOption&&
-			mouse.y<16*ref.currentOption+txtimg[ref.currentOption].height))
+			mouse.y>ref.data.config.fontsize*ref.currentOption&&
+			mouse.y<ref.data.config.fontsize*ref.currentOption+txtimg[ref.currentOption].height))
 		{	
 			if(ref[ref.currentOption].args != 'undefined')
 				ref[ref.currentOption].func(ref[ref.currentOption].args);
@@ -724,17 +733,6 @@ const _Data =
         map:{},
         creature:[],
 		hitbox:[],
-		area:[],
-		addArea:function(name,hitbox,position,active,visible,color)
-		{
-			position = DefaultsTo(position,{x:0,y:0,z:0});
-			color = defsto(color,RGBA(0,0,0,0));
-			visible = defsto(visible,true);
-			active = true;
-			let temp = {name:name,hitbox:hitbox,position:position,color:color,active:active,visible:visible};//color stands for wireframe color
-			this.area[name] = temp;
-			this.area.push(temp);
-		},
 		addHitbox:function(name,hitbox,position,rotation,frame,color,visible,active)
 		{
 			position = DefaultsTo(position,{x:0,y:0,z:0});
@@ -848,7 +846,7 @@ class Data
 		this.scene.background = {r:115, g:105, b:97, a:255};
 		this.scene.creature = [];
 		this.session.frame = 0;
-		this.scene.render.addText('build',0,this.config.title + " v" + (this.config.build/10000),r.Vector2(0,(this.config.screen.y)-16),COR_PRETO,true);
+		this.scene.render.addText('build',0,this.config.title + " v" + (this.config.build/10000),r.Vector2(0,(this.config.screen.y)-this.config.fontsize),COR_PRETO,true);
 		//CURRENT_LEVEL
 		this.scene.map.currentLevel = 0;
 		if(typeof loadCallback != 'undefined')

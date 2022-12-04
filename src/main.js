@@ -112,35 +112,28 @@ const Teclado =
 function load(data)
 {
 	//DEFAULT FONTS
-	data.file.font.push(r.LoadFontEx("assets/font/acentos/KyrillaSansSerif-Bold.ttf", 16, 0, 0));
-	data.file.font.push(r.LoadFontEx("assets/font/Mockery.ttf", 48, 0, 0));
-	data.file.font.push(r.LoadFontEx("assets/font/Mockery.ttf", 24, 0, 0));
+	data.file.font.push(r.LoadFontEx("assets/font/acentos/KyrillaSansSerif-Bold.ttf", data.config.fontsize, 0, 0));
+	data.file.font.push(r.LoadFontEx("assets/font/Mockery.ttf", data.config.fontsize*3, 0, 0));
+	data.file.font.push(r.LoadFontEx("assets/font/Mockery.ttf", data.config.fontsize*1.5, 0, 0));
 	//MUSIC
 	data.file.music.push(r.LoadMusicStream("assets/audio/music/maintheme_by_kayoa.mp3"));
 	//MODELS
 	data.file.loadModel("lvl0_map0","assets/models/map/level0/0.glb",false);
-	data.file.loadModel("lvl0_props0","assets/models/map/level0/props/0.glb",true);
-	data.file.loadModel("lvl0_hitbox0","assets/models/map/level0/hitbox/hitbox0.glb",true);
-	data.file.loadModel("lvl0_hitbox1","assets/models/map/level0/hitbox/hitbox1.glb",true);
-	data.file.loadModel("lvl0_hitbox2","assets/models/map/level0/hitbox/hitbox2.glb",true);
-	data.file.loadModel("lvl0_hitbox3","assets/models/map/level0/hitbox/hitbox3.glb",true);
-	data.file.loadModel("lvl0_hitbox4","assets/models/map/level0/hitbox/hitbox4.glb",true);
-	data.file.loadModel("lvl0_hitbox5","assets/models/map/level0/hitbox/hitbox5.glb",true);
-	data.file.loadModel("lvl0_hitbox6","assets/models/map/level0/hitbox/hitbox6.glb",true);
-	data.file.loadModel("lvl0_hitbox7","assets/models/map/level0/hitbox/hitbox7.glb",true);
-	data.file.loadModel("lvl0_hitbox8","assets/models/map/level0/hitbox/hitbox8.glb",true);
-	data.file.loadModel("lvl0_hitbox9","assets/models/map/level0/hitbox/hitbox9.glb",true);
-	data.file.loadModel("lvl0_hitbox10","assets/models/map/level0/hitbox/chao.glb",true);
-	data.file.loadModel("lvl0_map0item0","assets/models/map/level0/item/0.glb",true);
-	data.file.loadModel("lvl0_map0item1","assets/models/map/level0/item/1.glb",true);
-	data.file.loadModel("lvl0_map0item2","assets/models/map/level0/item/2.glb",true);
-	data.file.loadModel("lvl0_map0item3","assets/models/map/level0/item/3.glb",true);
-	data.file.loadModel("lvl0_area0","assets/models/map/level0/area/0.glb",true);
-	data.file.loadModel("lvl0_area1","assets/models/map/level0/area/1.glb",true);
-	data.file.loadModel("lvl0_area2","assets/models/map/level0/area/2.glb",true);
-	data.file.loadModel("lvl0_area3","assets/models/map/level0/area/3.glb",true);
-	data.file.loadModel("lvl0_area4","assets/models/map/level0/area/4.glb",true);
-	data.file.loadModel("lvl0_area5","assets/models/map/level0/area/5.glb",true);
+	data.file.loadModel("lvl0_hitbox0","assets/models/map/level0/hitbox/0.obj",true);
+	data.file.loadModel("lvl0_hitbox1","assets/models/map/level0/hitbox/1.obj",true);
+	data.file.loadModel("lvl0_hitbox2","assets/models/map/level0/hitbox/2.obj",true);
+	data.file.loadModel("lvl0_hitbox3","assets/models/map/level0/hitbox/3.obj",true);
+	data.file.loadModel("lvl0_hitbox4","assets/models/map/level0/hitbox/4.obj",true);
+	data.file.loadModel("lvl0_hitbox5","assets/models/map/level0/hitbox/5.obj",true);
+	data.file.loadModel("lvl0_hitbox6","assets/models/map/level0/hitbox/6.obj",true);
+	data.file.loadModel("lvl0_hitbox7","assets/models/map/level0/hitbox/7.obj",true);
+	data.file.loadModel("lvl0_hitbox8","assets/models/map/level0/hitbox/8.obj",true);
+	data.file.loadModel("lvl0_hitbox9","assets/models/map/level0/hitbox/9.obj",true);
+	data.file.loadModel("lvl0_hitbox10","assets/models/map/level0/hitbox/10.obj",true);
+	data.file.loadModel("lvl0_hitbox11","assets/models/map/level0/hitbox/11.obj",true);
+	data.file.loadModel("lvl0_hitbox12","assets/models/map/level0/hitbox/12.obj",true);
+	data.file.loadModel("lvl0_hitbox13","assets/models/map/level0/hitbox/13.obj",true);
+	data.file.loadModel("lvl0_hitbox14","assets/models/map/level0/hitbox/14.obj",true);
 	data.file.loadModel("player-idle","assets/models/player/idle/",false);//note that i didnt provided any file, so it loads all files of the folder as a animation
 	data.file.loadModel("player-walk","assets/models/player/walk/",false);
 }
@@ -157,7 +150,6 @@ function main()
 	//data.scene.addCreature2Render2('joao451','human',{x:0,y:4,z:0},{x:0,y:0,z:0},0.1,true,true);
 	
 	data.scene.render.addModel('map0','lvl0_map0');//add the map model to the render scene
-	console.log(data.file.model[0].meshes);
     data.scene.camera.target = data.scene.creature[0].position;
     data.scene.camera.position = {x:0.4375, y:10, z:11.0625};
 
@@ -165,8 +157,6 @@ function main()
 	for(let i = 0;i<data.file.hitbox.length;i++)
 		if(data.file.hitbox[i].name.includes('lvl0_hitbox'))
 			data.scene.addHitbox(data.file.hitbox[i].name,data.file.hitbox[i].hitbox);
-		else if(data.file.hitbox[i].name.includes('lvl0_area'))
-			data.scene.addArea(data.file.hitbox[i].name,data.file.hitbox[i].hitbox);
 	
 	Teclado.gameplay.useThis(data);//use the gameplay keyboard template
 	var tempray = r.GetMouseRay(r.GetMousePosition(), data.scene.camera);
@@ -174,7 +164,6 @@ function main()
     {
 		data.keyboard.run(data);
 		tempray = r.GetMouseRay(r.GetMousePosition(), data.scene.camera);
-		//r.GetRayCollisionMesh(tempray, data.file.model[0].meshes[0], data.file.model[0].model.transform)//a mesh loader must be written in order to make this work
 		if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
 		{
 			mqq.Gravit(data,data.scene.render.model['joao451']);
