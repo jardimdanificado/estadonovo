@@ -54,7 +54,7 @@ const COR_ROUPA1 = RGBA(110, 125, 103,255);
 const MAXANIM = 1;
 
 //-----------------------------------
-//BASICS
+//UTILS
 //-----------------------------------
 
 //A QUICK IMPLEMENTATIONS TO DEFAULT ARGS
@@ -65,7 +65,7 @@ function DefaultsTo(target,def)
 	else 
 		return target;
 }
-var defsto = DefaultsTo;
+const defsto = DefaultsTo;
 
 function LimitItTo(value,min,max)
 {
@@ -81,7 +81,42 @@ function LimitItTo(value,min,max)
 	}
 	return value;
 }
-var limito = LimitItTo;
+const limito = LimitItTo;
+
+var pendingList = [];
+function Pending(frames,func,args)
+{
+	
+	if(typeof frames != 'undefined'&& typeof func != 'undefined')
+	{
+		let temp = {};
+		temp.frames = frames;
+		temp.func = func;
+		if(typeof args != 'undefined')
+			temp.args = args;
+		pendingList.push(temp);
+	}
+	else
+	{
+		for(let i = 0;i<pendingList.length;i++)
+		{
+			//console.log(pendingList)
+			if(pendingList[i].frames > 0)
+				pendingList[i].frames--;
+			else
+			{
+				if(typeof pendingList[i].args == 'undefined')
+					pendingList[i].func();
+				else 
+					pendingList[i].func.apply(null,pendingList[i].args);
+				pendingList.splice(i,1);
+			}
+		}
+	}
+}
+const pendent = Pending;
+const pend = Pending;
+const pending = Pending;
 
 //-----------------------------------
 //CALCULATE
@@ -115,6 +150,324 @@ function RotateBoundingBox(hitbox,pivot,angle)
 	result.min = {x:Math.min(temp.min.x,temp.max.x),y:Math.min(temp.min.y,temp.max.y),z:Math.min(temp.min.z,temp.max.z)}
 	return result;
 }
+
+function MoveBoundingBox(hitbox,position)
+{
+	let result = {};
+	result.min = r.Vector3Add(hitbox.min,position);
+	result.max = r.Vector3Add(hitbox.max,position);
+	return result;
+}
+
+function RotateMoveBoundingBox(hitbox,angle,position)//rotate around 0,0,0 then move
+{
+	return(MoveBoundingBox(RotateBoundingBox(hitbox,Vector3(0,0,0),angle),position));
+}
+
+//-----------------------------------
+//RENDER && MENU
+//-----------------------------------
+
+function GetRenderModelCurrentFrame(modelfile,frame)
+{
+	if(typeof modelfile.model[0] == 'undefined')
+		return modelfile.model;
+	else
+		return modelfile.model[frame];
+}
+
+function Render(data)
+{
+	data.session.frame++;
+	r.BeginDrawing();
+	r.BeginTextureMode(data.session.rendertexture);
+	r.ClearBackground(data.scene.background);
+	r.BeginMode3D(data.scene.camera);
+	for(let i = 0; i< data.scene.render.model.length;i++)
+	{
+		if(data.scene.render.model[i].progression != 0)
+		{
+			if(data.session.frame % Math.floor(data.config.framerate/24) == 0)//setten up for 24fps
+			{
+				data.scene.render.model[i].frame += data.scene.render.model[i].progression;
+			}
+		}
+		data.scene.render.model[i].frame = limito(data.scene.render.model[i].frame,0,data.file.model[data.scene.render.model[i].id].model.length-2);
+		if(data.scene.render.model[i].visible == true)
+		{
+			r.DrawModelEx(
+				GetRenderModelCurrentFrame(data.file.model[data.scene.render.model[i].id],data.scene.render.model[i].frame), 
+				data.scene.render.model[i].position,
+				r.Vector3(0,1,0), 
+				data.scene.render.model[i].rotation.y, 
+				data.scene.render.model[i].scale, 
+				data.scene.render.model[i].color
+			);
+		}
+	}
+	r.EndMode3D();
+	r.EndTextureMode();
+	r.DrawTexturePro(
+		data.session.rendertexture.texture,
+		{
+			x:0,
+			y:0,
+			width:data.config.screen.x/data.config.pixelsize,
+			height:(data.config.screen.y/data.config.pixelsize)*-1
+		},
+		{x:0,y:0,width:data.config.screen.x,height:data.config.screen.y},
+		{x:0,y:0}
+		,0,
+		r.WHITE
+	);
+	for(let i = 0; i< data.scene.render.text.length;i++)
+	{
+		if(data.scene.render.text[i].visible == true)
+		{
+			r.DrawTextEx(
+				data.file.font[0],
+				data.scene.render.text[i].text,
+				data.scene.render.text[i].position, 
+				data.config.fontsize, 
+				0, 
+				data.scene.render.text[i].color
+			);
+		}
+	}
+	
+	for(let i = 0; i< data.scene.render.mouseDescription.length;i++)
+	{
+		if(typeof data.scene.render.mouseDescription[i].hitbox != 'undefined')
+		{
+			MouseDescriptor(data,data.scene.render.mouseDescription[i].hitbox,data.scene.render.mouseDescription[i].description,COR_PRETO);
+		}
+		else if(typeof data.scene.render.mouseDescription[i].rendermodel != 'undefined')
+		{
+			MouseDescriptor(
+								data,
+								RotateMoveBoundingBox(
+									r.GetModelBoundingBox(GetRenderModelCurrentFrame(data.file.model[data.scene.render.mouseDescription[i].rendermodel.id],data.scene.render.mouseDescription[i].rendermodel.frame)),
+									data.scene.render.mouseDescription[i].rendermodel.rotation.y,
+									data.scene.render.mouseDescription[i].rendermodel.position
+								),
+								data.scene.render.mouseDescription[i].description,
+								COR_PRETO
+							);
+		}
+	}
+	
+	if(data.config.showfps == true)
+		r.DrawFPS(0,0);
+	r.EndDrawing();
+}
+
+function Menu(ref,data)
+{
+	/*
+ 		{
+   			offload:false,
+	  		currentOption:0,
+	 		data:data,
+   			options:
+ 			[
+		   		{//exit the current menu(possibly go back to another menu, or go back to the game)
+			  		text:"return",
+	 				func:function(){this.offload = true;}, 
+				},
+	 			{//exit(to OS)
+		  			text:"exit",
+	 				func:function(){data.session.exit = true;this.offload = true;}, 
+				},
+	  		]
+ 		}
+  	*/
+	ref.offload = defsto(ref.offload,false);
+	ref.offloadkey = defsto(ref.offloadkey,r.KEY_NULL);
+	ref.currentOption = defsto(ref.currentOption,0);
+	ref.logo = defsto(ref.logo,false);
+	var locframe = 0;
+	if(typeof data != 'undefined')
+		ref.data = defsto(ref.data,data);
+	
+	if(typeof ref.data == 'undefined')
+		return false;
+
+	var locframe = 0;
+	var logoimg = r.ImageTextEx(ref.data.file.font[1], ref.data.config.title,48, 0, COR_PRETO);
+	var txtimg = [];
+	var mouse = {};
+	
+	for(let i = 0; i< ref.length;i++)
+		txtimg.push(r.ImageTextEx(ref.data.file.font[0], ref[i].text,ref.data.config.fontsize, 0, COR_PRETO));
+	r.StopMusicStream(ref.data.file.music[0]);
+	r.PlayMusicStream(ref.data.file.music[0]);
+	while(ref.offload == false)
+	{
+		r.UpdateMusicStream(ref.data.file.music[0]);
+		r.BeginDrawing();
+		r.ClearBackground(COR_BRANCO);
+		
+		mouse = r.GetMousePosition();
+
+		for(let i = 0;i<ref.length;i++)
+			if(mouse.x>0&&
+			   mouse.x<txtimg[i].width&&
+			   mouse.y>ref.data.config.fontsize*i&&
+			   mouse.y<ref.data.config.fontsize*i+txtimg[i].height)
+			{
+				ref.currentOption = i;
+				break;
+			}
+		
+		for(let i = 0;i<ref.length;i++)
+			if(ref.currentOption != i)
+				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, ref.data.config.fontsize*i), ref.data.config.fontsize, 0, COR_PRETO);
+			else
+				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, ref.data.config.fontsize*i), ref.data.config.fontsize, 0, COR_SELECIONADO2);
+
+		if(ref.logo == true)
+		{
+			if(mouse.x>0&&
+			   mouse.x<logoimg.width&&
+			   mouse.y>ref.data.config.screen.y-64&&
+			   mouse.y<ref.data.config.screen.y-64+logoimg.height)
+				r.DrawTextEx(ref.data.file.font[1],ref.data.config.title, r.Vector2(0,ref.data.config.screen.y-64), (ref.data.config.fontsize*3), 0, COR_SELECIONADO2);
+			else
+				r.DrawTextEx(ref.data.file.font[1],ref.data.config.title, r.Vector2(0,ref.data.config.screen.y-64), (ref.data.config.fontsize*3), 0, COR_PRETO);
+			
+			if(locframe%451 == 0)
+				r.DrawTextEx(ref.data.file.font[2],ref.data.config.subtitle, r.Vector2(0,ref.data.config.screen.y-24), ref.data.config.fontsize*1.5, 0, COR_SELECIONADO);
+			else
+				r.DrawTextEx(ref.data.file.font[2],ref.data.config.subtitle, r.Vector2(0,ref.data.config.screen.y-24), ref.data.config.fontsize*1.5, 0, COR_PRETO);
+		}
+		
+		if(r.IsKeyPressed(r.KEY_ENTER)||
+		   r.IsKeyPressed(r.KEY_E)||
+		   (r.IsMouseButtonPressed(r.MOUSE_BUTTON_LEFT)&&
+			mouse.x>0&&
+			mouse.x<txtimg[ref.currentOption].width&&
+			mouse.y>ref.data.config.fontsize*ref.currentOption&&
+			mouse.y<ref.data.config.fontsize*ref.currentOption+txtimg[ref.currentOption].height))
+		{	
+			if(ref[ref.currentOption].args != 'undefined')
+				ref[ref.currentOption].func(ref[ref.currentOption].args);
+			else
+				ref[ref.currentOption].func();
+		}
+		else if(r.IsKeyPressed(r.KEY_DOWN)||r.IsKeyPressed(r.KEY_S))
+		{	
+			if(ref.currentOption<ref.length)
+				ref.currentOption++;
+			else 
+				ref.currentOption = 0;
+		}
+		else if(r.IsKeyPressed(r.KEY_UP)||r.IsKeyPressed(r.KEY_W))
+		{
+			if(ref.currentOption>0)
+				ref.currentOption--;
+			else 
+				ref.currentOption = ref.length-1;
+		}
+		else if(locframe>0&&r.IsKeyPressed(ref.offloadkey))
+		{
+			ref.offload = true;
+		}
+		r.EndDrawing();
+		locframe++;
+	}
+	ref.offload = false;
+}
+
+function CreateDynamicKeyboard()
+{
+	return {
+		key:[],
+		set:function(id,type,infunc,args)
+		{
+			if(typeof this.key[id] == 'undefined')
+			{
+				id += "k";
+				this.key[id] = [];
+				this.key[id] = {id:id,pressed:{},down:{},released:{}};
+				this.key[id][0] = (this.key[id].pressed);
+				this.key[id][1] = (this.key[id].down);
+				this.key[id][2] = (this.key[id].released);
+				this.key.push(this.key[id]);
+			}
+			this.key[id][type].func = infunc;
+			if(args)
+			{
+				this.key[id][type].args = args;
+			}
+		},
+		run:function(data)
+		{
+			for(let i = 0; i< this.key.length; i++)
+				for(let type = 0; type< 3; type++)
+				{
+					var isk;
+					switch(type)
+					{
+						case 0:
+						{
+							isk = r.IsKeyPressed;
+						}
+						break;
+						case 1:
+						{
+							isk = r.IsKeyDown;
+						}
+						break;
+						case 2:
+						{
+							isk = r.IsKeyReleased;
+						}
+						break;
+					}
+					if(typeof this.key[i][type].func == "function")//existence check
+						if(isk(parseInt(this.key[i].id)) == true)//check if key is pressed/down/released
+						{	
+							if(!this.key[i][type].args[0])
+							{
+								if(type == 1)//if type = down
+								{
+									if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
+										this.key[i][type].func();
+								}
+								else
+									this.key[i][type].func();
+							}
+							else
+							{
+								if(type == 1)//if type = down
+								{
+									if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
+										this.key[i][type].func.apply(null,this.key[i][type].args);
+								}
+								else
+									this.key[i][type].func.apply(null,this.key[i][type].args);
+							}
+						}
+				}
+		}
+	}
+}
+
+//-----------------------------------
+//SAVE
+//-----------------------------------
+function Save(data)
+{
+	fs.writeFileSync('./assets/save/save.json', JSON.stringify(data.scene));
+}
+
+function Load(data,link)
+{
+	let tempLoad = require("./assets/save/save.json")
+	data.scene = Object.assign(data.scene, tempLoad);
+	data.scene.render.file = data.file;
+}
+
 //-----------------------------------
 //3D && CAMERA
 //-----------------------------------
@@ -326,351 +679,62 @@ function PlayerCollider(data,ref, backwards)
 }
 
 //-----------------------------------
-//RENDER && MENU
+//CREATURES
 //-----------------------------------
-function Render(data)
+
+function BodyPart(name,maxhp,sublimb)
 {
-	data.session.frame++;
-	r.BeginDrawing();
-	r.BeginTextureMode(data.session.rendertexture);
-	r.ClearBackground(data.scene.background);
-	r.BeginMode3D(data.scene.camera);
-	for(let i = 0; i< data.scene.render.model.length;i++)
-	{
-		if(data.scene.render.model[i].progression != 0)
-		{
-			if(data.session.frame % Math.floor(data.config.framerate/24) == 0)//setten up for 24fps
-			{
-				data.scene.render.model[i].frame += data.scene.render.model[i].progression;
-			}
-		}
-		data.scene.render.model[i].frame = limito(data.scene.render.model[i].frame,0,data.file.model[data.scene.render.model[i].id].model.length-2);
-		if(data.scene.render.model[i].visible == true)
-		{
-			if(typeof data.file.model[data.scene.render.model[i].id].model[0] != 'undefined')
-				r.DrawModelEx(
-					data.file.model[data.scene.render.model[i].id].model[data.scene.render.model[i].frame], 
-					data.scene.render.model[i].position, 
-					r.Vector3(0,1,0), 
-					data.scene.render.model[i].rotation.y, 
-					data.scene.render.model[i].scale, 
-					data.scene.render.model[i].color
-				);
-			else
-				r.DrawModelEx(
-					data.file.model[data.scene.render.model[i].id].model, 
-					data.scene.render.model[i].position,
-					r.Vector3(0,1,0), 
-					data.scene.render.model[i].rotation.y, 
-					data.scene.render.model[i].scale, 
-					data.scene.render.model[i].color
-				);
-		}
-	}
-	r.EndMode3D();
-	r.EndTextureMode();
-	r.DrawTexturePro(
-		data.session.rendertexture.texture,
-		{
-			x:0,
-			y:0,
-			width:data.config.screen.x/data.config.pixelsize,
-			height:(data.config.screen.y/data.config.pixelsize)*-1
-		},
-		{x:0,y:0,width:data.config.screen.x,height:data.config.screen.y},
-		{x:0,y:0}
-		,0,
-		r.WHITE
-	);
-	for(let i = 0; i< data.scene.render.text.length;i++)
-	{
-		if(data.scene.render.text[i].visible == true)
-		{
-			r.DrawTextEx(
-				data.file.font[0],
-				data.scene.render.text[i].text,
-				data.scene.render.text[i].position, 
-				data.config.fontsize, 
-				0, 
-				data.scene.render.text[i].color
-			);
-		}
-	}
-	for(let i = 0; i< data.scene.creature.length;i++)
-	{
-		if(typeof data.scene.render.model[data.scene.creature[i].name] != 'undefined')
-		{
-			let temp;
-			let trm = data.scene.render.model[data.scene.creature[i].name];//TEMP RENDER MODEL
-			if(typeof data.file.model[trm.id].model[0]!="undefined")
-				temp = r.GetModelBoundingBox(data.file.model[trm.id].model[trm.frame]);
-			else
-				temp = r.GetModelBoundingBox(data.file.model[trm.id].model);
-			temp = RotateBoundingBox(temp,Vector3(0,0,0),trm.rotation.y);
-			temp.min = r.Vector3Add(temp.min,trm.position);
-			temp.max = r.Vector3Add(temp.max,trm.position);
-			if(r.GetRayCollisionBox(r.GetMouseRay(r.GetMousePosition(),data.scene.camera),temp).hit == true)
-				r.DrawTextEx(
-					data.file.font[0],
-					trm.name,
-					Vector2(r.GetMouseX(),r.GetMouseY()-data.config.fontsize),
-					data.config.fontsize, 
-					0, 
-					data.scene.render.text[i].color
-				);
-		}
-	}
-	
-	if(data.config.showfps == true)
-		r.DrawFPS(0,0);
-	r.EndDrawing();
-}
-
-function Menu(ref,data)
-{
-	/*
- 		{
-   			offload:false,
-	  		currentOption:0,
-	 		data:data,
-   			options:
- 			[
-		   		{//exit the current menu(possibly go back to another menu, or go back to the game)
-			  		text:"return",
-	 				func:function(){this.offload = true;}, 
-				},
-	 			{//exit(to OS)
-		  			text:"exit",
-	 				func:function(){data.session.exit = true;this.offload = true;}, 
-				},
-	  		]
- 		}
-  	*/
-	ref.offload = defsto(ref.offload,false);
-	ref.offloadkey = defsto(ref.offloadkey,r.KEY_NULL);
-	ref.currentOption = defsto(ref.currentOption,0);
-	ref.logo = defsto(ref.logo,false);
-	var locframe = 0;
-	if(typeof data != 'undefined')
-		ref.data = defsto(ref.data,data);
-	
-	if(typeof ref.data == 'undefined')
-		return false;
-
-	var locframe = 0;
-	var logoimg = r.ImageTextEx(ref.data.file.font[1], ref.data.config.title,48, 0, COR_PRETO);
-	var txtimg = [];
-	var mouse = {};
-	
-	for(let i = 0; i< ref.length;i++)
-		txtimg.push(r.ImageTextEx(ref.data.file.font[0], ref[i].text,ref.data.config.fontsize, 0, COR_PRETO));
-	r.StopMusicStream(ref.data.file.music[0]);
-	r.PlayMusicStream(ref.data.file.music[0]);
-	while(ref.offload == false)
-	{
-		r.UpdateMusicStream(ref.data.file.music[0]);
-		r.BeginDrawing();
-		r.ClearBackground(COR_BRANCO);
-		
-		mouse = r.GetMousePosition();
-
-		for(let i = 0;i<ref.length;i++)
-			if(mouse.x>0&&
-			   mouse.x<txtimg[i].width&&
-			   mouse.y>ref.data.config.fontsize*i&&
-			   mouse.y<ref.data.config.fontsize*i+txtimg[i].height)
-			{
-				ref.currentOption = i;
-				break;
-			}
-		
-		for(let i = 0;i<ref.length;i++)
-			if(ref.currentOption != i)
-				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, ref.data.config.fontsize*i), ref.data.config.fontsize, 0, COR_PRETO);
-			else
-				r.DrawTextEx(ref.data.file.font[0],ref[i].text, r.Vector2(0, ref.data.config.fontsize*i), ref.data.config.fontsize, 0, COR_SELECIONADO2);
-
-		if(ref.logo == true)
-		{
-			if(mouse.x>0&&
-			   mouse.x<logoimg.width&&
-			   mouse.y>ref.data.config.screen.y-64&&
-			   mouse.y<ref.data.config.screen.y-64+logoimg.height)
-				r.DrawTextEx(ref.data.file.font[1],ref.data.config.title, r.Vector2(0,ref.data.config.screen.y-64), (ref.data.config.fontsize*3), 0, COR_SELECIONADO2);
-			else
-				r.DrawTextEx(ref.data.file.font[1],ref.data.config.title, r.Vector2(0,ref.data.config.screen.y-64), (ref.data.config.fontsize*3), 0, COR_PRETO);
-			
-			if(locframe%451 == 0)
-				r.DrawTextEx(ref.data.file.font[2],ref.data.config.subtitle, r.Vector2(0,ref.data.config.screen.y-24), ref.data.config.fontsize*1.5, 0, COR_SELECIONADO);
-			else
-				r.DrawTextEx(ref.data.file.font[2],ref.data.config.subtitle, r.Vector2(0,ref.data.config.screen.y-24), ref.data.config.fontsize*1.5, 0, COR_PRETO);
-		}
-		
-		if(r.IsKeyPressed(r.KEY_ENTER)||
-		   r.IsKeyPressed(r.KEY_E)||
-		   (r.IsMouseButtonPressed(r.MOUSE_BUTTON_LEFT)&&
-			mouse.x>0&&
-			mouse.x<txtimg[ref.currentOption].width&&
-			mouse.y>ref.data.config.fontsize*ref.currentOption&&
-			mouse.y<ref.data.config.fontsize*ref.currentOption+txtimg[ref.currentOption].height))
+	maxhp = defsto(maxhp,100);
+	let temp = [];
+	temp.name = name;
+	temp.hp = maxhp;
+	temp.maxhp = maxhp;
+	if(typeof sublimb != 'undefined')
+	{	
+		if(typeof sublimb[0] != 'undefined')
 		{	
-			if(ref[ref.currentOption].args != 'undefined')
-				ref[ref.currentOption].func(ref[ref.currentOption].args);
-			else
-				ref[ref.currentOption].func();
-		}
-		else if(r.IsKeyPressed(r.KEY_DOWN)||r.IsKeyPressed(r.KEY_S))
-		{	
-			if(ref.currentOption<ref.length)
-				ref.currentOption++;
-			else 
-				ref.currentOption = 0;
-		}
-		else if(r.IsKeyPressed(r.KEY_UP)||r.IsKeyPressed(r.KEY_W))
-		{
-			if(ref.currentOption>0)
-				ref.currentOption--;
-			else 
-				ref.currentOption = ref.length-1;
-		}
-		else if(locframe>0&&r.IsKeyPressed(ref.offloadkey))
-		{
-			ref.offload = true;
-		}
-		r.EndDrawing();
-		locframe++;
-	}
-	ref.offload = false;
-}
-
-function CreateDynamicKeyboard()
-{
-	return {
-		key:[],
-		set:function(id,type,infunc,args)
-		{
-			if(typeof this.key[id] == 'undefined')
+			for(let i = 0;i<sublimb.length;i++)
 			{
-				id += "k";
-				this.key[id] = [];
-				this.key[id] = {id:id,pressed:{},down:{},released:{}};
-				this.key[id][0] = (this.key[id].pressed);
-				this.key[id][1] = (this.key[id].down);
-				this.key[id][2] = (this.key[id].released);
-				this.key.push(this.key[id]);
+				temp[sublimb[i].name] = sublimb[i];
+				temp.push(temp[sublimb[i].name]);
 			}
-			this.key[id][type].func = infunc;
-			if(args)
-			{
-				this.key[id][type].args = args;
-			}
-		},
-		run:function(data)
+		}
+		else
 		{
-			for(let i = 0; i< this.key.length; i++)
-				for(let type = 0; type< 3; type++)
-				{
-					var isk;
-					switch(type)
-					{
-						case 0:
-						{
-							isk = r.IsKeyPressed;
-						}
-						break;
-						case 1:
-						{
-							isk = r.IsKeyDown;
-						}
-						break;
-						case 2:
-						{
-							isk = r.IsKeyReleased;
-						}
-						break;
-					}
-					if(typeof this.key[i][type].func == "function")//existence check
-						if(isk(parseInt(this.key[i].id)) == true)//check if key is pressed/down/released
-						{	
-							if(!this.key[i][type].args[0])
-							{
-								if(type == 1)
-								{
-									if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
-										this.key[i][type].func();
-								}
-								else
-									this.key[i][type].func();
-							}
-							else if(!this.key[i][type].args[1])
-							{
-								if(type == 1)
-								{
-									if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
-										this.key[i][type].func(this.key[i][type].args[0]);
-								}
-								else
-									this.key[i][type].func(this.key[i][type].args[0]);
-							}
-							else if(!this.key[i][type].args[2])
-							{
-								if(type == 1)
-								{
-									if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
-										this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1]);
-								}
-								else
-									this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1]);
-							}
-							else if(!this.key[i][type].args[3])
-							{
-								if(type == 1)
-								{
-									if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
-										this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2]);
-								}
-								else
-									this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2]);
-							}
-							else if(!this.key[i][type].args[4])
-							{
-								if(type == 1)
-								{
-									if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
-										this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2],this.key[i][type].args[3]);
-								}
-								else
-									this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2],this.key[i][type].args[3]);
-							}
-							else
-							{
-								if(type == 1)
-								{
-									if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
-										this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2],this.key[i][type].args[3],this.key[i][type].args[4]);
-								}
-								else
-									this.key[i][type].func(this.key[i][type].args[0],this.key[i][type].args[1],this.key[i][type].args[2],this.key[i][type].args[3],this.key[i][type].args[4]);
-							}
-						}
-				}
+			temp[sublimb.name] = sublimb;
+			temp.push(temp[sublimb.name]);
 		}
 	}
+	return temp;
 }
+const Limb = BodyPart;
 
 //-----------------------------------
-//SAVE
+//EVENTS
 //-----------------------------------
-function Save(data)
+
+function MouseDescriptor(data,hitbox,description,color)//check if a hitbox is under the mouse, if true description will be shown under the mouse
 {
-	fs.writeFileSync('./assets/save/save.json', JSON.stringify(data.scene));
+	if(r.GetRayCollisionBox(r.GetMouseRay(r.GetMousePosition(),data.scene.camera),hitbox).hit == true)
+		r.DrawTextEx(
+			data.file.font[0],
+			description,
+			Vector2(r.GetMouseX(),r.GetMouseY()-(data.config.fontsize*description.split('\n').length)),
+			data.config.fontsize, 
+			0, 
+			color
+		);
 }
 
-function Load(data,link)
+function EventHitboxer(data,eventbox,targetbox,func,args)
 {
-	let tempLoad = require("./assets/save/save.json")
-	data.scene = Object.assign(data.scene, tempLoad);
-	data.scene.render.file = data.file;
+	if(r.CheckCollisionBoxes(eventbox,targetbox))
+	{
+		if(typeof args != 'undefined')
+			func.apply(null,args);
+		else
+			func();
+	}
 }
 
 //-----------------------------------
@@ -733,6 +797,7 @@ const _Data =
         map:{},
         creature:[],
 		hitbox:[],
+		event:[],
 		addHitbox:function(name,hitbox,position,rotation,frame,color,visible,active)
 		{
 			position = DefaultsTo(position,{x:0,y:0,z:0});
@@ -753,6 +818,20 @@ const _Data =
 			speed = defsto(speed,0.1);
 			alive = defsto(alive,true);
 			active = defsto(active,true);
+			let body = {
+				head:Limb('head',100,[{leye:Limb('leye')},{reye:Limb('reye')},{mouth:Limb('mouth')}]),
+				neck:Limb('neck'),
+				torso:Limb('torso'),
+				larm:Limb('larm'),
+				rarm:Limb('rarm'),
+				lleg:Limb('lleg'),
+				rleg:Limb('rleg'),
+				lhand:Limb('lhand'),
+				rhand:Limb('rhand'),
+				lfeet:Limb('lfeet'),
+				rfeet:Limb('rfeet'),
+			};
+			let inventory = {item:[],max:16};
 			this.creature[name] = {name:name,position:position,rotation:rotation,speed:speed,alive:alive,active:active};
 			this.creature.push(this.creature[name]);
 		},
@@ -765,7 +844,7 @@ const _Data =
 			alive = defsto(alive,true);
 			active = defsto(active,true);
 			this.addCreature(name,type,position,rotation,speed,alive,active);
-			this.render.addCreature(this.creature[name], this.creature[name].type);
+			this.render.addCreature(this.creature[name]);
 		},
 		render:
 		{
@@ -773,11 +852,13 @@ const _Data =
 			model:[],
 			text:[],
 			image:[],
-			addCreature:function(crt,specime)
+			mouseDescription:[],
+			addCreature:function(crt)
 			{
-				specime = defsto(specime,'human');
-				if(specime === 'human')
+				crt.type = defsto(crt.type,'human');
+				if(crt.type === 'human')
 					this.addModel(crt.name,'player-idle',0,RGBA(153,100,0,255),crt.position,crt.rotation);
+				this.mouseDescription.push({rendermodel:this.model[crt.name],description:crt.name});
 			},
 			addModel:function(name,modelid,frame,color,position,rotation,scale,visible,progression)
 			{
@@ -881,6 +962,6 @@ module.exports =
 	COR_VERMELHO,COR_SELECIONADO,COR_SELECIONADO2,COR_PRETO,COR_VAZIO,
 	COR_BRANCO,COR_CINZA,COR_LARANJA,COR_PELE0,COR_ROUPA0,COR_ROUPA1,
 	Vector2,Vector2Zero,Vector3,Vector3Zero,RGBA,BoundingBox,RotateAroundPivot,
-	LimitItTo,limito,DefaultsTo,defsto,
+	LimitItTo,limito,DefaultsTo,defsto,Pending,pend,pendent,pending,
 	Data,Render,Menu,CameraStart,Move3D,PlayerCollider,Gravit,Save,Load,
 };

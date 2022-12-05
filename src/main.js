@@ -3,6 +3,7 @@ const fs = require('fs');
 //const {app} = require('electron');//this need to be uncommented to be run it on electron
 var mqq = require("./maquina.js");
 var data;
+var player;
 
 const Teclado =
 {
@@ -25,20 +26,38 @@ const Teclado =
 		{
 			w:function(data)
 			{
-				data.scene.render.model['joao451'].progression = 1;
-				data.scene.render.model['joao451'].id = 'player-walk';
+				player.render.progression = 1;
+				player.render.id = 'player-walk';
 			},
 			s:function(data)
 			{
-				data.scene.render.model['joao451'].progression = -1;
-				data.scene.render.model['joao451'].id = 'player-walk';
+				player.render.progression = -1;
+				player.render.id = 'player-walk';
 			},
+			f:function(data)
+			{
+				for(let i = 0; i< data.scene.event.length;i++)
+				{
+					if(data.scene.event[i].type == 'item')
+					{
+						if(player.creature.inventory.length < player.creature.inventory.max)
+						{
+							player.creature.inventory.push(data.scene.event[i].item);
+							data.scene.event = data.scene.event.splice(i,1);
+						}
+					}
+				}
+			},
+			j:function()
+			{
+				mqq.pend(15,console.log,['aoba','teste']);
+			}
 		},
 		down:
 		{
 			w:function(data)
 			{
-				if(mqq.PlayerCollider(data,data.scene.render.model['joao451'],false)==false)
+				if(mqq.PlayerCollider(data,player.render,false)==false)
 				{
 					mqq.Move3D(data.scene.creature['joao451'].position,data.scene.creature['joao451'].rotation.y,data.scene.creature['joao451'].speed);
 					if(data.config.camerafollow == true)
@@ -47,7 +66,7 @@ const Teclado =
 			},
 			s:function(data)
 			{
-				if(mqq.PlayerCollider(data,data.scene.render.model['joao451'],true)==false)
+				if(mqq.PlayerCollider(data,player.render,true)==false)
 				{
 					mqq.Move3D(data.scene.creature['joao451'].position,data.scene.creature['joao451'].rotation.y,(-1)*data.scene.creature['joao451'].speed);
 					if(data.config.camerafollow == true)
@@ -81,13 +100,13 @@ const Teclado =
 		{
 			w:function(data)
 			{
-				data.scene.render.model['joao451'].progression = 1;
-				data.scene.render.model['joao451'].id = 'player-idle';
+				player.render.progression = 1;
+				player.render.id = 'player-idle';
 			},
 			s:function(data)
 			{
-				data.scene.render.model['joao451'].progression = 1;
-				data.scene.render.model['joao451'].id = 'player-idle';
+				player.render.progression = 1;
+				player.render.id = 'player-idle';
 			},
 		},
 		useThis:function(data)
@@ -105,6 +124,7 @@ const Teclado =
 			data.keyboard.set(r.KEY_E,'down',this.down.e,[data]);
 			data.keyboard.set(r.KEY_SPACE,'down',this.down.space,[data]);
 			data.keyboard.set(r.KEY_G,'pressed',mqq.Save,[data]);
+			data.keyboard.set(r.KEY_J,'pressed',this.pressed.j,[data]);
 		}
 	}
 }
@@ -148,6 +168,10 @@ function main()
 	data.scene.render.addCreature(data.scene.creature['joao451']);//add the just created creature in the render context
 	//or you can use this instead, does the same as the 2 functions above
 	//data.scene.addCreature2Render2('joao451','human',{x:0,y:4,z:0},{x:0,y:0,z:0},0.1,true,true);
+
+	player = {};
+	player.render = data.scene.render.model['joao451'];
+	player.creature = data.scene.creature['joao451'];
 	
 	data.scene.render.addModel('map0','lvl0_map0');//add the map model to the render scene
     data.scene.camera.target = data.scene.creature[0].position;
@@ -166,7 +190,8 @@ function main()
 		tempray = r.GetMouseRay(r.GetMousePosition(), data.scene.camera);
 		if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
 		{
-			mqq.Gravit(data,data.scene.render.model['joao451']);
+			mqq.pend();
+			mqq.Gravit(data,player.render);
 		}
 		mqq.Render(data);
     }
