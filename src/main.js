@@ -59,41 +59,41 @@ const Teclado =
 			{
 				if(mqq.PlayerCollider(data,player.render,false)==false)
 				{
-					mqq.Move3D(data.scene.creature['joao451'].position,data.scene.creature['joao451'].rotation.y,data.scene.creature['joao451'].speed);
+					mqq.Move3D(player.creature.position,player.creature.rotation.y,player.creature.speed);
 					if(data.config.camerafollow == true)
-						mqq.Move3D(data.scene.camera.position,data.scene.creature['joao451'].rotation.y,data.scene.creature['joao451'].speed);
+						mqq.Move3D(data.scene.camera.position,player.creature.rotation.y,player.creature.speed);
 				}
 			},
 			s:function(data)
 			{
 				if(mqq.PlayerCollider(data,player.render,true)==false)
 				{
-					mqq.Move3D(data.scene.creature['joao451'].position,data.scene.creature['joao451'].rotation.y,(-1)*data.scene.creature['joao451'].speed);
+					mqq.Move3D(player.creature.position,player.creature.rotation.y,(-1)*player.creature.speed);
 					if(data.config.camerafollow == true)
-						mqq.Move3D(data.scene.camera.position,data.scene.creature['joao451'].rotation.y,data.scene.creature['joao451'].speed*(-1));
+						mqq.Move3D(data.scene.camera.position,player.creature.rotation.y,player.creature.speed*(-1));
 				}
 			},
 			a:function(data)
 			{
-				data.scene.creature['joao451'].rotation.y += data.config.rotationspeed;
-				data.scene.creature['joao451'].rotation.y = mqq.limito(data.scene.creature['joao451'].rotation.y,0,359);
+				player.creature.rotation.y += data.config.rotationspeed;
+				player.creature.rotation.y = mqq.limito(player.creature.rotation.y,0,359);
 			},
 			d:function(data)
 			{
-				data.scene.creature['joao451'].rotation.y -= data.config.rotationspeed;
-				data.scene.creature['joao451'].rotation.y = mqq.limito(data.scene.creature['joao451'].rotation.y,0,359);
+				player.creature.rotation.y -= data.config.rotationspeed;
+				player.creature.rotation.y = mqq.limito(player.creature.rotation.y,0,359);
 			},
 			q:function(data)
 			{
-				data.scene.camera.position = mqq.RotateAroundPivot(data.scene.camera.position,data.scene.creature['joao451'].position,data.config.rotationspeed);
+				data.scene.camera.position = mqq.RotateAroundPivot(data.scene.camera.position,player.creature.position,data.config.rotationspeed);
 			},
 			e:function(data)
 			{
-				data.scene.camera.position = mqq.RotateAroundPivot(data.scene.camera.position,data.scene.creature['joao451'].position,data.config.rotationspeed*(-1));
+				data.scene.camera.position = mqq.RotateAroundPivot(data.scene.camera.position,player.creature.position,data.config.rotationspeed*(-1));
 			},
 			space:function(data)
 			{
-				data.scene.creature['joao451'].position.y += 0.2;
+				player.creature.position.y += 0.2;
 			},
 		},
 		released:
@@ -177,20 +177,18 @@ function main()
     data.scene.camera.target = data.scene.creature[0].position;
     data.scene.camera.position = {x:0.4375, y:10, z:11.0625};
 
-	//this add all lvl0 hitboxes and areas to scene
+	//this add all lvl0 hitboxes to scene
 	for(let i = 0;i<data.file.hitbox.length;i++)
 		if(data.file.hitbox[i].name.includes('lvl0_hitbox'))
 			data.scene.addHitbox(data.file.hitbox[i].name,data.file.hitbox[i].hitbox);
 	
 	Teclado.gameplay.useThis(data);//use the gameplay keyboard template
-	var tempray = r.GetMouseRay(r.GetMousePosition(), data.scene.camera);
     while(!r.WindowShouldClose() && data.session.exit == false)
     {
 		data.keyboard.run(data);
-		tempray = r.GetMouseRay(r.GetMousePosition(), data.scene.camera);
 		if(data.session.frame%(Math.floor(data.config.framerate/30.0))==0)
 		{
-			mqq.pend();
+			mqq.pend();//frames the pendending events
 			mqq.Gravit(data,player.render);
 		}
 		mqq.Render(data);
