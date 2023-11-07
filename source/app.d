@@ -42,7 +42,7 @@ struct RenderModel
     int currentFrame;
 }
 
-class Data
+class FileData
 {
     FontSlot[] fonts;
     ModelSlot[] models;
@@ -162,7 +162,7 @@ class Render
 
 void main()
 {
-    Data data = new Data();
+    FileData data = new FileData();
     Render render = new Render();
     // call this before using raylib
     validateRaylibBinding();
