@@ -7,7 +7,7 @@ struct FontSlot
 {
     Font file;
     string name;
-    int size;
+    int size = 20;
 }
 
 struct ModelSlot
@@ -20,15 +20,14 @@ struct BoundingBoxSlot
 {
     BoundingBox file;
     string name;
-    int size;
 }
 
 struct RenderText
 {
     string text;
-    Vector2 position;
-    Color color;
-    int size;
+    Vector2 position = Vector2(0, 0);
+    Color color = Color(0, 0, 0, 255);
+    int size = 1;
     Font font;
 }
 
