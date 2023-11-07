@@ -13,3 +13,5 @@ assblasterplastered (https://sketchfab.com/assblasterplastered) - Made the base 
 raylib (https://www.raylib.com/) - Robust OpenGL manipulation and game devlib.
 
 RobLoach (https://github.com/RobLoach/node-raylib) - Made the raylib bindings for nodejs. 
+
+schveiguy (https://github.com/schveiguy/raylib-d) - Made the raylib-d.

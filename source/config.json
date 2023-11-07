@@ -2,7 +2,8 @@
   "title": "Estado Novo",
   "subtitle": "Uma obra por jardimdanificado",
   "build": 811,
-  "screen": {
+  "screen": 
+  {
     "x": 600,
     "y": 480
   },

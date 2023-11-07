@@ -1,0 +1,31 @@
+{
+    "libs": 
+    [
+        "raylib"
+    ],
+    "lflags-posix": 
+    [
+        "-L."
+    ],
+    "lflags-osx": 
+    [
+        "-rpath",
+        "@executable_path/"
+    ],
+    "lflags-linux": 
+    [
+        "-rpath=$$ORIGIN"
+    ],
+    "description": "estadonovo, brutalist action-rpg.",
+    "name": "estadonovo",
+    "dependencies": 
+    {
+        "raylib-d": "~>4.5.2"
+    },
+    "authors": 
+    [
+        "jardimdanificado"
+    ],
+    "copyright": "Copyright © 2023, jardimdanificado",
+    "license": "proprietary"
+}

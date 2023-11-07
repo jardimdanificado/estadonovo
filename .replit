@@ -1,6 +1,0 @@
-run = "./node_modules/.bin/json -I -f package.json -e 'this.build = parseInt(this.build)+1'&&./node_modules/.bin/json -I -f src/config.json -e 'this.build = parseInt(this.build)+1'&&npm start"
-hidden = [".config",".git","node_modules"]
-[env]
-XDG_CONFIG_HOME="/home/runner/${REPL_SLUG}/.config"
-[nix]
-channel = "stable-21_11"
