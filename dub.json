@@ -17,6 +17,7 @@
         "-rpath=$$ORIGIN"
     ],
     "description": "estadonovo, brutalist action-rpg.",
+    "sourceFiles": ["src/main.d"],
     "name": "estadonovo",
     "dependencies": 
     {

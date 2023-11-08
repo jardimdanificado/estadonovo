@@ -1,45 +1,37 @@
+module maquina;
+
 import std.stdio;
+import std.file;
 import std.string;
 import std.conv;
+
+import util;
+
 import raylib;
 
-struct FontSlot
+//--------------------------------------------
+//FileData
+//FileData
+//FileData
+//--------------------------------------------
+
+class FontSlot
 {
     Font file;
     string name;
     int size = 20;
 }
 
-struct ModelSlot
+class ModelSlot
 {
     Model[] file;
     string name;
 }
 
-struct BoundingBoxSlot
+class BoundingBoxSlot
 {
     BoundingBox file;
     string name;
-}
-
-struct RenderText
-{
-    string text;
-    Vector2 position = Vector2(0, 0);
-    Color color = Color(0, 0, 0, 255);
-    int size = 1;
-    Font font;
-}
-
-struct RenderModel
-{
-    Model[] model;
-    Vector3 position;
-    Vector3 rotation;
-    Vector3 scale;
-    float rotationAngle;
-    Color color;
-    int currentFrame;
 }
 
 class FileData
@@ -47,14 +39,17 @@ class FileData
     FontSlot[] fonts;
     ModelSlot[] models;
     BoundingBoxSlot[] boundingBoxes;
-    void loadFont(string filepath, int size, string name = "")
+
+    FontSlot loadFont(string filepath, int size, string name = "")
     {
         if (name == "")
             name = filepath;
-        FontSlot font = {
+        FontSlot font = 
+        {
             file: LoadFontEx(filepath.toStringz(), size, null, 0), name: name, size: size
         };
         this.fonts ~= font;
+        return font;
     }
 
     ModelSlot loadModel(string filepath, int length = 1, string name = "")
@@ -66,7 +61,7 @@ class FileData
 
         if(filepath.endsWith(".glb")||filepath.endsWith(".obj")||filepath.endsWith(".glfw"))
         {
-            model = ModelSlot([LoadModel(filepath.toStringz())], name);
+            model = new ModelSlot([LoadModel(filepath.toStringz())], name);
         }
         else if(filepath.endsWith('/'))
         {
@@ -78,19 +73,42 @@ class FileData
                 writeln(str);
                 _models ~= LoadModel(str.toStringz());
             }
-            model = ModelSlot(_models, name);
+            model = new ModelSlot(_models, name);
         }
         this.models ~= model;
         return model;
     }
-
-    this()
-    {
-
-    }
 }
 
-class Render
+
+//--------------------------------------------
+//RenderData Structs
+//RenderData Structs
+//RenderData Structs
+//--------------------------------------------
+
+
+class RenderText
+{
+    string text;
+    Vector2 position = Vector2(0, 0);
+    Color color = Color(0, 0, 0, 255);
+    int size = 1;
+    Font font;
+}
+
+class RenderModel
+{
+    Model[] model;
+    Vector3 position;
+    Vector3 rotation;
+    Vector3 scale;
+    float rotationAngle;
+    Color color;
+    int currentFrame;
+}
+
+class RenderData
 {
     Color background = {r: 255, g: 255, b: 255, a: 255};
     Camera3D camera = 
@@ -117,7 +135,6 @@ class Render
 
     void addModel(ModelSlot modelslot, Vector3 position, Vector3 rotation, float rotationAngle, Vector3 scale, Color color)
     {
-
         RenderModel renderModel = 
         {
             model: modelslot.file, 
@@ -153,33 +170,59 @@ class Render
         EndMode3D();
         for (int i = 0; i < this.texts.length; i++)
         {
-            DrawTextEx(this.texts[i].font, this.texts[i].text.ptr, this.texts[i].position, this.texts[i].size, 0, this
-                    .texts[i].color);
+            DrawTextEx(
+                this.texts[i].font, 
+                this.texts[i].text.ptr,
+                this.texts[i].position,
+                this.texts[i].size,
+                0,
+                this.texts[i].color
+            );
         }
         EndDrawing();
     }
 }
 
-void main()
-{
-    FileData data = new FileData();
-    Render render = new Render();
-    // call this before using raylib
-    validateRaylibBinding();
-    InitWindow(800, 600, "Estado Novo");
-    SetTargetFPS(60);
+//--------------------------------------------
+//WorldData
+//WorldData
+//WorldData
+//--------------------------------------------
 
-    data.loadFont("assets/font/kremlin.ttf", 20);
-    data.loadModel("assets/models/map/level0/0.glb");
-    data.loadModel("assets/models/player/walk/",24);
-    
-    render.addText("Estado Novo", Vector2(100,100), Color(255,0,0,255), 20, data.fonts[0].file);
-    render.addModel(data.models[0], Vector3Zero(), Vector3Zero(), 0, Vector3(1,1,1), Color(255, 255, 255, 255));
-    render.addModel(data.models[1], Vector3(1,3,1), Vector3Zero(), 0, Vector3(1,1,1), Color(255, 0, 0, 255));
-    
-    while (!WindowShouldClose())
-    {
-        render.render();
-    }
-    CloseWindow();
+class CreatureNeeds
+{
+    float health = 100;
+    float food = 100;
+    float water = 100;
+    float sleep = 100;
+    float social = 100;
+    float fun = 100;
+    float bath = 100;
+    float pee = 100;
+    float poo = 100;
+}
+
+class CreatureRender
+{
+    ModelSlot model;
+    Vector3 position;
+    Vector3 rotation;
+    Vector3 scale;
+    float rotationAngle;
+    Color color;
+}
+
+class Creature
+{
+    CreatureNeeds needs;
+    Vector3 position;
+    float rotation;
+    string name;
+    string specime;
+    CreatureRender render;
+}
+
+class WorldData
+{
+    Creature[] creatures;
 }
