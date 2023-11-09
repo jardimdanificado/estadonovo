@@ -33,8 +33,8 @@ void main()
     data.loadModel("assets/models/player/walk/",24);
 
     render.addText("Estado Novo", Vector2(100,100), Color(255,0,0,255), 20, data.fonts[0].file);
-    render.addModel(data.models[0], Vector3Zero(), Vector3Zero(), 0, Vector3(1,1,1), Color(255, 255, 255, 255));
-    render.addModel(data.models[1], Vector3(1,3,1), Vector3Zero(), 0, Vector3(1,1,1), Color(255, 0, 0, 255));
+    render.addModel(data.models[0], Vector3Zero(), 0, Vector3(1,1,1), Color(255, 255, 255, 255));
+    render.addModel(data.models[1], Vector3(1,3,1), 0, Vector3(1,1,1), Color(255, 0, 0, 255));
     //config = null;
     while (!WindowShouldClose())
     {

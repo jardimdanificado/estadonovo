@@ -132,7 +132,7 @@ class RenderData
         this.texts ~= renderText;
     }
 
-    void addModel(ModelSlot modelslot, Vector3 position, Vector3 rotation, float rotationAngle, Vector3 scale, Color color)
+    void addModel(ModelSlot modelslot, Vector3 position, float rotationAngle, Vector3 scale, Color color)
     {
         RenderModel renderModel = 
         {
@@ -155,7 +155,7 @@ class RenderData
         {
             DrawModelEx(this.models[i].model[this.models[i].currentFrame], 
                 this.models[i].position, 
-                this.models[i].rotation, 
+                Vector3(0, 1, 0), 
                 this.models[i].rotationAngle, 
                 this.models[i].scale, 
                 this.models[i].color
@@ -204,7 +204,7 @@ struct CreatureRender
 {
     ModelSlot model;
     Vector3* position;
-    Vector3* scale;
+    Vector3 scale;
     float* rotationAngle;
     Color color;
 }
@@ -221,7 +221,8 @@ class Creature
     {
         this.name = name;
         this.specime = specime;
-        this.render = CreatureRender(null, &this.position, &this.scale, &this.rotation, this.color);
+        ModelSlot dummy;//fix this ASAP
+        this.render = CreatureRender(dummy, &this.position, Vector3(1,1,1), &this.rotation, Color(255,255,255,255));
     }
 }
 
