@@ -15,20 +15,20 @@ import raylib;
 //FileData
 //--------------------------------------------
 
-class FontSlot
+struct FontSlot
 {
     Font file;
     string name;
     int size = 20;
 }
 
-class ModelSlot
+struct ModelSlot
 {
     Model[] file;
     string name;
 }
 
-class BoundingBoxSlot
+struct BoundingBoxSlot
 {
     BoundingBox file;
     string name;
@@ -59,9 +59,9 @@ class FileData
         
         ModelSlot model;
 
-        if(filepath.endsWith(".glb")||filepath.endsWith(".obj")||filepath.endsWith(".glfw"))
+        if(filepath.endsWith(".glb")||filepath.endsWith(".obj"))
         {
-            model = new ModelSlot([LoadModel(filepath.toStringz())], name);
+            model = ModelSlot([LoadModel(filepath.toStringz())], name);
         }
         else if(filepath.endsWith('/'))
         {
@@ -73,7 +73,7 @@ class FileData
                 writeln(str);
                 _models ~= LoadModel(str.toStringz());
             }
-            model = new ModelSlot(_models, name);
+            model = ModelSlot(_models, name);
         }
         this.models ~= model;
         return model;
@@ -88,7 +88,7 @@ class FileData
 //--------------------------------------------
 
 
-class RenderText
+struct RenderText
 {
     string text;
     Vector2 position = Vector2(0, 0);
@@ -97,11 +97,10 @@ class RenderText
     Font font;
 }
 
-class RenderModel
+struct RenderModel
 {
     Model[] model;
     Vector3 position;
-    Vector3 rotation;
     Vector3 scale;
     float rotationAngle;
     Color color;
@@ -138,8 +137,7 @@ class RenderData
         RenderModel renderModel = 
         {
             model: modelslot.file, 
-            position: position, 
-            rotation: rotation, 
+            position: position,  
             rotationAngle: rotationAngle, 
             scale: scale, 
             color: color,
@@ -189,7 +187,7 @@ class RenderData
 //WorldData
 //--------------------------------------------
 
-class CreatureNeeds
+struct CreatureNeeds
 {
     float health = 100;
     float food = 100;
@@ -202,24 +200,29 @@ class CreatureNeeds
     float poo = 100;
 }
 
-class CreatureRender
+struct CreatureRender
 {
     ModelSlot model;
-    Vector3 position;
-    Vector3 rotation;
-    Vector3 scale;
-    float rotationAngle;
+    Vector3* position;
+    Vector3* scale;
+    float* rotationAngle;
     Color color;
 }
 
 class Creature
 {
-    CreatureNeeds needs;
-    Vector3 position;
-    float rotation;
+    CreatureNeeds needs = CreatureNeeds();
+    CreatureRender render = CreatureRender();
+    Vector3 position = Vector3(0, 0, 0);
+    float rotation = 0.0f;
     string name;
     string specime;
-    CreatureRender render;
+    this(string name, string specime)
+    {
+        this.name = name;
+        this.specime = specime;
+        this.render = CreatureRender(null, &this.position, &this.scale, &this.rotation, this.color);
+    }
 }
 
 class WorldData
