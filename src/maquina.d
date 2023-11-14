@@ -100,9 +100,9 @@ struct RenderText
 struct RenderModel
 {
     Model[] model;
-    Vector3 position;
+    Vector3* position;
     Vector3 scale;
-    float rotationAngle;
+    float* rotationAngle;
     Color color;
     int currentFrame;
 }
@@ -132,14 +132,14 @@ class RenderData
         this.texts ~= renderText;
     }
 
-    void addModel(ModelSlot modelslot, Vector3 position, float rotationAngle, Vector3 scale, Color color)
+    void addModel(ModelSlot* modelslot, Vector3* position, float* rotationAngle, Vector3 scale, Color color)
     {
         RenderModel renderModel = 
         {
-            model: modelslot.file, 
-            position: position,  
+            model: modelslot.file,
+            position: position,
             rotationAngle: rotationAngle, 
-            scale: scale, 
+            scale: scale,
             color: color,
             currentFrame: 0
         };
@@ -153,10 +153,11 @@ class RenderData
         BeginMode3D(this.camera);
         for (int i = 0; i < this.models.length; i++)
         {
+            writeln(this.models[i].position.x, " ", this.models[i].position.y, " ", this.models[i].position.z);
             DrawModelEx(this.models[i].model[this.models[i].currentFrame], 
-                this.models[i].position, 
+                *this.models[i].position, 
                 Vector3(0, 1, 0), 
-                this.models[i].rotationAngle, 
+                *this.models[i].rotationAngle, 
                 this.models[i].scale, 
                 this.models[i].color
             );
@@ -200,33 +201,56 @@ struct CreatureNeeds
     float poo = 100;
 }
 
+struct Specime
+{
+    string name;
+    ModelSlot* modelSlot;
+    CreatureNeeds defaultNeeds;
+}
+
 struct CreatureRender
 {
-    ModelSlot model;
+    ModelSlot* model;
     Vector3* position;
     Vector3 scale;
     float* rotationAngle;
     Color color;
 }
 
-class Creature
+struct Creature
 {
-    CreatureNeeds needs = CreatureNeeds();
-    CreatureRender render = CreatureRender();
-    Vector3 position = Vector3(0, 0, 0);
-    float rotation = 0.0f;
     string name;
     string specime;
-    this(string name, string specime)
-    {
-        this.name = name;
-        this.specime = specime;
-        ModelSlot dummy;//fix this ASAP
-        this.render = CreatureRender(dummy, &this.position, Vector3(1,1,1), &this.rotation, Color(255,255,255,255));
-    }
+    Vector3* position;
+    float* rotation;
+    CreatureRender render = CreatureRender();
+    CreatureNeeds needs = CreatureNeeds();
 }
 
 class WorldData
 {
+    Specime[] specimes;
     Creature[] creatures;
+    Specime* newSpecime(string specime, ModelSlot* modelSlot, CreatureNeeds defaultNeeds)
+    {
+        this.specimes ~= Specime(specime, modelSlot, defaultNeeds);
+        return(&this.specimes[(this.specimes.length)-1]);
+    }
+    Creature* newCreature(string name, string specime = "human", Vector3 position, float rotation)
+    {
+        Specime* tempSpecime = null; 
+        for(int i = 0; i < this.specimes.length;i++)
+        {
+            if(this.specimes[i].name == specime)
+                tempSpecime = &this.specimes[i];
+        }
+        if(tempSpecime == null)
+        {
+            writeln("specime not found");
+            return null;
+        }
+        this.creatures ~= Creature(name, specime, &position, &rotation, CreatureRender( tempSpecime.modelSlot, &position,Vector3(1,1,1), &rotation, Color(255,255,255,255)));
+        return(&this.creatures[(this.creatures.length)-1]);
+    }
 }
+
