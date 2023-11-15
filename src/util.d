@@ -8,6 +8,11 @@ import std.conv;
 import raylib;
 
 
+float deg2rad(float deg)
+{
+    return (deg * PI / 180);
+}
+
 string readTxt(string filePath) 
 {
     try 

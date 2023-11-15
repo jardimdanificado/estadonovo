@@ -4,19 +4,85 @@ import std.conv;
 import std.file;
 import std.json;
 import std.random;
+import std.math;
 
 import raylib;
 
 //import maquina;
 import util;
 
+T[][] splitList(T)(T[] lista, size_t tamanho)
+{
+    T[][] listasMenores;
+
+    size_t inicio = 0;
+    size_t fim = tamanho;
+
+    while (inicio < lista.length)
+    {
+        if (fim > lista.length)
+        {
+            fim = lista.length;
+        }
+
+        T[] sublista = lista[inicio..fim];
+        listasMenores ~= sublista;
+
+        inicio = fim;
+        fim += tamanho;
+    }
+
+    return listasMenores;
+}
+
+Vector3 move3d(Vector3 position, float rotation, float speed)
+{
+    //z+ frente
+    //x+ esquerda
+    float  valorZ, valorX;
+    int giro = to!int(floor(rotation / 90.0));
+    float resto = rotation - (90.0 * giro);
+    float restodoresto = 90.0 - resto;
+    valorZ = speed - (resto * (speed / 90.0));
+    valorX = (speed - (restodoresto * (speed / 90)));
+	switch(giro)
+    {
+        case 0:
+        {
+            position.z += valorZ;
+            position.x += valorX;
+        }
+        break;
+        case 1:
+        {
+            position.z -= valorX;
+            position.x += valorZ;
+        }
+        break;
+        case 2:
+        {
+            position.z -= valorZ;
+            position.x -= valorX;
+        }
+        break;
+        case 3:
+        {
+            position.z += valorX;
+            position.x -= valorZ;
+        }
+        break;
+        default:break;
+    }
+    return position;
+}
+
 class CreatureNeeds
 {
-    float hunger = 0;
-    float thirst = 0;
-    float sleep = 0;
-    float hygiene = 0;
-    float fun = 0;
+    float hunger = 100;
+    float thirst = 100;
+    float sleep = 100;
+    float hygiene = 100;
+    float fun = 100;
 }
 
 class SpecimeData
@@ -28,19 +94,16 @@ class SpecimeData
         JSONValue json = parseJSON(readTxt(specimePath ~ "specime.json"));
         this.name = json["name"].str;
         Model[] tempModels = bulkLoadModel(specimePath ~ "model/", to!int(json["model_count"].integer), json["model_extension"].str);
-        writeln(tempModels.length);
-        Model[] emptyAnim;
-        Model[] tempAnim;
-        for(int i = 0; i < tempModels.length; i++)
-        {
-            tempAnim ~= tempModels[i];
-            if(i % to!int(json["anim_length"].integer) == 0)
-            {
-                this.models ~= tempAnim;
-                tempAnim = emptyAnim;
-            }
-        }
+        this.models = splitList(tempModels, to!int(json["anim_length"].integer));
     }
+}
+
+struct CreatureRenderData
+{
+    int anim = 0;
+    int frame = 0;
+    int lastcheck = 0;
+    bool reverse = false;
 }
 
 struct CreatureData
@@ -49,7 +112,11 @@ struct CreatureData
     string specime = "human";
     Vector3 position = {0, 0, 0};
     float rotation = 0;
-    float speed = 0;
+    float speed = 0.25;
+    CreatureNeeds needs;
+    int map = 0;
+    Color color = Color(155, 132, 15, 255);
+    CreatureRenderData renderData = CreatureRenderData();
 }
 
 class MapData
@@ -67,7 +134,7 @@ class MapData
     }
 }
 
-alias KeyboardFuncType = void function(PlayerData*);
+alias KeyboardFuncType = void delegate(PlayerData*);
 
 class PlayerData
 {
@@ -86,10 +153,23 @@ struct WorldData
     CreatureData[] creatures;
     MapData[] maps;
     PlayerData player;
+    int time = 0;
+
+    void startup(CreatureData* playerCreature = &this.creatures[0])
+    {
+        player = new PlayerData(playerCreature, (PlayerData*){});
+    }
+
+    CreatureData* newCreature(string name, string specime = "human", Vector3 position = Vector3(0,0,0), float rotation = 0, float speed = 0.125)
+    {
+        this.creatures ~= CreatureData(name, specime, position, rotation, speed);
+        return &this.creatures[this.creatures.length - 1];
+    }
 }
 
 class SessionData
 {
+    int tick = 0;
     Random random;
     this(int seed = 7)
     {
@@ -103,11 +183,12 @@ class RenderData
     SessionData* sessionPointer;
     Camera camera = Camera(Vector3(10, 10, 10), Vector3(0, 0, 0), Vector3(0, 1, 0), 45, 0);
     Font[] fonts;
-    Font* defaultFont = null;
+    Font defaultFont;
     Vector2 screen = Vector2(0, 0);
     RenderTexture renderTexture = RenderTexture(0, Texture(0,0,0,0,0), Texture(0,0,0,0,0));
     string title = "Untitled";
     int framerate = 60;
+    int pixelSize = 2;
 
     this(WorldData* worldPointer, SessionData* sessionPointer)
     {
@@ -117,35 +198,86 @@ class RenderData
 
     Font loadFont(string fontPath)
     {
-        Font tempFont = LoadFontEx(fontPath.toStringz(), 20, null, 0);
+        Font tempFont = LoadFont(fontPath.toStringz());
         this.fonts ~= tempFont;
         return tempFont;
     }
 
-    void render()
-    {
-        BeginDrawing();
-        ClearBackground(Color(0, 0, 0, 255));
-        
-        BeginMode3D(this.camera);
-        DrawGrid(10, 1.0f);
-        
-        EndMode3D();
-        //DrawText("Congrats! You created your first window!", 190, 200, 20, Color(0,0,0,255));
-        EndDrawing();
-    }
-
-    void startup(int w, int h, string title, int framerate = 60)
+    void startup(int w, int h, string title, int framerate = 60, int pixelSize = 2, string defaultFont = "data/font/Papirology.ttf")
     {
         this.screen = Vector2(w, h);
         this.title = title;
         this.framerate = framerate;
-        
+        this.pixelSize = pixelSize;
         InitWindow(w, h, title.toStringz());
         SetTargetFPS(framerate);
-        this.renderTexture = LoadRenderTexture(w, h);
-        Font tempFont = this.loadFont("data/font/kremlin.ttf");
-        this.defaultFont = &tempFont;
+        this.renderTexture = LoadRenderTexture(w/this.pixelSize, h/this.pixelSize);
+        Font tempFont = this.loadFont(defaultFont);
+        this.defaultFont = tempFont;
+    }
+
+    private void bakeRenderTexture()
+    {
+        BeginTextureMode(this.renderTexture);
+        ClearBackground(Color(0, 0, 0, 255));
+        BeginMode3D(this.camera);
+        
+        foreach (key; this.worldPointer.maps[this.worldPointer.player.creaturePointer.map].models)
+        {
+            DrawModel(key, Vector3(0, 0, 0), 1.0f, Color(255, 255, 255, 255));
+        }
+
+        for (int i = 0; i < this.worldPointer.creatures.length; i++)
+        {
+            CreatureData* key = &this.worldPointer.creatures[i];
+            if(key.map == this.worldPointer.player.creaturePointer.map)
+            {
+
+                DrawModelEx(this.worldPointer.specimes[0].models[key.renderData.anim][key.renderData.frame], key.position, Vector3(0, 1, 0), (key.rotation), Vector3(1, 1, 1), key.color);
+                
+                bool tempCondition = false;
+                int tempFrame = 0;
+                if(key.renderData.reverse)
+                {
+                    tempCondition = key.renderData.frame >= 0;
+                    tempFrame = to!int(this.worldPointer.specimes[0].models[0].length - 1);
+                }
+                else
+                {
+                    tempCondition = key.renderData.frame <= this.worldPointer.specimes[0].models[0].length - 1;
+                }
+
+                if(key.renderData.lastcheck + (this.framerate/this.worldPointer.specimes[0].models[0].length) <= this.sessionPointer.tick)
+                {
+                    if (key.renderData.frame + (key.renderData.reverse ? -1 : 1) < this.worldPointer.specimes[0].models[0].length)
+                    {
+                        key.renderData.frame += key.renderData.reverse ? -1 : 1;
+                    }
+                    else
+                    {
+                        key.renderData.frame = key.renderData.reverse ? to!int(this.worldPointer.specimes[0].models[0].length) -1 : 0;
+                    }
+                    key.renderData.lastcheck = this.sessionPointer.tick;
+                }
+            }
+        }
+
+        //DrawGrid(10, 1.0f);
+        
+        EndMode3D();
+        EndTextureMode();
+    }
+
+    void render()
+    {
+        camera.target = this.worldPointer.player.creaturePointer.position;
+        BeginDrawing();
+        bakeRenderTexture();
+        
+        DrawTextureEx(this.renderTexture.texture, Vector2(this.screen.x, this.screen.y), 180, this.pixelSize, Color(255, 255, 255, 255));
+        DrawTextEx(this.defaultFont, "Estado Novo", Vector2(0, this.screen.y-17), 20, 0, Color(255, 255, 244, 255));
+        EndDrawing();
+        this.sessionPointer.tick++;
     }
 }
 
@@ -159,17 +291,71 @@ void main()
     // call this before using raylib
     validateRaylibBinding();
 
-    render.startup(to!int(config["screen"]["x"].integer), to!int(config["screen"]["y"].integer), config["title"].str, to!int(config["framerate"].integer));
+    render.startup(to!int(config["screen"]["x"].integer), to!int(config["screen"]["y"].integer), config["title"].str, to!int(config["framerate"].integer), to!int(config["pixel_size"].integer));
     
     //adding specimes and maps
     world.specimes ~= new SpecimeData("data/specime/human/");
     world.maps ~= new MapData("data/map/0/");
-    
+    CreatureData* player = world.newCreature("player", "human", Vector3(0, 0, 0),0,0.125);
+    world.startup(player);
+    world.player.keyboard = (PlayerData* player) 
+    {
+        if (IsKeyPressed(87))
+        {
+            player.creaturePointer.renderData.anim = 1;
+        }
+        else if(IsKeyReleased(87))
+        {
+            player.creaturePointer.renderData.anim = 0;
+        }
+        
+        if (IsKeyPressed(83))
+        {
+            player.creaturePointer.renderData.anim = 1;
+            player.creaturePointer.renderData.reverse = true;
+        }
+        else if(IsKeyReleased(83))
+        {
+            player.creaturePointer.renderData.anim = 0;
+            player.creaturePointer.renderData.reverse = false;
+        }
 
+        if(IsKeyDown(68))
+        {
+            player.creaturePointer.rotation += 3;
+            if(player.creaturePointer.rotation > 360)
+            {
+                player.creaturePointer.rotation -= 360;
+            }
+        }
+        if(IsKeyDown(65))
+        {
+            player.creaturePointer.rotation -= 3;
+            if(player.creaturePointer.rotation < 0)
+            {
+                player.creaturePointer.rotation += 360;
+            }
+        }
+        if (IsKeyDown(87))
+        {
+            Vector3 temp = move3d(player.creaturePointer.position, player.creaturePointer.rotation, player.creaturePointer.speed);
+            player.creaturePointer.position.x = temp.x;
+            player.creaturePointer.position.z = temp.z;
+        }
+        if (IsKeyDown(83))
+        {
+            Vector3 temp = move3d(player.creaturePointer.position, player.creaturePointer.rotation, -player.creaturePointer.speed);
+            player.creaturePointer.position.x = temp.x;
+            player.creaturePointer.position.z = temp.z;
+        }
+    };
     SetTargetFPS(to!int(config["framerate"].integer));
+
     while(!WindowShouldClose())
     {
         render.render();
+        world.player.keyboard(&world.player);
+        
         //teclado(player);
         //random = Random(counter);
     }
