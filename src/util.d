@@ -5,6 +5,9 @@ import std.file;
 import std.string;
 import std.conv;
 
+import raylib;
+
+
 string readTxt(string filePath) 
 {
     try 
@@ -20,4 +23,28 @@ string readTxt(string filePath)
         writeln("Erro ao ler o arquivo: ", e.msg);
         return "";  // Retorna uma string vazia em caso de erro
     }
+}
+
+Model[] bulkLoadModel(string filePath, int length, string extension = ".obj")
+{
+    Model[] models;
+    for (int i = 0; i < length; i++)
+    {
+        string path = filePath ~ to!string(i) ~ extension;
+        Model model = LoadModel(path.toStringz());
+        models ~= model;
+    }
+    return models;
+}
+
+BoundingBox[] bulkLoadHitbox(string filePath, int length, string extension = ".obj")
+{
+    BoundingBox[] hitboxes;
+    for (int i = 0; i < length; i++)
+    {
+        string path = filePath ~ to!string(i) ~ extension;
+        BoundingBox hb = GetModelBoundingBox(LoadModel(path.toStringz()));
+        hitboxes ~= hb;
+    }
+    return hitboxes;
 }

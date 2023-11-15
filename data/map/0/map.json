@@ -1,0 +1,7 @@
+{
+    "name": "cadeia",
+    "hitbox_count": 15,
+    "model_count": 1,
+    "hitbox_extension": ".obj",
+    "model_extension": ".glb"
+}

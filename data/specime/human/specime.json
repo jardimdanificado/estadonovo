@@ -1,0 +1,17 @@
+{
+    "name":"human",
+    "model_count":14,
+    "anim_length":7,
+    "animations":["idle","walk"],
+    "model_extension":".obj",
+    "max_needs":
+    {
+        "food":100,
+        "water":100,
+        "sleep":100,
+        "pee":100,
+        "poo":100,
+        "hygiene":100,
+        "fun":100
+    }
+}
