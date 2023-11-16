@@ -142,7 +142,7 @@ struct WorldData
         player = new PlayerData(playerCreature, (PlayerData*){});
     }
 
-    CreatureData* newCreature(string name, string specime = "human", Vector3 position = Vector3(0,0,0), float rotation = 0, float speed = 0.125)
+    CreatureData* newCreature(string name, string specime = "human")
     {
         this.creatures ~= CreatureData(name, specime);
         return &this.creatures[this.creatures.length - 1];
@@ -243,7 +243,16 @@ class RenderData
                 }
             }
         }
+        foreach (key; this.worldPointer.maps[this.worldPointer.player.creaturePointer.map].hitboxes)
+        {
+            DrawBoundingBox(key.hitbox, Color(255, 0, 0, 255));
+        }
 
+        foreach (key; this.worldPointer.creatures)
+        {
+            DrawRay(key.generic.ray.gravity, Color(0, 255, 0, 255));
+            DrawRay(key.generic.ray.horizontal, Color(0, 0, 255, 255));
+        }
         //DrawGrid(10, 1.0f);
         
         EndMode3D();
@@ -306,16 +315,6 @@ Vector3 move3d(Vector3 position, float rotation, float speed)
     return position;
 }
 
-void UpdateGravityRay(GenericData* targetobj)
-{
-    targetobj.ray.gravity.position.x = targetobj.position.x;
-    targetobj.ray.gravity.position.y = (targetobj.position.y+0.00001)-(0.005*(targetobj.fallTime));
-    targetobj.ray.gravity.position.z = targetobj.position.z;
-    targetobj.ray.gravity.direction.x = 0;
-    targetobj.ray.gravity.direction.y = 1;
-    targetobj.ray.gravity.direction.z = 0;
-}
-
 void UpdateHorizontalRay(GenericData* targetobj, bool backwards)
 {
     //z+ frente
@@ -375,6 +374,7 @@ void UpdateHorizontalRay(GenericData* targetobj, bool backwards)
         }
     }
     Vector3 newPosition = Vector3(targetobj.position.x,targetobj.position.y+0.7,targetobj.position.z);
+    //newPosition = move3d(newPosition,targetobj.rotation,0.1);
     targetobj.ray.horizontal.position.x = newPosition.x;
     targetobj.ray.horizontal.position.y = newPosition.y;
     targetobj.ray.horizontal.position.z = newPosition.z;
@@ -386,14 +386,19 @@ void UpdateHorizontalRay(GenericData* targetobj, bool backwards)
 
 float Gravity(GenericData targetobj, float gravidade)
 {
-    return((targetobj.position.y) - gravidade*((targetobj.fallTime*(targetobj.fallTime/10)))/30);
+    return((targetobj.position.y) - gravidade*((targetobj.fallTime*(targetobj.fallTime/10.0)))/30.0);
 }
 
 void Gravit(WorldData* world, GenericData* targetobj)
 {
-	UpdateGravityRay(targetobj);
+    //writeln(world.player.creaturePointer.generic is *targetobj);
+	targetobj.ray.gravity.position.x = targetobj.position.x;
+    targetobj.ray.gravity.position.y = (targetobj.position.y+0.00001)-(0.005*(targetobj.fallTime));
+    targetobj.ray.gravity.position.z = targetobj.position.z;
+
 	RayCollision gravityraiocolisao = RayCollision(false,0,Vector3(0,0,0),Vector3(0,0,0));
     HitboxSlot[] hitboxes = world.maps[world.player.creaturePointer.map].hitboxes;
+
     foreach(key;hitboxes)
     {
 		if(key.active == true)
@@ -407,12 +412,14 @@ void Gravit(WorldData* world, GenericData* targetobj)
 	
     if(gravityraiocolisao.hit == false)
     {
-        targetobj.position.y = (Gravity(*targetobj, 1));
+        //writeln(targetobj.position.y);
+        targetobj.position.y = Gravity(*targetobj, 1);
         targetobj.fallTime++;
+        //writeln(targetobj.position.y);
     }
     else
     {
-        if(gravityraiocolisao.distance<0.7)
+        if(gravityraiocolisao.distance<0.1)
         {
             targetobj.position.y = gravityraiocolisao.point.y;
             targetobj.fallTime = 0;
@@ -438,7 +445,7 @@ bool PlayerCollider(WorldData* world,GenericData* targetobj, bool backwards)
     
     if(directionraiocolisao.hit == true)
     {
-        if(directionraiocolisao.distance<0.5)
+        if(directionraiocolisao.distance<0.7)
         {
             return true;
         }
@@ -449,17 +456,17 @@ bool PlayerCollider(WorldData* world,GenericData* targetobj, bool backwards)
             caixa.max.y += 1.2;
             caixa.max.z += 0.2;
             caixa.min.x += -0.2;
-            caixa.min.y += 0.8;
+            caixa.min.y += 0.7;
             caixa.min.z += -0.2;
             if(backwards)
             {
-                move3d(caixa.max,targetobj.rotation,-0.1);
-                move3d(caixa.min,targetobj.rotation,-0.1);
+                caixa.max = move3d(caixa.max,targetobj.rotation,-targetobj.speed);
+                caixa.min = move3d(caixa.min,targetobj.rotation,-targetobj.speed);
             }
             else
             {
-                move3d(caixa.max,targetobj.rotation,0.1);
-                move3d(caixa.min,targetobj.rotation,0.1);
+                caixa.max = move3d(caixa.max,targetobj.rotation,targetobj.speed);
+                caixa.min = move3d(caixa.min,targetobj.rotation,targetobj.speed);
             }
             foreach(key;hitboxes)
 				if(key.active == true)
@@ -487,7 +494,8 @@ void main()
     //adding specimes and maps
     world.specimes ~= new SpecimeData("data/specime/human/");
     world.maps ~= new MapData("data/map/0/");
-    CreatureData* player = world.newCreature("player", "human", Vector3(0, 0, 0),0,0.125);
+    CreatureData* player = world.newCreature("player", "human");
+    player.generic.position.y = 5;
     world.startup(player);
     world.player.keyboard = (PlayerData* player) 
     {
@@ -527,17 +535,21 @@ void main()
                 player.creaturePointer.generic.rotation += 360;
             }
         }
-        if (IsKeyDown(87))
+        if (IsKeyDown(87) && !PlayerCollider(&world, &player.creaturePointer.generic, false))
         {
             Vector3 temp = move3d(player.creaturePointer.generic.position, player.creaturePointer.generic.rotation, player.creaturePointer.generic.speed);
             player.creaturePointer.generic.position.x = temp.x;
             player.creaturePointer.generic.position.z = temp.z;
         }
-        if (IsKeyDown(83))
+        if (IsKeyDown(83) && !PlayerCollider(&world, &player.creaturePointer.generic, true))
         {
             Vector3 temp = move3d(player.creaturePointer.generic.position, player.creaturePointer.generic.rotation, -player.creaturePointer.generic.speed);
             player.creaturePointer.generic.position.x = temp.x;
             player.creaturePointer.generic.position.z = temp.z;
+        }
+        if (IsKeyDown(32))
+        {
+            player.creaturePointer.generic.position.y += 0.3;
         }
     };
     SetTargetFPS(to!int(config["framerate"].integer));
@@ -546,7 +558,10 @@ void main()
     {
         render.render();
         world.player.keyboard(&world.player);
-        
+        for(short i = 0; i < world.creatures.length; i++)
+        {
+            Gravit(&world, &world.creatures[i].generic);
+        }
         //teclado(player);
         //random = Random(counter);
     }
