@@ -11,7 +11,7 @@
   "framerate": 30,
   "fontsize": 16,
   "showfps": true,
-  "pixel_size": 2,
+  "pixel_size": 1,
   "rotationspeed": 9,
   "camerafollow": true,
   "camerafov": 60
