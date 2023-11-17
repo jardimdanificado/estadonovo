@@ -256,7 +256,6 @@ class RenderData
             DrawRay(key.generic.ray.gravity, Color(0, 255, 0, 255));
             DrawRay(key.generic.ray.horizontal, Color(0, 0, 255, 255));
         }
-        //DrawGrid(10, 1.0f);
         
         EndMode3D();
         EndTextureMode();
@@ -394,7 +393,6 @@ float gravity(GenericData targetobj, float gravidade)
 
 void gravit(WorldData* world, GenericData* targetobj)
 {
-    //writeln(world.player.creaturePointer.generic is *targetobj);
 	targetobj.ray.gravity.position.x = targetobj.position.x;
     targetobj.ray.gravity.position.y = (targetobj.position.y+0.00001)-(0.005*(targetobj.fallTime));
     targetobj.ray.gravity.position.z = targetobj.position.z;
@@ -415,10 +413,8 @@ void gravit(WorldData* world, GenericData* targetobj)
 	
     if(gravityraiocolisao.hit == false)
     {
-        //writeln(targetobj.position.y);
         targetobj.position.y = gravity(*targetobj, 1);
         targetobj.fallTime++;
-        //writeln(targetobj.position.y);
     }
     else
     {

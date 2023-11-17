@@ -106,7 +106,6 @@ void main()
         if (IsKeyDown(32) && player.creaturePointer.generic.fallTime < 32)
         {
             player.creaturePointer.generic.position.y += 0.3;
-            //writeln(player.creaturePointer.generic.fallTime);
         }
     };
     SetTargetFPS(to!int(config["framerate"].integer));
@@ -119,8 +118,6 @@ void main()
         {
             gravit(&world, &world.creatures[i].generic);
         }
-        //teclado(player);
-        //random = Random(counter);
     }
     CloseWindow();
 }
