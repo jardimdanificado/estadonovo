@@ -19,6 +19,7 @@
     "description": "estadonovo, brutalist action-rpg.",
     "sourceFiles": ["src/main.d"],
     "name": "estadonovo",
+    "version": "0.0.802",
     "dependencies": 
     {
         "raylib-d": "~>4.5.2"
