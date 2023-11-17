@@ -20,6 +20,7 @@ void main()
     SessionData session = new SessionData(to!int(config["seed"].integer));
     RenderData render = new RenderData(&world, &session);
 
+
     // call this before using raylib
     validateRaylibBinding();
 
@@ -30,7 +31,28 @@ void main()
     world.maps ~= new MapData("data/map/0/");
     CreatureData* player = world.newCreature("player", "human");
     player.generic.position.y = 5;
+    
     world.startup(player);
+    
+    FullscreenMenu menu = FullscreenMenu();
+    menu.buttons ~= MenuButton("play",Vector2(0,0));
+    menu.buttons ~= MenuButton("exit",Vector2(0,100));
+    menu.texts ~= MenuText("title",Vector2(200,100),Color(255,255,255,255));
+    menu.texts[0].font = &render.fonts[0];
+    menu.buttons[0].font = &render.fonts[0];
+    menu.buttons[1].font = &render.fonts[0];
+    menu.buttons[0].action = () 
+    {
+        return "offload";
+    };
+    menu.buttons[1].action = () 
+    {
+        writeln("no exit button yet :(");
+        return "keep";
+    };
+    menu.loop();
+
+
     world.player.keyboard = (PlayerData* player) 
     {
         if (IsKeyPressed(87))

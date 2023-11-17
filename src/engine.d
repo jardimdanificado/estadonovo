@@ -197,6 +197,7 @@ class RenderData
         SetTargetFPS(framerate);
         this.renderTexture = LoadRenderTexture(w/this.pixelSize, h/this.pixelSize);
         Font tempFont = this.loadFont(defaultFont);
+        this.fonts ~= tempFont;
         this.defaultFont = tempFont;
     }
 
@@ -482,4 +483,79 @@ bool playerCollider(WorldData* world,GenericData* targetobj, bool backwards)
 }
 
 //---------------------------------------------
+//MENU
 //---------------------------------------------
+
+struct MenuText
+{
+    string text = "";
+    Vector2 position = Vector2(0,0);
+    Color color = Color(255,255,255,255);
+    Font* font = null;
+}
+
+struct MenuButton
+{
+    string text = "";
+    Vector2 position = Vector2(0,0);
+    Color color = Color(255,255,255,255);
+    Color hoverColor = Color(0,255,255,255);
+    Color clickColor = Color(255,0,255,255);
+    Font* font = null;
+    string delegate() action;
+}
+
+struct FullscreenMenu
+{
+    MenuText[] texts;
+    MenuButton[] buttons;
+    Color backgroundColor = Color(0,0,0,255);
+    private string result = "keep";
+    string render()
+    {
+        result = "keep";
+        BeginDrawing();
+        ClearBackground(backgroundColor);
+        foreach(key; this.texts)
+        {
+            DrawTextEx(*key.font, key.text.toStringz(), key.position, 20, 0, key.color);
+        }
+
+        foreach(key; this.buttons)
+        {
+            if(CheckCollisionPointRec(GetMousePosition(), Rectangle(key.position.x, key.position.y, MeasureText(key.text.toStringz(), 20), 20)))
+            {
+                if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+                {
+                    result = key.action();
+                    return(result);
+                }
+                else
+                {
+                    DrawTextEx(*key.font, key.text.toStringz(), key.position, 20, 0, key.clickColor);
+                }
+            }
+            else
+            {
+                DrawTextEx(*key.font, key.text.toStringz(), key.position, 20, 0, key.hoverColor);
+            }
+        }
+
+        EndDrawing();
+        return result;
+    }
+    void loop()
+    {
+        string loopResult = "keep";
+        while(!WindowShouldClose())
+        {
+            loopResult = this.render();
+            if(loopResult == "offload")
+            {
+                this.result = loopResult;
+                break;
+            }
+        }
+        this.render();
+    }
+}
