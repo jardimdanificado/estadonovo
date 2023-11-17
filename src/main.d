@@ -419,7 +419,7 @@ void Gravit(WorldData* world, GenericData* targetobj)
     }
     else
     {
-        if(gravityraiocolisao.distance<0.1)
+        if(gravityraiocolisao.distance<0.1*(targetobj.fallTime))
         {
             targetobj.position.y = gravityraiocolisao.point.y;
             targetobj.fallTime = 0;
@@ -521,7 +521,7 @@ void main()
 
         if(IsKeyDown(68))
         {
-            player.creaturePointer.generic.rotation += 3;
+            player.creaturePointer.generic.rotation += 6;
             if(player.creaturePointer.generic.rotation > 360)
             {
                 player.creaturePointer.generic.rotation -= 360;
@@ -529,7 +529,7 @@ void main()
         }
         if(IsKeyDown(65))
         {
-            player.creaturePointer.generic.rotation -= 3;
+            player.creaturePointer.generic.rotation -= 6;
             if(player.creaturePointer.generic.rotation < 0)
             {
                 player.creaturePointer.generic.rotation += 360;
@@ -547,9 +547,10 @@ void main()
             player.creaturePointer.generic.position.x = temp.x;
             player.creaturePointer.generic.position.z = temp.z;
         }
-        if (IsKeyDown(32))
+        if (IsKeyDown(32) && player.creaturePointer.generic.fallTime < 32)
         {
             player.creaturePointer.generic.position.y += 0.3;
+            //writeln(player.creaturePointer.generic.fallTime);
         }
     };
     SetTargetFPS(to!int(config["framerate"].integer));
