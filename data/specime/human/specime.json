@@ -1,8 +1,8 @@
 {
     "name":"human",
-    "model_count":14,
+    "model_count":28,
     "anim_length":7,
-    "animations":["idle","walk"],
+    "animations":["idle","walk","run","use"],
     "model_extension":".obj",
     "max_needs":
     {

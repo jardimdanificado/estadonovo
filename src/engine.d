@@ -53,7 +53,7 @@ struct GenericData
 {
     Vector3 position = {0, 0, 0};
     float rotation = 0;
-    float speed = 0.25;
+    float speed = 0.175;
     float fallTime = 0;
     GenericObjectRayData ray =  GenericObjectRayData(Ray(Vector3(0,0,0), Vector3(0,1,0)), Ray(Vector3(0,0,0), Vector3(0,0,0)));
 }

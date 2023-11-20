@@ -37,7 +37,7 @@ void main()
     FullscreenMenu menu = FullscreenMenu();
     menu.buttons ~= MenuButton("play",Vector2(0,0));
     menu.buttons ~= MenuButton("exit",Vector2(0,100));
-    menu.texts ~= MenuText("title",Vector2(200,100),Color(255,255,255,255));
+    menu.texts ~= MenuText("estado novo",Vector2(GetScreenWidth() - (MeasureText("estado novo",20) - 6), GetScreenHeight() - 16),Color(255,255,255,255));
     menu.texts[0].font = &render.fonts[0];
     menu.buttons[0].font = &render.fonts[0];
     menu.buttons[1].font = &render.fonts[0];
@@ -93,13 +93,35 @@ void main()
         }
         if (IsKeyDown(87) && !playerCollider(&world, &player.creaturePointer.generic, false))
         {
-            Vector3 temp = move3d(player.creaturePointer.generic.position, player.creaturePointer.generic.rotation, player.creaturePointer.generic.speed);
+            float tempSpeed;
+            if(IsKeyDown(340))
+            {
+                tempSpeed = player.creaturePointer.generic.speed*1.75;
+                player.creaturePointer.renderData.anim = 2;
+            }
+            else
+            {
+                tempSpeed = player.creaturePointer.generic.speed;
+                player.creaturePointer.renderData.anim = 1;
+            }
+            Vector3 temp = move3d(player.creaturePointer.generic.position, player.creaturePointer.generic.rotation, tempSpeed);
             player.creaturePointer.generic.position.x = temp.x;
             player.creaturePointer.generic.position.z = temp.z;
         }
         if (IsKeyDown(83) && !playerCollider(&world, &player.creaturePointer.generic, true))
         {
-            Vector3 temp = move3d(player.creaturePointer.generic.position, player.creaturePointer.generic.rotation, -player.creaturePointer.generic.speed);
+            float tempSpeed;
+            if(IsKeyDown(340))
+            {
+                tempSpeed = player.creaturePointer.generic.speed*1.75;
+                player.creaturePointer.renderData.anim = 2;
+            }
+            else
+            {
+                tempSpeed = player.creaturePointer.generic.speed * 0.75;
+                player.creaturePointer.renderData.anim = 1;
+            }
+            Vector3 temp = move3d(player.creaturePointer.generic.position, player.creaturePointer.generic.rotation, -tempSpeed);
             player.creaturePointer.generic.position.x = temp.x;
             player.creaturePointer.generic.position.z = temp.z;
         }
