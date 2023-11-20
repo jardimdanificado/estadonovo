@@ -34,11 +34,13 @@ void main()
     
     world.startup(player);
     
+    Font titleFont = render.loadFont("data/font/acentos/eurcntrc.ttf", 70);
     FullscreenMenu menu = FullscreenMenu();
-    menu.buttons ~= MenuButton("play",Vector2(0,0));
-    menu.buttons ~= MenuButton("exit",Vector2(0,100));
-    menu.texts ~= MenuText("estado novo",Vector2(GetScreenWidth() - (MeasureText("estado novo",20) - 6), GetScreenHeight() - 16),Color(255,255,255,255));
-    menu.texts[0].font = &render.fonts[0];
+    menu.buttons ~= MenuButton("exit",Vector2(GetScreenWidth() - (MeasureText("exit",20)), GetScreenHeight() - 106), cor_cinza, cor_marrom, cor_laranja);
+    menu.buttons ~= MenuButton("play",Vector2(GetScreenWidth() - (MeasureText("play",20)+7), GetScreenHeight() - 90), cor_cinza, cor_marrom, cor_laranja);
+    menu.texts ~= MenuText("estado novo",Vector2(GetScreenWidth() - (MeasureText("estado novo",70) + 70), GetScreenHeight() - 64), cor_laranja, &titleFont);
+    menu.backgroundColor = cor_quase_branco;
+    menu.texts[0].fontSize = 70;
     menu.buttons[0].font = &render.fonts[0];
     menu.buttons[1].font = &render.fonts[0];
     menu.buttons[0].action = () 

@@ -13,6 +13,24 @@ import raylib;
 //import maquina;
 import util;
 
+/*
+van-dyke: rgba(56, 48, 46, 1);
+silver: rgba(203, 193, 190, 1);
+dim-gray: rgba(115, 105, 97, 1);
+outer-space: rgba(77, 84, 84, 1);
+platinum: rgba(230, 225, 223, 1);
+persian-orange: rgba(202, 137, 109, 1);
+linen: rgba(250, 239, 229, 1);
+*/
+
+Color cor_preto = Color(56, 48, 46, 255);
+Color cor_cinza = Color(203, 193, 190, 255);
+Color cor_marrom = Color(115, 105, 97, 255);
+Color cor_cinza_escuro = Color(77, 84, 84, 255);
+Color cor_branco = Color(230, 225, 223, 255);
+Color cor_laranja = Color(202, 137, 109, 255);
+Color cor_quase_branco = Color(250, 239, 229, 255);
+
 T[][] splitList(T)(T[] lista, size_t tamanho)
 {
     T[][] listasMenores;
@@ -180,9 +198,9 @@ class RenderData
         this.sessionPointer = sessionPointer;
     }
 
-    Font loadFont(string fontPath)
+    Font loadFont(string fontPath, int fontSize = 20)
     {
-        Font tempFont = LoadFont(fontPath.toStringz());
+        Font tempFont = LoadFontEx(fontPath.toStringz(), fontSize, null, 0);
         this.fonts ~= tempFont;
         return tempFont;
     }
@@ -488,6 +506,7 @@ struct MenuText
     Vector2 position = Vector2(0,0);
     Color color = Color(255,255,255,255);
     Font* font = null;
+    int fontSize = 20;
 }
 
 struct MenuButton
@@ -498,6 +517,7 @@ struct MenuButton
     Color hoverColor = Color(0,255,255,255);
     Color clickColor = Color(255,0,255,255);
     Font* font = null;
+    int fontSize = 20;
     string delegate() action;
 }
 
@@ -514,7 +534,7 @@ struct FullscreenMenu
         ClearBackground(backgroundColor);
         foreach(key; this.texts)
         {
-            DrawTextEx(*key.font, key.text.toStringz(), key.position, 20, 0, key.color);
+            DrawTextEx(*key.font, key.text.toStringz(), key.position, key.fontSize, 0, key.color);
         }
 
         foreach(key; this.buttons)
@@ -528,12 +548,12 @@ struct FullscreenMenu
                 }
                 else
                 {
-                    DrawTextEx(*key.font, key.text.toStringz(), key.position, 20, 0, key.clickColor);
+                    DrawTextEx(*key.font, key.text.toStringz(), key.position, key.fontSize, 0, key.clickColor);
                 }
             }
             else
             {
-                DrawTextEx(*key.font, key.text.toStringz(), key.position, 20, 0, key.hoverColor);
+                DrawTextEx(*key.font, key.text.toStringz(), key.position, key.fontSize, 0, key.hoverColor);
             }
         }
 
