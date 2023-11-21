@@ -19,8 +19,7 @@ void main()
     WorldData world = WorldData();
     SessionData session = new SessionData(to!int(config["seed"].integer));
     RenderData render = new RenderData(&world, &session);
-
-
+    
     // call this before using raylib
     validateRaylibBinding();
 
@@ -34,25 +33,44 @@ void main()
     
     world.startup(player);
     
-    Font titleFont = render.loadFont("data/font/acentos/eurcntrc.ttf", 70);
+    //menu
+    Font titleFont = render.loadFont("data/font/Mockery.ttf", uniform(20, 90));
     FullscreenMenu menu = FullscreenMenu();
-    menu.buttons ~= MenuButton("exit",Vector2(GetScreenWidth() - (MeasureText("exit",20)), GetScreenHeight() - 106), cor_cinza, cor_marrom, cor_laranja);
-    menu.buttons ~= MenuButton("play",Vector2(GetScreenWidth() - (MeasureText("play",20)+7), GetScreenHeight() - 90), cor_cinza, cor_marrom, cor_laranja);
-    menu.texts ~= MenuText("estado novo",Vector2(GetScreenWidth() - (MeasureText("estado novo",70) + 70), GetScreenHeight() - 64), cor_laranja, &titleFont);
+    
+    menu.buttons ~= MenuButton("exit",Vector2(GetScreenWidth() - (MeasureTextEx(render.fonts[0],"exit",20,0)).x-7, GetScreenHeight() - 26), cor_cinza, cor_marrom, cor_laranja, &render.fonts[0]);
+    menu.buttons ~= MenuButton("play",Vector2(GetScreenWidth() - (MeasureTextEx(render.fonts[0],"play",20,0)).x-7, GetScreenHeight() - 48), cor_cinza, cor_marrom, cor_laranja, &render.fonts[0]);
+    int vmargin = to!int(((((render.screen.y/titleFont.baseSize)+1)*titleFont.baseSize) - render.screen.y)/3);
+    int hmargin = to!int((render.screen.x - 50) - to!int((render.screen.x-50)/MeasureTextEx(titleFont, "estado novo ", titleFont.baseSize, 0).x)*MeasureTextEx(titleFont, "estado novo ", titleFont.baseSize, 0).x);
+    for(short i = 0; i < to!int(render.screen.y/titleFont.baseSize)+2; i++)
+    {
+        for(short j = 0; j < to!int((render.screen.x-50)/MeasureTextEx(titleFont, "estado novo ", titleFont.baseSize, 0).x); j++)
+        {
+            menu.buttons ~= MenuButton("estado novo",Vector2(hmargin/2 + j * (MeasureTextEx(titleFont, "estado novo ", titleFont.baseSize, 0).x), -vmargin + i*titleFont.baseSize), cor_cinza, cor_marrom, cor_laranja, &titleFont, titleFont.baseSize);
+            menu.buttons[menu.buttons.length-1].action = ()
+            {
+                return "offload";
+            };
+        }
+        //menu.buttons ~= MenuButton("estado novo",Vector2(7, -margin + i*titleFont.baseSize), cor_cinza, cor_marrom, cor_laranja, &titleFont, titleFont.baseSize);
+        
+    }
+    
     menu.backgroundColor = cor_quase_branco;
-    menu.texts[0].fontSize = 70;
-    menu.buttons[0].font = &render.fonts[0];
-    menu.buttons[1].font = &render.fonts[0];
-    menu.buttons[0].action = () 
+
+    menu.buttons[1].action = () 
     {
         return "offload";
     };
-    menu.buttons[1].action = () 
+    menu.buttons[0].action = () 
     {
-        writeln("no exit button yet :(");
-        return "keep";
+        session.exit = true;
+        return "exit";
     };
-    menu.loop();
+
+    menu.loop(()
+    {
+        session.tick++;
+    });
 
 
     world.player.keyboard = (PlayerData* player) 
@@ -134,7 +152,7 @@ void main()
     };
     SetTargetFPS(to!int(config["framerate"].integer));
 
-    while(!WindowShouldClose())
+    while(!WindowShouldClose() && !session.exit)
     {
         render.render();
         world.player.keyboard(&world.player);

@@ -177,6 +177,7 @@ class SessionData
     {
         this.random = Random(seed);
     }
+    bool exit = false;
 }
 
 class RenderData
@@ -539,7 +540,8 @@ struct FullscreenMenu
 
         foreach(key; this.buttons)
         {
-            if(CheckCollisionPointRec(GetMousePosition(), Rectangle(key.position.x, key.position.y, MeasureText(key.text.toStringz(), 20), 20)))
+            Vector2 textSize = MeasureTextEx(*key.font, key.text.toStringz(), key.fontSize, 0);
+            if(CheckCollisionPointRec(GetMousePosition(), Rectangle(key.position.x, key.position.y, textSize.x, textSize.y)))
             {
                 if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
                 {
@@ -560,7 +562,7 @@ struct FullscreenMenu
         EndDrawing();
         return result;
     }
-    void loop()
+    void loop(void delegate() complement = null)
     {
         string loopResult = "keep";
         while(!WindowShouldClose())
@@ -570,6 +572,20 @@ struct FullscreenMenu
             {
                 this.result = loopResult;
                 break;
+            }
+            else if (loopResult == "keep")
+            {
+                //continue;
+            }
+            else if (loopResult == "exit")
+            {
+                this.result = loopResult;
+                break;
+            }
+
+            if(complement !is null)
+            {
+                complement();
             }
         }
         this.render();
