@@ -522,12 +522,25 @@ struct MenuButton
     string delegate() action;
 }
 
+struct MenuKeyboardKey
+{
+    int key;
+    short size = 20;
+    string delegate() action;
+}
+
+struct MenuKeyboard
+{
+    MenuKeyboardKey keys; 
+}
+
 struct FullscreenMenu
 {
     MenuText[] texts;
     MenuButton[] buttons;
     Color backgroundColor = Color(0,0,0,255);
     private string result = "keep";
+
     string render()
     {
         result = "keep";

@@ -8,9 +8,10 @@ import std.math;
 
 import raylib;
 
-//import maquina;
 import util;
 import engine;
+
+alias key = KeyboardKey;
 
 //main
 void main()
@@ -25,6 +26,9 @@ void main()
 
     render.startup(to!int(config["screen"]["x"].integer), to!int(config["screen"]["y"].integer), config["title"].str, to!int(config["framerate"].integer), to!int(config["pixel_size"].integer));
     
+    // set exit key to none
+    SetExitKey(0);
+
     //adding specimes and maps
     world.specimes ~= new SpecimeData("data/specime/human/");
     world.maps ~= new MapData("data/map/0/");
@@ -39,6 +43,7 @@ void main()
     
     menu.buttons ~= MenuButton("exit",Vector2(GetScreenWidth() - (MeasureTextEx(render.fonts[0],"exit",20,0)).x-7, GetScreenHeight() - 26), cor_cinza, cor_marrom, cor_laranja, &render.fonts[0]);
     menu.buttons ~= MenuButton("play",Vector2(GetScreenWidth() - (MeasureTextEx(render.fonts[0],"play",20,0)).x-7, GetScreenHeight() - 48), cor_cinza, cor_marrom, cor_laranja, &render.fonts[0]);
+    
     int vmargin = to!int(((((render.screen.y/titleFont.baseSize)+1)*titleFont.baseSize) - render.screen.y)/3);
     int hmargin = to!int((render.screen.x - 50) - to!int((render.screen.x-50)/MeasureTextEx(titleFont, "estado novo ", titleFont.baseSize, 0).x)*MeasureTextEx(titleFont, "estado novo ", titleFont.baseSize, 0).x);
     for(short i = 0; i < to!int(render.screen.y/titleFont.baseSize)+2; i++)
@@ -75,27 +80,27 @@ void main()
 
     world.player.keyboard = (PlayerData* player) 
     {
-        if (IsKeyPressed(87))
+        if (IsKeyPressed(key.KEY_W))
         {
             player.creaturePointer.renderData.anim = 1;
         }
-        else if(IsKeyReleased(87))
+        else if(IsKeyReleased(key.KEY_W))
         {
             player.creaturePointer.renderData.anim = 0;
         }
         
-        if (IsKeyPressed(83))
+        if (IsKeyPressed(key.KEY_S))
         {
             player.creaturePointer.renderData.anim = 1;
             player.creaturePointer.renderData.reverse = true;
         }
-        else if(IsKeyReleased(83))
+        else if(IsKeyReleased(key.KEY_S))
         {
             player.creaturePointer.renderData.anim = 0;
             player.creaturePointer.renderData.reverse = false;
         }
 
-        if(IsKeyDown(68))
+        if(IsKeyDown(key.KEY_D))
         {
             player.creaturePointer.generic.rotation += 6;
             if(player.creaturePointer.generic.rotation > 360)
@@ -103,7 +108,7 @@ void main()
                 player.creaturePointer.generic.rotation -= 360;
             }
         }
-        if(IsKeyDown(65))
+        if(IsKeyDown(key.KEY_A))
         {
             player.creaturePointer.generic.rotation -= 6;
             if(player.creaturePointer.generic.rotation < 0)
@@ -111,10 +116,10 @@ void main()
                 player.creaturePointer.generic.rotation += 360;
             }
         }
-        if (IsKeyDown(87) && !playerCollider(&world, &player.creaturePointer.generic, false))
+        if (IsKeyDown(key.KEY_W) && !playerCollider(&world, &player.creaturePointer.generic, false))
         {
             float tempSpeed;
-            if(IsKeyDown(340))
+            if(IsKeyDown(key.KEY_LEFT_SHIFT))
             {
                 tempSpeed = player.creaturePointer.generic.speed*1.75;
                 player.creaturePointer.renderData.anim = 2;
@@ -128,10 +133,10 @@ void main()
             player.creaturePointer.generic.position.x = temp.x;
             player.creaturePointer.generic.position.z = temp.z;
         }
-        if (IsKeyDown(83) && !playerCollider(&world, &player.creaturePointer.generic, true))
+        if (IsKeyDown(key.KEY_S) && !playerCollider(&world, &player.creaturePointer.generic, true))
         {
             float tempSpeed;
-            if(IsKeyDown(340))
+            if(IsKeyDown(key.KEY_LEFT_SHIFT))
             {
                 tempSpeed = player.creaturePointer.generic.speed*1.75;
                 player.creaturePointer.renderData.anim = 2;
@@ -145,11 +150,19 @@ void main()
             player.creaturePointer.generic.position.x = temp.x;
             player.creaturePointer.generic.position.z = temp.z;
         }
-        if (IsKeyDown(32) && player.creaturePointer.generic.fallTime < 32)
+        if (IsKeyDown(key.KEY_SPACE) && player.creaturePointer.generic.fallTime < 32)
         {
             player.creaturePointer.generic.position.y += 0.3;
         }
+        if(IsKeyDown(key.KEY_ESCAPE))
+        {
+            menu.loop(()
+            {
+                session.tick++;
+            });
+        }
     };
+    
     SetTargetFPS(to!int(config["framerate"].integer));
 
     while(!WindowShouldClose() && !session.exit)
