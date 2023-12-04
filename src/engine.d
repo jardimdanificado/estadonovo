@@ -13,16 +13,6 @@ import raylib;
 //import maquina;
 import util;
 
-/*
-van-dyke: rgba(56, 48, 46, 1);
-silver: rgba(203, 193, 190, 1);
-dim-gray: rgba(115, 105, 97, 1);
-outer-space: rgba(77, 84, 84, 1);
-platinum: rgba(230, 225, 223, 1);
-persian-orange: rgba(202, 137, 109, 1);
-linen: rgba(250, 239, 229, 1);
-*/
-
 Color cor_preto = Color(56, 48, 46, 255);
 Color cor_cinza = Color(203, 193, 190, 255);
 Color cor_marrom = Color(115, 105, 97, 255);
