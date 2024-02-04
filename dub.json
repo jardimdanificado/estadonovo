@@ -22,12 +22,12 @@
     "version": "0.0.805",
     "dependencies": 
     {
-        "raylib-d": "~>5.0.0"
+        "raylib-d": "~>5.0.1"
     },
     "authors": 
     [
         "jardimdanificado"
     ],
-    "copyright": "Copyright © 2023, jardimdanificado",
+    "copyright": "Copyright © 2024, jardimdanificado",
     "license": "proprietary"
 }
