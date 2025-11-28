@@ -1,18 +1,10 @@
-#include "raylib/raylib.h"
+#include "../libs/raylib/raylib.h"
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
-#if defined(PLATFORM_DESKTOP)
-    #define GLSL_VERSION            330
-#else   // PLATFORM_RPI, PLATFORM_ANDROID, PLATFORM_WEB
-    #define GLSL_VERSION            100
-#endif
-
-
-
-
+#define GLSL_VERSION            100
 
 char *msg;
 
