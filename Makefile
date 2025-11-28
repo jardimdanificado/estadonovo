@@ -1,5 +1,3 @@
-build-ubuntu:
+all:
 	bash build.sh
-
-build-windows:
-	build.bat
+	
