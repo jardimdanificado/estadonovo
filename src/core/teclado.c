@@ -1,0 +1,124 @@
+void TECLADO_MAIN ( PERSONAGEM * personagem , ITEM *item, MAPA mapa)
+{
+	if ( IsKeyPressed ( KEY_RIGHT ) ||IsKeyPressed ( KEY_D ) )
+	{
+		if ( personagem->rotacao == 0 )
+			personagem->rotacao = 360;
+		//             personagem.posicao.x -= 0.03f;
+		personagem->rotacao -= 45;
+
+	}
+	if ( IsKeyPressed ( KEY_LEFT ) ||IsKeyPressed ( KEY_A ) )
+	{
+		if ( personagem->rotacao == 360 )
+			personagem->rotacao = 0;
+		//             personagem.posicao.x += 0.03f;
+		personagem->rotacao += 45;
+
+	}
+	if(IsKeyPressed ( KEY_DOWN ) ||IsKeyPressed ( KEY_S ))
+    {
+        personagem->modelo.frame = 0;
+    }
+	if ( IsKeyDown ( KEY_DOWN ) ||IsKeyDown ( KEY_S ) )
+	{
+		PERSONAGEM_ANIMARUN (*&personagem,'-',*item );
+		PERSONAGEM_MOVETRAS (*&personagem , mapa);
+	}
+	if(IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+    {
+        personagem->modelo.frame = 0;
+    }
+	if ( IsKeyDown ( KEY_UP ) || IsKeyDown ( KEY_W ) )
+	{
+		PERSONAGEM_ANIMARUN (*&personagem,'+',*item  );
+		PERSONAGEM_MOVEFRENTE (*&personagem , mapa);
+	}
+	if ( IsKeyDown ( KEY_LEFT_SHIFT ) )
+	{
+		personagem->velocidade = 0.2f;
+	}
+	if ( IsKeyReleased ( KEY_LEFT_SHIFT ) )
+	{
+		personagem->velocidade = 0.1f;
+	}
+	if ( IsKeyReleased ( KEY_UP ) || IsKeyReleased ( KEY_W ) )
+	{
+		personagem->modelo.atual = personagem->modelo.idle;
+        if(personagem->equip.calca != 0)
+            personagem->equip.calcaAtual = item->calca[personagem->equip.calca].idle;
+        if(personagem->equip.chapeu != 0)
+            personagem->equip.chapeuAtual = item->chapeu[personagem->equip.chapeu].idle;
+        if(personagem->equip.camisa != 0)
+            personagem->equip.camisaAtual = item->camisa[personagem->equip.camisa].idle;
+        if(personagem->equip.arma != 0)
+            personagem->equip.armaAtual = item->arma[personagem->equip.arma].idle;
+	}
+	if ( IsKeyReleased ( KEY_DOWN ) || IsKeyReleased ( KEY_S ) )
+	{
+		personagem->modelo.atual = personagem->modelo.idle;
+        if(personagem->equip.calca != 0)
+            personagem->equip.calcaAtual = item->calca[personagem->equip.calca].idle;
+        if(personagem->equip.chapeu != 0)
+            personagem->equip.chapeuAtual = item->chapeu[personagem->equip.chapeu].idle;
+        if(personagem->equip.camisa != 0)
+            personagem->equip.camisaAtual = item->camisa[personagem->equip.camisa].idle;
+        if(personagem->equip.arma != 0)
+            personagem->equip.armaAtual = item->arma[personagem->equip.arma].idle;
+	}
+	if ( IsKeyPressed ( KEY_SPACE ) &&PERSONAGEM_CHECARCHAO( *personagem, mapa) )
+	{
+		personagem->modelo.atual = personagem->modelo.use_default[0];
+        if(personagem->equip.calca != 0)
+            personagem->equip.calcaAtual = item->calca[personagem->equip.calca].use[0];
+        if(personagem->equip.chapeu != 0)
+            personagem->equip.chapeuAtual = item->chapeu[personagem->equip.chapeu].use[0];
+        if(personagem->equip.camisa != 0)
+            personagem->equip.camisaAtual = item->camisa[personagem->equip.camisa].use[0];
+        if(personagem->equip.arma != 0)
+            personagem->equip.armaAtual = item->arma[personagem->equip.arma].idle;
+		personagem->velocidadePulo = 0.2;
+		personagem->pulando = true;
+		personagem->pulo = clock();
+	}
+	if ( IsKeyDown ( KEY_SPACE ) )
+	{
+		if ( personagem->pulando == true )
+			personagem->posicao.y += personagem->velocidade*2;
+		if ( clock() >= personagem->pulo+5000&&clock() < personagem->pulo+7500 )
+		{
+			personagem->velocidadePulo = 0.1;
+		}
+		else if ( clock() >= personagem->pulo+7500&&clock() < personagem->pulo+9000 )
+		{
+			personagem->velocidadePulo = 0.05;
+		}
+		else if ( clock() >= personagem->pulo+9000&&clock() < personagem->pulo+10000 )
+		{
+			personagem->velocidadePulo = 0.025;
+		}
+		else if ( clock() > personagem->pulo+10000 )
+		{
+			personagem->pulando = false;
+		}
+	}
+	if ( IsKeyReleased ( KEY_SPACE ) )
+	{
+		personagem->pulando = false;
+		personagem->pulo = clock();
+		personagem->modelo.atual = personagem->modelo.idle;
+        if(personagem->equip.calca != 0)
+            personagem->equip.calcaAtual = item->calca[personagem->equip.calca].idle;
+        if(personagem->equip.chapeu != 0)
+            personagem->equip.chapeuAtual = item->chapeu[personagem->equip.chapeu].idle;
+        if(personagem->equip.camisa != 0)
+            personagem->equip.camisaAtual = item->camisa[personagem->equip.camisa].idle;
+        if(personagem->equip.arma != 0)
+            personagem->equip.armaAtual = item->arma[personagem->equip.arma].idle;
+	}
+	if ( IsKeyPressed ( KEY_E ) )
+	{
+        personagem->modelo.frame = 0;
+		PERSONAGEM_USE_PRESS (*&personagem );
+    }
+}

@@ -1,3 +1,2 @@
-node_modules
-data/save/save.json
-estadonovo
+./BUILD
+./BUILD_WIN
