@@ -81,6 +81,17 @@ export class World {
             const model = this.safeModelAt(ent.state, ent.frame);
             this.drawModel(ent.position, model, ent.rotation, ent.modelScale);
         }
+
+        // considerando player como 0, mas precisa ser corrigido futuramente
+        push();
+        // vamos fazer um cone invertido encima do player para indicar a posição
+        const player = this.creatures[0];
+        translate(player.position.x, player.position.y - player.size.y - 90, player.position.z);
+        fill(255, 255, 50, 150);
+        noStroke();
+        rotateX(HALF_PI);
+        torus(10, 3, 8, 4);
+        pop();
     };
 
     // ---------------------------
