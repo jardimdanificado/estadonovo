@@ -5,6 +5,7 @@ export class World {
     {
         this.cubes = [];
         this.creatures = [];
+        this.structures = [];
         this.models = { player: {} };
         this.modelBounds = { player: {} };
         this.lastAnimTime = 0;
@@ -20,6 +21,17 @@ export class World {
 
     new_cube(pos, size) {
         this.cubes.push({ pos, size });
+    };
+
+    new_structure(opts) {
+        const structure = {
+            position: opts.position.copy(),
+            model: opts.model,
+            scale: opts.scale || 1,
+            rotation: opts.rotation || 0
+        };
+        this.structures.push(structure);
+        return structure;
     };
 
     new_creature(opts) {
@@ -72,6 +84,21 @@ export class World {
             fill(150, 100, 50);
             noStroke();
             box(c.size.x, c.size.y, c.size.z);
+            pop();
+        }
+
+        // estruturas (torres, etc)
+        for (let s of this.structures) {
+            push();
+            translate(s.position.x, s.position.y, s.position.z);
+            rotateY(s.rotation);
+            scale(s.scale);
+            scale(1, -1, 1);
+            translate(0, 100, 0);
+            noStroke();
+            if (s.model) {
+                model(s.model);
+            }
             pop();
         }
 
