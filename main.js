@@ -16,6 +16,9 @@ function preload() {
     for (let f = 0; f < world.USE_FRAMES; f++) {
         world.models.player.use[f] = safeLoadModel(`data/player/use/${f}.obj`);
     }
+
+    // Carregar modelo da torre
+    world.models.tower = safeLoadModel(`data/structure/wooden watch tower2.obj`);
 }
 
 function safeLoadModel(path) {
@@ -42,6 +45,13 @@ function setup() {
     world.new_cube(createVector(400, -40, 0), createVector(120, 80, 120));
     world.new_cube(createVector(-320, -40, 160), createVector(100, 120, 100));
     world.new_cube(createVector(0, -40, 480), createVector(60, 60, 60));
+
+    // Adicionar torre ao mapa
+    world.new_structure({
+        position: createVector(0, -40, 0),
+        model: world.models.tower,
+        scale: 15.353125
+    });
 
     world.new_creature({
         position: createVector(0, -40, 0),
