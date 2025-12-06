@@ -1,3 +1,32 @@
+function getModelBounds(obj) {
+    let minX=Infinity, minY=Infinity, minZ=Infinity;
+    let maxX=-Infinity, maxY=-Infinity, maxZ=-Infinity;
+
+    for (let v of obj.vertices) {
+        minX = Math.min(minX, v.x);
+        minY = Math.min(minY, v.y);
+        minZ = Math.min(minZ, v.z);
+        maxX = Math.max(maxX, v.x);
+        maxY = Math.max(maxY, v.y);
+        maxZ = Math.max(maxZ, v.z);
+    }
+
+    return {
+        min: {x:minX, y:minY, z:minZ},
+        size:{x:maxX-minX, y:maxY-minY, z:maxZ-minZ}
+    };
+}
+
+
+function getStretchScale(model, targetSize) {
+    const b = getModelBounds(model);
+
+    return createVector(
+        targetSize.x / (b.size.x || 1),
+        targetSize.y / (b.size.y || 1),
+        targetSize.z / (b.size.z || 1)
+    );
+}
 
 
 export class World {
@@ -5,7 +34,6 @@ export class World {
     {
         this.cubes = [];
         this.creatures = [];
-        this.structures = [];
         this.models = { player: {} };
         this.modelBounds = { player: {} };
         this.lastAnimTime = 0;
@@ -19,20 +47,10 @@ export class World {
         this.STEP_HEIGHT = 20;
     }
 
-    new_cube(pos, size) {
-        this.cubes.push({ pos, size });
-    };
+    new_cube(pos, size, texture = null, model = null, wireframe = false) {
+        this.cubes.push({ pos, size, texture, model, wireframe });
+    }
 
-    new_structure(opts) {
-        const structure = {
-            position: opts.position.copy(),
-            model: opts.model,
-            scale: opts.scale || 1,
-            rotation: opts.rotation || 0
-        };
-        this.structures.push(structure);
-        return structure;
-    };
 
     new_creature(opts) {
         const ent = {
@@ -82,23 +100,46 @@ export class World {
             push();
             translate(c.pos.x, c.pos.y, c.pos.z);
             fill(150, 100, 50);
-            noStroke();
-            box(c.size.x, c.size.y, c.size.z);
-            pop();
-        }
-
-        // estruturas (torres, etc)
-        for (let s of this.structures) {
-            push();
-            translate(s.position.x, s.position.y, s.position.z);
-            rotateY(s.rotation);
-            scale(s.scale);
-            scale(1, -1, 1);
-            translate(0, 100, 0);
-            noStroke();
-            if (s.model) {
-                model(s.model);
+            
+            if (c.texture) {
+                texture(c.texture);
             }
+
+            if (c.wireframe) {
+                //noFill();
+                stroke(0);
+            }
+            else 
+            {
+                noStroke();
+            }
+
+
+            if (c.model) {
+                const b = getModelBounds(c.model);
+                const s = getStretchScale(c.model, c.size);
+
+                // estica sem manter proporção
+                scale(s.x, s.y, s.z);
+
+                // flip Y
+                scale(1, -1, 1);
+
+                // o OBJ do p5 é desenhado centrado
+                const cx = b.min.x + b.size.x / 2;
+                const cy = b.min.y + b.size.y / 2;
+                const cz = b.min.z + b.size.z / 2;
+
+                translate(-cx, -cy, -cz);
+
+                model(c.model);
+
+                pop();
+                continue;
+            }
+
+
+            box(c.size.x, c.size.y, c.size.z);
             pop();
         }
 

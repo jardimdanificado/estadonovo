@@ -18,7 +18,7 @@ function preload() {
     }
 
     // Carregar modelo da torre
-    world.models.tower = safeLoadModel(`data/structure/wooden watch tower2.obj`);
+    //world.models.tower = safeLoadModel(`data/structure/wooden watch tower2.obj`);
 }
 
 function safeLoadModel(path) {
@@ -34,6 +34,7 @@ function safeLoadModel(path) {
     return mdl;
 }
 
+
 function setup() {
     createCanvas(800, 600, WEBGL);
 
@@ -42,16 +43,9 @@ function setup() {
            0, 0, 0,     // centro/target da câmera (center) -> centerX = 100 aqui
            0, 1, 0);      // vetor "up"
 
-    world.new_cube(createVector(400, -40, 0), createVector(120, 80, 120));
+    world.new_cube(createVector(400, -40, 0), createVector(120, 80, 120), loadImage('data/test.png'), loadModel('data/structure/wooden watch tower2.obj'), false, 50);
     world.new_cube(createVector(-320, -40, 160), createVector(100, 120, 100));
     world.new_cube(createVector(0, -40, 480), createVector(60, 60, 60));
-
-    // Adicionar torre ao mapa
-    world.new_structure({
-        position: createVector(0, -40, 0),
-        model: world.models.tower,
-        scale: 15.353125
-    });
 
     world.new_creature({
         position: createVector(0, -40, 0),
