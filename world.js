@@ -1,11 +1,38 @@
+function getModelBounds(obj) {
+    let minX = Infinity, minY = Infinity, minZ = Infinity;
+    let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+
+    for (let v of obj.vertices) {
+        minX = Math.min(minX, v.x);
+        minY = Math.min(minY, v.y);
+        minZ = Math.min(minZ, v.z);
+        maxX = Math.max(maxX, v.x);
+        maxY = Math.max(maxY, v.y);
+        maxZ = Math.max(maxZ, v.z);
+    }
+
+    return {
+        min: { x: minX, y: minY, z: minZ },
+        size: { x: maxX - minX, y: maxY - minY, z: maxZ - minZ }
+    };
+}
+
+
+function getStretchScale(model, targetSize) {
+    const b = getModelBounds(model);
+
+    return createVector(
+        targetSize.x / (b.size.x || 1),
+        targetSize.y / (b.size.y || 1),
+        targetSize.z / (b.size.z || 1)
+    );
+}
 
 
 export class World {
-    constructor()
-    {
+    constructor() {
         this.cubes = [];
         this.creatures = [];
-        this.structures = [];
         this.models = { player: {} };
         this.modelBounds = { player: {} };
         this.lastAnimTime = 0;
@@ -15,24 +42,23 @@ export class World {
         this.FRAME_INTERVAL = 120;
         this.GRAVITY = 0.6;
         this.GROUND_Y = -40;
-        this.COLLISION_MARGIN = 2;
-        this.STEP_HEIGHT = 20;
+        this.STEP_HEIGHT = 5;
+        this.PUSH_FORCE = 1.5;
     }
 
-    new_cube(pos, size) {
-        this.cubes.push({ pos, size });
-    };
-
-    new_structure(opts) {
-        const structure = {
-            position: opts.position.copy(),
-            model: opts.model,
-            scale: opts.scale || 1,
-            rotation: opts.rotation || 0
-        };
-        this.structures.push(structure);
-        return structure;
-    };
+    new_cube(pos, size, weight = -1, texture = null, model = null, wireframe = false, modelScale = 1, rotation = 0) {
+        this.cubes.push({
+            pos,
+            size,
+            weight,
+            texture,
+            model,
+            wireframe,
+            modelScale,
+            rotation,
+            vel: createVector(0, 0, 0)
+        });
+    }
 
     new_creature(opts) {
         const ent = {
@@ -52,18 +78,16 @@ export class World {
             respawnDelay: opts.respawnDelay || 1200,
             startDelay: opts.startDelay || 0,
             modelScale: opts.modelScale || 1,
-            onGround: true,
-            _lastAnimTime: millis()
+            onGround: false,
+            _lastAnimTime: millis(),
+            strength: opts.strength || 10
         };
         this.creatures.push(ent);
         return ent;
     };
 
     render() {
-        background(255,200,150);
-        // as opções do orbitControl são: sensitivityX, sensitivityY, zoomSensitivity
-        // é pra a gente nao ver debaixo do chão
-
+        background(255, 200, 150);
         orbitControl(1, 0, 1);
 
         ambientLight(150);
@@ -77,41 +101,65 @@ export class World {
         plane(2000, 2000);
         pop();
 
+        // atualiza física dos cubos móveis
+        this.updateCubes();
+
         // cubos
         for (let c of this.cubes) {
             push();
             translate(c.pos.x, c.pos.y, c.pos.z);
-            fill(150, 100, 50);
-            noStroke();
-            box(c.size.x, c.size.y, c.size.z);
-            pop();
-        }
-
-        // estruturas (torres, etc)
-        for (let s of this.structures) {
-            push();
-            translate(s.position.x, s.position.y, s.position.z);
-            rotateY(s.rotation);
-            scale(s.scale);
-            scale(1, -1, 1);
-            translate(0, 100, 0);
-            noStroke();
-            if (s.model) {
-                model(s.model);
+            
+            if (c.weight > 0) {
+                fill(120, 80, 40);
+            } else {
+                fill(150, 100, 50);
             }
+
+            if (c.texture) {
+                texture(c.texture);
+            }
+
+            if (c.wireframe) {
+                stroke(0);
+            } else {
+                noStroke();
+            }
+
+            if (c.model) {
+                if (c.rotation) {
+                    rotateX(c.rotation);
+                }
+                
+                const b = getModelBounds(c.model);
+                const s = getStretchScale(c.model, c.size);
+
+                scale(s.x, s.y, s.z);
+                scale(1, -1, 1);
+
+                const cx = b.min.x + b.size.x / 2;
+                const cy = b.min.y + b.size.y / 2;
+                const cz = b.min.z + b.size.z / 2;
+
+                translate(-cx, -cy, -cz);
+                model(c.model);
+                pop();
+                continue;
+            }
+
+            box(c.size.x, c.size.y, c.size.z);
             pop();
         }
 
         // update + render creatures
         for (let ent of this.creatures) {
             this.updateCreature(ent);
+            
             const model = this.safeModelAt(ent.state, ent.frame);
             this.drawModel(ent.position, model, ent.rotation, ent.modelScale);
         }
 
-        // considerando player como 0, mas precisa ser corrigido futuramente
+        // indicador do player
         push();
-        // vamos fazer um cone invertido encima do player para indicar a posição
         const player = this.creatures[0];
         translate(player.position.x, player.position.y - player.size.y - 90, player.position.z);
         fill(255, 255, 50, 150);
@@ -121,9 +169,113 @@ export class World {
         pop();
     };
 
-    // ---------------------------
-    // Internals
-    // ---------------------------
+    updateCubes() {
+        const dt = deltaTime / 16.666;
+
+        for (let c of this.cubes) {
+            if (c.weight <= 0) continue;
+
+            // gravidade
+            c.vel.y += this.GRAVITY * dt;
+            c.pos.y += c.vel.y * dt;
+
+            // movimento horizontal
+            c.pos.x += c.vel.x * dt;
+            c.pos.z += c.vel.z * dt;
+
+            // fricção forte
+            c.vel.x *= 0.7;
+            c.vel.z *= 0.7;
+            
+            // para movimento muito pequeno
+            if (Math.abs(c.vel.x) < 0.1) c.vel.x = 0;
+            if (Math.abs(c.vel.z) < 0.1) c.vel.z = 0;
+
+            // chão
+            const halfY = c.size.y / 2;
+            if (c.pos.y >= this.GROUND_Y - halfY) {
+                c.pos.y = this.GROUND_Y - halfY;
+                c.vel.y = 0;
+            }
+
+            // colisão vertical (ficar em cima)
+            for (let other of this.cubes) {
+                if (other === c) continue;
+                
+                if (this.boxesOverlapXZ(c.pos, c.size, other.pos, other.size)) {
+                    const cubeTop = other.pos.y - other.size.y / 2;
+                    const cubeBottom = c.pos.y + c.size.y / 2;
+                    
+                    if (c.vel.y >= 0 && cubeBottom >= cubeTop - 2 && cubeBottom <= cubeTop + 5) {
+                        c.pos.y = cubeTop - c.size.y / 2;
+                        c.vel.y = 0;
+                    }
+                }
+            }
+        }
+        
+        // Segunda passada: resolve colisões horizontais
+        for (let c of this.cubes) {
+            if (c.weight <= 0) continue;
+            
+            for (let other of this.cubes) {
+                if (other === c) continue;
+                
+                if (this.boxesOverlap(c.pos, c.size, other.pos, other.size)) {
+                    // verifica se NÃO está em cima
+                    const cubeTop = other.pos.y - other.size.y / 2;
+                    const cubeBottom = c.pos.y + c.size.y / 2;
+                    const isOnTop = Math.abs(cubeBottom - cubeTop) < 4;
+                    
+                    if (!isOnTop) {
+                        const dx = c.pos.x - other.pos.x;
+                        const dz = c.pos.z - other.pos.z;
+                        
+                        // só empurra se este cubo está se movendo
+                        const isMoving = Math.abs(c.vel.x) > 0.2 || Math.abs(c.vel.z) > 0.2;
+                        
+                        if (Math.abs(dx) > Math.abs(dz)) {
+                            const pushDir = dx > 0 ? 1 : -1;
+                            const overlap = (c.size.x / 2 + other.size.x / 2) - Math.abs(dx);
+                            
+                            if (other.weight > 0 && isMoving) {
+                                // empurra o outro se for mais leve ou igual
+                                if (c.weight >= other.weight) {
+                                    other.vel.x += pushDir * 0.15;
+                                    c.pos.x += pushDir * (overlap / 2);
+                                    other.pos.x -= pushDir * (overlap / 2);
+                                } else {
+                                    c.pos.x += pushDir * overlap;
+                                    c.vel.x = 0;
+                                }
+                            } else {
+                                c.pos.x += pushDir * overlap;
+                                c.vel.x = 0;
+                            }
+                        } else {
+                            const pushDir = dz > 0 ? 1 : -1;
+                            const overlap = (c.size.z / 2 + other.size.z / 2) - Math.abs(dz);
+                            
+                            if (other.weight > 0 && isMoving) {
+                                if (c.weight >= other.weight) {
+                                    other.vel.z += pushDir * 0.15;
+                                    c.pos.z += pushDir * (overlap / 2);
+                                    other.pos.z -= pushDir * (overlap / 2);
+                                } else {
+                                    c.pos.z += pushDir * overlap;
+                                    c.vel.z = 0;
+                                }
+                            } else {
+                                c.pos.z += pushDir * overlap;
+                                c.vel.z = 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     safeModelAt(state, frame) {
         const states = this.models.player;
         if (!states[state]) return null;
@@ -132,61 +284,90 @@ export class World {
     };
 
     updateCreature(ent) {
+        const dt = deltaTime / 16.666;
+
         // gravidade
-        ent.vel.y += this.GRAVITY * (deltaTime / 16.666);
-        ent.position.y += ent.vel.y * (deltaTime / 16.666);
+        ent.vel.y += this.GRAVITY * dt;
 
-        // usa movimento externo
-        let moveVec = (ent._inputMoveVec) ? ent._inputMoveVec.copy() : createVector(0, 0, 0);
+        // movimento do NPC
+        let moveVec = createVector(0, 0, 0);
 
-        // NPC movimentação
         if (ent.npc) {
-            if (ent.traveling) {
-                ent.state = 'run';
-                const mv = p5.Vector.mult(ent.dirVec, ent.speed * (deltaTime / 16.666));
-                ent.position.add(mv);
-                moveVec = ent.dirVec.copy();
+            if (ent.traveling && ent.targetPos) {
+                const toTarget = p5.Vector.sub(ent.targetPos, ent.position);
+                const dist = toTarget.mag();
 
-                if (ent.targetPos && p5.Vector.sub(ent.targetPos, ent.position).mag() < 6) {
+                if (dist < 6) {
                     ent.traveling = false;
                     ent.arrivedAt = millis();
                     ent.state = 'idle';
                     ent.frame = 0;
+                } else {
+                    ent.state = 'run';
+                    ent.dirVec = toTarget.normalize();
+                    moveVec = p5.Vector.mult(ent.dirVec, ent.speed);
                 }
             } else {
                 ent.state = 'idle';
                 ent.frame = 0;
 
                 if (ent.arrivedAt && millis() - ent.arrivedAt > ent.respawnDelay) {
-                    const base = (ent.spawnPos) ? ent.spawnPos.copy() : ent.position.copy();
-                    const newTarget = createVector(base.x + random(-200, 200), base.y, base.z + random(-200, 200));
+                    const base = ent.spawnPos || ent.position;
+                    const newTarget = createVector(
+                        base.x + random(-200, 200), 
+                        base.y, 
+                        base.z + random(-200, 200)
+                    );
                     ent.targetPos = newTarget;
-                    ent.dirVec = p5.Vector.sub(ent.targetPos, ent.position).normalize();
                     ent.traveling = true;
                     ent.arrivedAt = 0;
-                    ent.state = 'run';
                 }
             }
         } else {
-            // jogador: aplica movimento com colisão
-            if (moveVec && moveVec.mag() > 0.001) {
-                ent.state = 'run';
-                const scaled = p5.Vector.mult(moveVec, (deltaTime / 16.666));
-                this.resolveMovementCollision(ent, scaled);
-            } else {
-                ent.state = 'idle';
+            // player
+            moveVec = (ent._inputMoveVec) ? ent._inputMoveVec.copy() : createVector(0, 0, 0);
+            ent.state = (moveVec.mag() > 0.001) ? 'run' : 'idle';
+        }
+
+        // aplica movimento com colisão
+        if (moveVec.mag() > 0.001) {
+            const scaled = p5.Vector.mult(moveVec, dt);
+            this.applyMovement(ent, scaled);
+        }
+
+        // aplica gravidade
+        ent.position.y += ent.vel.y * dt;
+
+        // colisão com chão
+        const halfY = ent.size.y / 2;
+        if (ent.position.y >= this.GROUND_Y) {
+            ent.position.y = this.GROUND_Y;
+            ent.vel.y = 0;
+            ent.onGround = true;
+        } else {
+            ent.onGround = false;
+        }
+
+        // colisão com cubos (vertical)
+        for (let c of this.cubes) {
+            const overlapXZ = this.boxesOverlapXZ(ent.position, ent.size, c.pos, c.size);
+            
+            if (overlapXZ && ent.vel.y >= 0) {
+                const cubeTop = c.pos.y - c.size.y / 2;
+                const entBottom = ent.position.y + halfY;
+                
+                if (entBottom >= cubeTop - 2 && entBottom <= cubeTop + 5) {
+                    ent.position.y = cubeTop - halfY;
+                    ent.vel.y = 0;
+                    ent.onGround = true;
+                }
             }
         }
 
-        // resolve colisões verticais (gravidade + chão)
-        this.resolveVerticalCollision(ent);
-
         // atualiza rotação
-        if ((ent.npc && moveVec.mag() > 0.001) || (ent._inputMoveVec && ent._inputMoveVec.mag() > 0.001)) {
-            const faceVec = (ent.npc) ? moveVec.copy() : ent._inputMoveVec.copy();
-            if (faceVec.mag() > 0.001) {
-                ent.rotation = atan2(faceVec.x, faceVec.z);
-            }
+        const faceVec = (ent.npc) ? moveVec : (ent._inputMoveVec || moveVec);
+        if (faceVec.mag() > 0.001) {
+            ent.rotation = atan2(faceVec.x, faceVec.z);
         }
 
         // animação
@@ -203,48 +384,126 @@ export class World {
         if (ent._inputMoveVec) delete ent._inputMoveVec;
     };
 
-    resolveMovementCollision(ent, movement) {
-        // Tenta mover nos 3 eixos separadamente para deslizamento
-
-        // X
-        const nextX = p5.Vector.add(ent.position, createVector(movement.x, 0, 0));
-        if (!this.collides3D(nextX, ent.size)) {
-            ent.position = nextX;
+    applyMovement(ent, movement) {
+        // tenta mover em X
+        ent.position.x += movement.x;
+        
+        // verifica colisões
+        let blocked = false;
+        
+        for (let c of this.cubes) {
+            if (this.boxesOverlap(ent.position, ent.size, c.pos, c.size)) {
+                // verifica se está andando em cima do cubo
+                const cubeTop = c.pos.y - c.size.y / 2;
+                const entBottom = ent.position.y + ent.size.y / 2;
+                const isOnTop = Math.abs(entBottom - cubeTop) < 3;
+                
+                if (isOnTop) {
+                    // está em cima, não faz nada, deixa andar
+                    continue;
+                }
+                
+                // verifica se pode subir (step up)
+                const stepHeight = cubeTop - entBottom;
+                
+                if (stepHeight > 0 && stepHeight <= this.STEP_HEIGHT && ent.onGround) {
+                    // sobe o degrau
+                    ent.position.y = cubeTop - ent.size.y / 2 - 0.5;
+                } else {
+                    // bloqueia movimento
+                    ent.position.x -= movement.x;
+                    blocked = true;
+                    
+                    // tenta empurrar cubo (só se não estiver em cima)
+                    if (c.weight > 0 && ent.strength >= c.weight && !isOnTop) {
+                        c.vel.x += (movement.x > 0 ? 1 : -1) * this.PUSH_FORCE;
+                    }
+                }
+                break;
+            }
         }
 
-        // Z
-        const nextZ = p5.Vector.add(ent.position, createVector(0, 0, movement.z));
-        if (!this.collides3D(nextZ, ent.size)) {
-            ent.position = nextZ;
+        // verifica colisão com outras criaturas
+        if (!blocked) {
+            for (let other of this.creatures) {
+                if (other === ent) continue;
+                
+                if (this.boxesOverlap(ent.position, ent.size, other.position, other.size)) {
+                    ent.position.x -= movement.x;
+                    break;
+                }
+            }
+        }
+
+        // tenta mover em Z
+        ent.position.z += movement.z;
+        blocked = false;
+        
+        for (let c of this.cubes) {
+            if (this.boxesOverlap(ent.position, ent.size, c.pos, c.size)) {
+                // verifica se está andando em cima do cubo
+                const cubeTop = c.pos.y - c.size.y / 2;
+                const entBottom = ent.position.y + ent.size.y / 2;
+                const isOnTop = Math.abs(entBottom - cubeTop) < 3;
+                
+                if (isOnTop) {
+                    // está em cima, não faz nada, deixa andar
+                    continue;
+                }
+                
+                // verifica se pode subir (step up)
+                const stepHeight = cubeTop - entBottom;
+                
+                if (stepHeight > 0 && stepHeight <= this.STEP_HEIGHT && ent.onGround) {
+                    ent.position.y = cubeTop - ent.size.y / 2 - 0.5;
+                } else {
+                    ent.position.z -= movement.z;
+                    blocked = true;
+                    
+                    // tenta empurrar cubo (só se não estiver em cima)
+                    if (c.weight > 0 && ent.strength >= c.weight && !isOnTop) {
+                        c.vel.z += (movement.z > 0 ? 1 : -1) * this.PUSH_FORCE;
+                    }
+                }
+                break;
+            }
+        }
+
+        if (!blocked) {
+            for (let other of this.creatures) {
+                if (other === ent) continue;
+                
+                if (this.boxesOverlap(ent.position, ent.size, other.position, other.size)) {
+                    ent.position.z -= movement.z;
+                    break;
+                }
+            }
         }
     };
 
-    getAABB(pos, size) {
-        const half = { x: size.x / 2, y: size.y / 2, z: size.z / 2 };
-        return {
-            minX: pos.x - half.x,
-            maxX: pos.x + half.x,
-            minY: pos.y - half.y,
-            maxY: pos.y + half.y,
-            minZ: pos.z - half.z,
-            maxZ: pos.z + half.z
-        };
-    };
+    boxesOverlap(pos1, size1, pos2, size2) {
+        return !(
+            pos1.x - size1.x/2 > pos2.x + size2.x/2 ||
+            pos1.x + size1.x/2 < pos2.x - size2.x/2 ||
+            pos1.y - size1.y/2 > pos2.y + size2.y/2 ||
+            pos1.y + size1.y/2 < pos2.y - size2.y/2 ||
+            pos1.z - size1.z/2 > pos2.z + size2.z/2 ||
+            pos1.z + size1.z/2 < pos2.z - size2.z/2
+        );
+    }
 
-    checkAABBCollision(aabb1, aabb2) {
-        return !(aabb1.maxX < aabb2.minX + this.COLLISION_MARGIN ||
-            aabb1.minX > aabb2.maxX - this.COLLISION_MARGIN ||
-            aabb1.maxY < aabb2.minY + this.COLLISION_MARGIN ||
-            aabb1.minY > aabb2.maxY - this.COLLISION_MARGIN ||
-            aabb1.maxZ < aabb2.minZ + this.COLLISION_MARGIN ||
-            aabb1.minZ > aabb2.maxZ - this.COLLISION_MARGIN);
-    };
+    boxesOverlapXZ(pos1, size1, pos2, size2) {
+        return !(
+            pos1.x - size1.x/2 > pos2.x + size2.x/2 ||
+            pos1.x + size1.x/2 < pos2.x - size2.x/2 ||
+            pos1.z - size1.z/2 > pos2.z + size2.z/2 ||
+            pos1.z + size1.z/2 < pos2.z - size2.z/2
+        );
+    }
 
     collides3D(pos, size) {
-        const aabb = this.getAABB(pos, size);
         for (let c of this.cubes) {
-            const cubeAABB = this.getAABB(c.pos, c.size);
-            if (this.checkAABBCollision(aabb, cubeAABB)) {
+            if (this.boxesOverlap(pos, size, c.pos, c.size)) {
                 return true;
             }
         }
@@ -317,34 +576,17 @@ export class World {
         const speed = 3;
         let mv = createVector(0, 0, 0);
 
-        if (keyIsDown(87) || keyIsDown(UP_ARROW)) 
-        {
+        if (keyIsDown(87) || keyIsDown(UP_ARROW)) {
             mv.add(p5.Vector.mult(forward, speed));
-            camera(cam.eyeX + forward.x * speed, cam.eyeY, cam.eyeZ + forward.z * speed,
-                   cam.centerX + forward.x * speed, cam.centerY, cam.centerZ + forward.z * speed,
-                   0, 1, 0);
         }
-        if (keyIsDown(83) || keyIsDown(DOWN_ARROW)) 
-        {
-            
+        if (keyIsDown(83) || keyIsDown(DOWN_ARROW)) {
             mv.sub(p5.Vector.mult(forward, speed));
-            camera(cam.eyeX - forward.x * speed, cam.eyeY, cam.eyeZ - forward.z * speed,
-                   cam.centerX - forward.x * speed, cam.centerY, cam.centerZ - forward.z * speed,
-                   0, 1, 0);
         }
-        if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) 
-        {
+        if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) {
             mv.sub(p5.Vector.mult(right, speed));
-            camera(cam.eyeX - right.x * speed, cam.eyeY, cam.eyeZ - right.z * speed,
-                   cam.centerX - right.x * speed, cam.centerY, cam.centerZ - right.z * speed,
-                   0, 1, 0);
         }
-        if (keyIsDown(65) || keyIsDown(LEFT_ARROW))
-        {
+        if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) {
             mv.add(p5.Vector.mult(right, speed));
-            camera(cam.eyeX + right.x * speed, cam.eyeY, cam.eyeZ + right.z * speed,
-                   cam.centerX + right.x * speed, cam.centerY, cam.centerZ + right.z * speed,
-                   0, 1, 0);
         }
 
         return mv;
@@ -356,40 +598,4 @@ export class World {
             ent.onGround = false;
         }
     };
-
-    resolveVerticalCollision(ent) {
-        let bestSurface = null;
-        for (let c of this.cubes) {
-            const halfC = { x: c.size.x / 2, y: c.size.y / 2, z: c.size.z / 2 };
-            const halfE = { x: ent.size.x / 2, z: ent.size.z / 2 };
-
-            if (ent.position.x + halfE.x > c.pos.x - halfC.x &&
-                ent.position.x - halfE.x < c.pos.x + halfC.x &&
-                ent.position.z + halfE.z > c.pos.z - halfC.z &&
-                ent.position.z - halfE.z < c.pos.z + halfC.z) {
-
-                const surfaceY = c.pos.y - halfC.y - ent.size.y / 2;
-                if (surfaceY <= ent.position.y) {
-                    if (bestSurface === null || surfaceY > bestSurface) {
-                        bestSurface = surfaceY;
-                    }
-                }
-            }
-        }
-
-        if (bestSurface !== null) {
-            ent.position.y = bestSurface;
-            ent.vel.y = 0;
-            ent.onGround = true;
-            return;
-        }
-
-        if (ent.position.y >= this.GROUND_Y) {
-            ent.position.y = this.GROUND_Y;
-            ent.vel.y = 0;
-            ent.onGround = true;
-        } else {
-            ent.onGround = false;
-        }
-    }
 }
