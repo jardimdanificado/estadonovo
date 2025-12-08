@@ -17,6 +17,18 @@ function preload() {
         world.models.player.use[f] = safeLoadModel(`data/player/use/${f}.obj`);
     }
 
+    // Carregar modelo da cadeira usando p5.js
+    world.models.chair = safeLoadModel('data/structure/cadeira.obj');
+    
+    // Carregar modelo do toilet
+    world.models.toilet = safeLoadModel('data/structure/10778_Toilet_V2.obj');
+    
+    // Carregar modelo da caixa
+    world.models.caixa = safeLoadModel('data/structure/caixa.obj');
+    
+    // Carregar modelo da bottle
+    world.models.bottle = safeLoadModel('data/structure/Bottle 2.obj');
+    
     // Carregar modelo da torre
     //world.models.tower = safeLoadModel(`data/structure/wooden watch tower2.obj`);
 }
@@ -43,7 +55,7 @@ function setup() {
            0, 0, 0,     // centro/target da câmera (center) -> centerX = 100 aqui
            0, 1, 0);      // vetor "up"
 
-    world.new_cube(createVector(-320, -40, 160), createVector(100, 120, 100), 2);
+    world.new_cube(createVector(200, 0, 200), createVector(100, 120, 100), 2);
     world.new_cube(createVector(-320, -400, 160), createVector(100, 120, 100), 2);
     world.new_cube(createVector(0, -40, 480), createVector(60, 60, 60));
     const cubes = []; // registra todos os AABBs criados
@@ -76,7 +88,7 @@ function setup() {
     spawnCube(createVector(-320, -400, 160), createVector(100, 120, 100), 2);
     spawnCube(createVector(0, -40, 480), createVector(60, 60, 60), 1);
 
-    // spam controlado de cubos (centenas, zero interpenetração)
+    /* spam controlado de cubos (centenas, zero interpenetração)
     for (let i = 0; i < 1000; i++) {
         let tries = 0;
         while (tries < 50) {
@@ -94,10 +106,23 @@ function setup() {
 
             if (spawnCube(pos, size, 1)) break; // aprovado
             tries++;
-        }
+       }
     }
+     */
 
-    world.new_cube(createVector(400, -400, 0), createVector(120, 400, 120), 2, loadImage('data/test.png'), loadModel('data/structure/wooden watch tower2.obj'), false, 50);
+     world.new_cube(createVector(400, -400, 0), createVector(120, 400, 120), 2, loadImage('data/test.png'), loadModel('data/structure/wooden watch tower2.obj'), false, 50);
+
+    // Adicionar cadeira na cena - tamanho 60x180x60 para manter proporções 2:6:2 do modelo original
+    world.new_cube(createVector(200, -90, 200), createVector(60, 180, 60), 2, loadImage('data/structure/cadeira_0.png'), world.models.chair, false, 3);
+
+    // Adicionar toilet na cena com proporções corretas 1:1.72:2.31 (X:Y:Z)
+    world.new_cube(createVector(350, -86, 200), createVector(50, 86, 115), 2, loadImage('data/structure/Toilet.jpg'), world.models.toilet, false, 3, HALF_PI);
+
+    // Adicionar caixa na cena (cubo perfeito 1:1:1) - escala 4.5x
+    world.new_cube(createVector(100, -45, 200), createVector(90, 90, 90), 2, loadImage('data/structure/caixa_0.png'), world.models.caixa, false, 4.5);
+
+    // Adicionar bottle 2 na cena com proporções 1:0.67:0.87 (X:Y:Z)
+    world.new_cube(createVector(250, -20, 100), createVector(60, 40, 52), 2, loadImage('data/structure/2.jpg'), world.models.bottle, false, 0.1);
 
     world.new_creature({
         position: createVector(0, -40, 0),

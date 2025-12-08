@@ -46,7 +46,7 @@ export class World {
         this.PUSH_FORCE = 1.5;
     }
 
-    new_cube(pos, size, weight = -1, texture = null, model = null, wireframe = false) {
+    new_cube(pos, size, weight = -1, texture = null, model = null, wireframe = false, modelScale = 1, rotation = 0) {
         this.cubes.push({
             pos,
             size,
@@ -54,6 +54,8 @@ export class World {
             texture,
             model,
             wireframe,
+            modelScale,
+            rotation,
             vel: createVector(0, 0, 0)
         });
     }
@@ -124,6 +126,10 @@ export class World {
             }
 
             if (c.model) {
+                if (c.rotation) {
+                    rotateX(c.rotation);
+                }
+                
                 const b = getModelBounds(c.model);
                 const s = getStretchScale(c.model, c.size);
 
@@ -147,6 +153,7 @@ export class World {
         // update + render creatures
         for (let ent of this.creatures) {
             this.updateCreature(ent);
+            
             const model = this.safeModelAt(ent.state, ent.frame);
             this.drawModel(ent.position, model, ent.rotation, ent.modelScale);
         }
