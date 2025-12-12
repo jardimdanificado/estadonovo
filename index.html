@@ -1,37 +1,638 @@
-sd<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>estado novo</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.3/p5.js"></script>
-    <style>
-        body {
-            margin: 0;
-            background: #222;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            font-family: Arial;
-            color: #fff;
-        }
-
-        #info {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px;
-            font-size: 12px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulação de Mundo 3D</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #1a1a1a;
+      font-family: 'Courier New', monospace;
+      color: #00ff00;
+    }
+    #container {
+      display: flex;
+      height: 100vh;
+    }
+    #canvas-container {
+      flex: 1;
+      position: relative;
+    }
+    #ui-panel {
+      width: 300px;
+      background: #0a0a0a;
+      border-left: 2px solid #00ff00;
+      padding: 20px;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+    #minimap {
+      width: 260px;
+      height: 260px;
+      background: #1a1a1a;
+      border: 2px solid #00ff00;
+      margin: 10px 0;
+      cursor: crosshair;
+      position: relative;
+    }
+    #minimap canvas {
+      display: block;
+    }
+    h2 {
+      margin-top: 0;
+      color: #00ff00;
+      border-bottom: 1px solid #00ff00;
+      padding-bottom: 10px;
+    }
+    .stat {
+      margin: 8px 0;
+      font-size: 14px;
+    }
+    .stat-label {
+      color: #00aa00;
+    }
+    .bar-container {
+      background: #222;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .bar {
+      height: 100%;
+      transition: width 0.3s;
+      border-radius: 4px;
+    }
+    .bar.hunger { background: #ff6b35; }
+    .bar.thirst { background: #4ecdc4; }
+    .bar.energy { background: #ffe66d; }
+    .bar.pee { background: #95e1d3; }
+    .bar.poo { background: #8b5a3c; }
+    .creature-list {
+      margin-top: 15px;
+      font-size: 12px;
+    }
+    .creature-item {
+      padding: 5px;
+      margin: 3px 0;
+      background: #1a1a1a;
+      border-left: 3px solid #00ff00;
+      cursor: pointer;
+    }
+    .creature-item:hover {
+      background: #2a2a2a;
+    }
+    .creature-item.dead {
+      border-left-color: #ff0000;
+      opacity: 0.5;
+    }
+    .log {
+      margin-top: 15px;
+      font-size: 11px;
+      max-height: 200px;
+      overflow-y: auto;
+      background: #0a0a0a;
+      padding: 10px;
+      border: 1px solid #00aa00;
+    }
+    .log-entry {
+      margin: 2px 0;
+      color: #888;
+    }
+    .log-entry.important {
+      color: #ff6b35;
+    }
+    .controls {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      border: 1px solid #00ff00;
+      font-size: 12px;
+      color: #00ff00;
+    }
+    .creature-label {
+      position: absolute;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+      pointer-events: none;
+      white-space: nowrap;
+      transform: translate(-50%, -100%);
+    }
+  </style>
 </head>
-
 <body>
-    <div id="info">WASD/Setas: Mover | Espaço: Pular<br />Mouse: Câmera</div>
-    <script type="module" src="main.js"></script>
-</body>
+  <div id="container">
+    <div id="canvas-container">
+      <div class="controls">
+        🎮 Clique no MAPA (UI) para mover | Arraste: Girar câmera 3D | 🎯 Visualização 3D
+      </div>
+      <div id="creature-labels"></div>
+    </div>
+    <div id="ui-panel">
+      <h2>MAPA (Clique para mover)</h2>
+      <div id="minimap"></div>
+      
+      <h2>PLAYER (Criatura 0)</h2>
+      <div id="player-stats"></div>
+      
+      <h2>OUTRAS CRIATURAS</h2>
+      <div class="creature-list" id="creatures-list"></div>
+      
+      <h2>LOG DE EVENTOS</h2>
+      <div class="log" id="event-log"></div>
+    </div>
+  </div>
 
+  <script type="module">
+    import { World } from "./world.js"
+    
+    // Inicializar mundo
+    const world = new World();
+    world.spawn('room', 'Floresta', 100, 100);
+    world.spawn('room', 'Caverna', 50, 50);
+    world.spawn('room', 'Lago', 80, 80);
+    world.spawn('creature');
+    world.spawn('creature');
+    world.spawn('creature');
+    for (let i = 0; i < 8; i++) world.spawn('item', null, 'food');
+
+    // P5.js sketch em 3D
+    let cellSize = 10;
+    let cameraAngle = 0;
+    let cameraDistance = 200;
+    let cameraHeight = 200;
+    let lastTickTime = 0;
+    const tickRate = 100;
+    let font;
+    let isDraggingCamera = false;
+    let minimapSketch;
+    
+    // Cache de modelos carregados globalmente
+    let modelsCache = {
+      idle: [],
+      run: [],
+      use: []
+    };
+
+    new p5((p) => {
+      p.preload = () => {
+        font = p.loadFont('https://cdnjs.cloudflare.com/ajax/libs/topcoat/0.8.0/font/SourceCodePro-Regular.otf');
+        
+        // Carregar modelos .obj no cache global
+        try {
+          // Idle - 1 frame
+          modelsCache.idle[0] = p.loadModel('data/player/idle/0.obj', 
+            () => console.log('Idle model loaded'),
+            (err) => console.error('Error loading idle model:', err)
+          );
+          
+          // Walk - 5 frames
+          for (let i = 0; i < 5; i++) {
+            modelsCache.run[i] = p.loadModel(`data/player/run/${i}.obj`, 
+              () => console.log(`Walk frame ${i} loaded`),
+              (err) => console.error(`Error loading run frame ${i}:`, err)
+            );
+          }
+          
+          // Use - 3 frames
+          for (let i = 0; i < 3; i++) {
+            modelsCache.use[i] = p.loadModel(`data/player/use/${i}.obj`, 
+              () => console.log(`Use frame ${i} loaded`),
+              (err) => console.error(`Error loading use frame ${i}:`, err)
+            );
+          }
+        } catch (e) {
+          console.error('Error in preload:', e);
+        }
+      };
+      
+      p.setup = () => {
+        const canvas = p.createCanvas(p.windowWidth - 300, p.windowHeight, p.WEBGL);
+        canvas.parent('canvas-container');
+        p.frameRate(60);
+        p.textFont(font);
+        
+        // Atribuir modelos carregados às criaturas
+        for (let creature of world.creatures) {
+          if (creature._render) {
+            creature._render.animations.idle.models = modelsCache.idle;
+            creature._render.animations.run.models = modelsCache.run;
+            creature._render.animations.use.models = modelsCache.use;
+          }
+        }
+      };
+      
+      p.mousePressed = () => {
+        if (p.mouseX >= 0 && p.mouseX <= p.width && p.mouseY >= 0 && p.mouseY <= p.height) {
+          isDraggingCamera = true;
+        }
+      };
+      
+      p.mouseReleased = () => {
+        isDraggingCamera = false;
+      };
+
+      p.draw = () => {
+        const currentTime = p.millis();
+        if (currentTime - lastTickTime >= tickRate) {
+          world.pass();
+          lastTickTime = currentTime;
+          
+          // Atualizar frames de animação de todas as criaturas no tickrate
+          for (let creature of world.creatures) {
+            if (creature._render && creature.alive) {
+              updateCreatureAnimation(creature);
+            }
+          }
+        }
+        
+        const player = world.creatures[0];
+        if (!player || player.room === -1) return;
+        
+        const room = world.rooms[player.room];
+        
+        if (isDraggingCamera && p.mouseIsPressed) {
+          cameraAngle += (p.mouseX - p.pmouseX) * 0.01;
+        }
+        
+        const playerX = player.position.x * cellSize - (room.size.x * cellSize) / 2;
+        const playerZ = player.position.y * cellSize - (room.size.y * cellSize) / 2;
+        
+        const camX = playerX + Math.cos(cameraAngle) * cameraDistance;
+        const camY = -cameraHeight;
+        const camZ = playerZ + Math.sin(cameraAngle) * cameraDistance;
+        
+        p.background(10, 15, 20);
+        p.camera(camX, camY, camZ, playerX, 0, playerZ, 0, 1, 0);
+        
+        p.ambientLight(60, 60, 80);
+        p.directionalLight(200, 200, 255, 0.5, 1, -0.5);
+        p.pointLight(255, 255, 200, playerX, -50, playerZ);
+        
+        // Chão
+        p.push();
+        p.translate(0, 0, 0);
+        p.fill(255, 255, 255);
+        p.stroke(50, 60, 70);
+        p.strokeWeight(1);
+        p.box(room.size.x * cellSize, 10, room.size.y * cellSize);
+        p.pop();
+        
+        const halfX = (room.size.x * cellSize) / 2;
+        const halfZ = (room.size.y * cellSize) / 2;
+        
+        
+        // Itens
+        for (let i = 0; i < world.items.length; i++) {
+          const item = world.items[i];
+          if (item && item.owner === -1) {
+            const itemX = item.worldPos.x * cellSize - halfX;
+            const itemZ = item.worldPos.y * cellSize - halfZ;
+            
+            p.push();
+            p.translate(itemX, -10, itemZ);
+            p.noStroke();
+            p.fill(255, 200, 0);
+            p.sphere(5);
+            
+            const pulse = p.sin(p.frameCount * 0.1 + i) * 2 + 3;
+            p.fill(255, 200, 0, 100);
+            p.sphere(pulse);
+            p.pop();
+          }
+        }
+        
+        // Criaturas
+        for (let i = 0; i < world.creatures.length; i++) {
+          const creature = world.creatures[i];
+          if (creature.alive && creature.room === player.room && creature._render && creature._render.visible) {
+            const x = creature.position.x * cellSize - halfX;
+            const z = creature.position.y * cellSize - halfZ;
+            
+            p.push();
+            p.translate(x, -15, z);
+            
+            // Renderizar modelo da criatura
+            renderCreature(p, creature, halfX, halfZ, x, z);
+            
+            // Caminho
+            if (creature.path && creature.path.length > 0) {
+              p.push();
+              p.stroke(255, 255, 0, 150);
+              p.strokeWeight(2);
+              p.noFill();
+              
+              p.beginShape();
+              p.vertex(0, -15, 0);
+              for (const point of creature.path) {
+                const pathX = point.x * cellSize - halfX;
+                const pathZ = point.y * cellSize - halfZ;
+                p.vertex(pathX - x, -15, pathZ - z);
+              }
+              p.endShape();
+              p.pop();
+              
+            }
+            
+            p.pop();
+          }
+        }
+        
+        updateUI();
+      };
+
+      p.windowResized = () => {
+        p.resizeCanvas(p.windowWidth - 300, p.windowHeight);
+      };
+    });
+    
+    // Função para atualizar animação da criatura
+    function updateCreatureAnimation(creature) {
+      const render = creature._render;
+      const previousAnimation = render.currentAnimation;
+      
+      // Determinar animação baseada no estado
+      if (creature.path && creature.path.length > 0) {
+        render.currentAnimation = 'run';
+      } else if (creature.eventQueue.length > 0) {
+        const evt = creature.eventQueue[0];
+        if (evt && evt.name === 'eat') {
+          render.currentAnimation = 'use';
+        } else {
+          render.currentAnimation = 'idle';
+        }
+      } else {
+        render.currentAnimation = 'idle';
+      }
+      
+      // Resetar frame ao trocar animação
+      if (previousAnimation !== render.currentAnimation) {
+        render.animations[render.currentAnimation].currentFrame = 0;
+      }
+      
+      // Avançar frame
+      const anim = render.animations[render.currentAnimation];
+      anim.currentFrame = (anim.currentFrame + 1) % anim.frames;
+    }
+    
+    // Função para renderizar criatura
+    function renderCreature(p, creature, halfX, halfZ, x, z) {
+      const render = creature._render;
+      const anim = render.animations[render.currentAnimation];
+      const frame = anim.currentFrame;
+      
+      p.noStroke();
+      
+      // Parse da cor (hex para RGB)
+      const color = p.color(render.color);
+      p.fill(color);
+      
+      // Tentar usar modelo .obj
+      if (anim.models[frame]) {
+        p.push();
+        p.scale(render.size * 4); // Escala baseada no tamanho da criatura
+        p.rotateX(p.PI);
+        
+        // Rotacionar baseado na direção do movimento
+        if (creature.path && creature.path.length > 0) {
+          const nextPoint = creature.path[0];
+          const dirX = nextPoint.x - creature.position.x;
+          const dirZ = nextPoint.y - creature.position.y;
+          const angle = Math.atan2(dirZ, dirX);
+          p.rotateY(angle + p.HALF_PI);
+        }
+        
+        p.model(anim.models[frame]);
+        p.pop();
+      }
+    }
+    
+    // Função para converter coordenadas 3D para 2D na tela
+    function worldToScreen(p, worldPos, camX, camY, camZ, lookX, lookY, lookZ) {
+      // Criar matriz de câmera manualmente
+      const cam = p.createVector(camX, camY, camZ);
+      const look = p.createVector(lookX, lookY, lookZ);
+      const up = p.createVector(0, 1, 0);
+      
+      // Direção da câmera
+      const forward = p5.Vector.sub(look, cam).normalize();
+      const right = p5.Vector.cross(forward, up).normalize();
+      const newUp = p5.Vector.cross(right, forward).normalize();
+      
+      // Posição relativa à câmera
+      const relPos = p5.Vector.sub(worldPos, cam);
+      
+      // Projetar na base da câmera
+      const x = relPos.dot(right);
+      const y = relPos.dot(newUp);
+      const z = -relPos.dot(forward); // Negativo porque olhamos para -Z
+      
+      if (z <= 0) return null; // Atrás da câmera
+      
+      // Projeção perspectiva
+      const fov = p.PI / 3; // 60 graus
+      const aspect = p.width / p.height;
+      const f = 1 / Math.tan(fov / 2);
+      
+      const screenX = (x / z) * f / aspect * p.width / 2 + p.width / 2;
+      const screenY = -(y / z) * f * p.height / 2 + p.height / 2;
+      
+      return { x: screenX, y: screenY, z: z };
+    }
+    
+    // Minimapa
+    minimapSketch = new p5((m) => {
+      m.setup = () => {
+        const canvas = m.createCanvas(260, 260);
+        canvas.parent('minimap');
+        m.frameRate(60);
+      };
+      
+      m.mousePressed = () => {
+        const player = world.creatures[0];
+        if (!player || player.room === -1) return;
+        
+        const room = world.rooms[player.room];
+        const scale = Math.min(260 / room.size.x, 260 / room.size.y);
+        const offsetX = (260 - room.size.x * scale) / 2;
+        const offsetY = (260 - room.size.y * scale) / 2;
+        
+        const gridX = Math.floor((m.mouseX - offsetX) / scale);
+        const gridY = Math.floor((m.mouseY - offsetY) / scale);
+        
+        if (gridX >= 0 && gridX < room.size.x && gridY >= 0 && gridY < room.size.y) {
+          player.queueEvent('move-to', function() {
+            this.setTarget(gridX, gridY, world);
+            world.log(`${this.name[this.name.length - 1]} movendo para (${gridX}, ${gridY})`);
+          });
+        }
+      };
+      
+      m.draw = () => {
+        m.background(26, 26, 26);
+        
+        const player = world.creatures[0];
+        if (!player || player.room === -1) return;
+        
+        const room = world.rooms[player.room];
+        const scale = Math.min(260 / room.size.x, 260 / room.size.y);
+        const offsetX = (260 - room.size.x * scale) / 2;
+        const offsetY = (260 - room.size.y * scale) / 2;
+        
+        m.fill(30, 40, 50);
+        m.stroke(50, 60, 70);
+        m.strokeWeight(1);
+        m.rect(offsetX, offsetY, room.size.x * scale, room.size.y * scale);
+        
+        m.stroke(40, 50, 60);
+        m.strokeWeight(0.5);
+        for (let x = 0; x <= room.size.x; x += 5) {
+          const px = offsetX + x * scale;
+          m.line(px, offsetY, px, offsetY + room.size.y * scale);
+        }
+        for (let y = 0; y <= room.size.y; y += 5) {
+          const py = offsetY + y * scale;
+          m.line(offsetX, py, offsetX + room.size.x * scale, py);
+        }
+        
+        for (let i = 0; i < world.items.length; i++) {
+          const item = world.items[i];
+          if (item && item.owner === -1) {
+            const x = offsetX + item.worldPos.x * scale;
+            const y = offsetY + item.worldPos.y * scale;
+            m.noStroke();
+            m.fill(255, 200, 0);
+            m.circle(x, y, 4);
+          }
+        }
+        
+        for (let i = 0; i < world.creatures.length; i++) {
+          const creature = world.creatures[i];
+          if (creature.alive && creature.room === player.room && creature._render && creature._render.visible) {
+            const x = offsetX + creature.position.x * scale;
+            const y = offsetY + creature.position.y * scale;
+            
+            if (creature.path && creature.path.length > 0) {
+              m.stroke(255, 255, 0, 100);
+              m.strokeWeight(1);
+              m.noFill();
+              m.beginShape();
+              m.vertex(x, y);
+              for (const point of creature.path) {
+                const px = offsetX + point.x * scale;
+                const py = offsetY + point.y * scale;
+                m.vertex(px, py);
+              }
+              m.endShape();
+              
+              if (creature.targetPosition) {
+                const tx = offsetX + creature.targetPosition.x * scale;
+                const ty = offsetY + creature.targetPosition.y * scale;
+                m.noFill();
+                m.stroke(0, 255, 100);
+                m.strokeWeight(2);
+                m.circle(tx, ty, 8);
+              }
+            }
+            
+            m.noStroke();
+            m.fill(creature._render.color);
+            m.circle(x, y, creature._render.size);
+          }
+        }
+        
+        const gridX = Math.floor((m.mouseX - offsetX) / scale);
+        const gridY = Math.floor((m.mouseY - offsetY) / scale);
+        if (gridX >= 0 && gridX < room.size.x && gridY >= 0 && gridY < room.size.y) {
+          m.noFill();
+          m.stroke(0, 255, 100, 100);
+          m.strokeWeight(1);
+          const hx = offsetX + gridX * scale;
+          const hy = offsetY + gridY * scale;
+          m.rect(hx, hy, scale, scale);
+        }
+      };
+    });
+
+    function updateUI() {
+      const player = world.creatures[0];
+      if (!player) return;
+      
+      const render = player._render;
+      const anim = render ? render.animations[render.currentAnimation] : null;
+      
+      const statsHTML = `
+        <div class="stat">
+          <span class="stat-label">Nome:</span> ${player.name.join(' ')}
+        </div>
+        <div class="stat">
+          <span class="stat-label">Idade:</span> ${world.time - player.birth}
+        </div>
+        <div class="stat">
+          <span class="stat-label">Sala:</span> ${world.rooms[player.room]?.name}
+        </div>
+        ${render ? `
+        <div class="stat">
+          <span class="stat-label">Animação:</span> ${render.currentAnimation} (frame ${anim.currentFrame}/${anim.frames - 1})
+        </div>
+        <div class="stat">
+          <span class="stat-label">Modelos:</span> ${anim.models[anim.currentFrame] ? '✓ Carregado' : '✗ Fallback'}
+        </div>
+        ` : ''}
+        <div class="stat">
+          <span class="stat-label">Fome:</span>
+          <div class="bar-container"><div class="bar hunger" style="width: ${player.needs.hunger}%"></div></div>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Sede:</span>
+          <div class="bar-container"><div class="bar thirst" style="width: ${player.needs.thirst}%"></div></div>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Energia:</span>
+          <div class="bar-container"><div class="bar energy" style="width: ${player.needs.energy}%"></div></div>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Xixi:</span>
+          <div class="bar-container"><div class="bar pee" style="width: ${player.needs.pee}%"></div></div>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Cocô:</span>
+          <div class="bar-container"><div class="bar poo" style="width: ${player.needs.poo}%"></div></div>
+        </div>
+      `;
+      document.getElementById('player-stats').innerHTML = statsHTML;
+      
+      let creaturesHTML = '';
+      for (let i = 1; i < world.creatures.length; i++) {
+        const c = world.creatures[i];
+        const cRender = c._render;
+        creaturesHTML += `
+          <div class="creature-item ${c.alive ? '' : 'dead'}" style="border-left-color: ${cRender ? cRender.color : '#00ff00'}">
+            ${c.name[c.name.length - 1]} - ${c.alive ? 'Vivo' : 'Morto'} (${c.age || 0})
+            ${cRender ? `<br><small>Anim: ${cRender.currentAnimation}</small>` : ''}
+          </div>
+        `;
+      }
+      document.getElementById('creatures-list').innerHTML = creaturesHTML;
+      
+      let logHTML = '';
+      for (let i = world.eventLog.length - 1; i >= 0; i--) {
+        const entry = world.eventLog[i];
+        logHTML += `<div class="log-entry ${entry.important ? 'important' : ''}">[${entry.time}] ${entry.message}</div>`;
+      }
+      document.getElementById('event-log').innerHTML = logHTML;
+    }
+  </script>
+</body>
 </html>
