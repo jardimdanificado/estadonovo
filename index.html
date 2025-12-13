@@ -282,7 +282,7 @@
         
         // Chão
         p.push();
-        p.translate(0, 0, 0);
+        p.translate(0, -5, 0);
         p.fill(255, 255, 255);
         p.stroke(50, 60, 70);
         p.strokeWeight(1);
@@ -582,14 +582,6 @@
         <div class="stat">
           <span class="stat-label">Sala:</span> ${world.rooms[player.room]?.name}
         </div>
-        ${render ? `
-        <div class="stat">
-          <span class="stat-label">Animação:</span> ${render.currentAnimation} (frame ${anim.currentFrame}/${anim.frames - 1})
-        </div>
-        <div class="stat">
-          <span class="stat-label">Modelos:</span> ${anim.models[anim.currentFrame] ? '✓ Carregado' : '✗ Fallback'}
-        </div>
-        ` : ''}
         <div class="stat">
           <span class="stat-label">Fome:</span>
           <div class="bar-container"><div class="bar hunger" style="width: ${player.needs.hunger}%"></div></div>
@@ -620,7 +612,6 @@
         creaturesHTML += `
           <div class="creature-item ${c.alive ? '' : 'dead'}" style="border-left-color: ${cRender ? cRender.color : '#00ff00'}">
             ${c.name[c.name.length - 1]} - ${c.alive ? 'Vivo' : 'Morto'} (${c.age || 0})
-            ${cRender ? `<br><small>Anim: ${cRender.currentAnimation}</small>` : ''}
           </div>
         `;
       }
