@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulação de Mundo 3D</title>
+  <title>brutopolis 0</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -135,7 +135,7 @@
   <div id="container">
     <div id="canvas-container">
       <div class="controls">
-        🎮 Clique no MAPA (UI) para mover | Arraste: Girar câmera 3D | 🎯 Visualização 3D
+        🎮 WASD: Mover personagem | Arraste: Girar câmera 3D | Clique no MAPA (UI) para posicionar
       </div>
       <div id="creature-labels"></div>
     </div>
@@ -167,16 +167,28 @@
     world.spawn('creature');
     for (let i = 0; i < 8; i++) world.spawn('item', null, 'food');
 
-    // P5.js sketch em 3D
+    // Variáveis globais
     let cellSize = 10;
     let cameraAngle = 0;
     let cameraDistance = 200;
     let cameraHeight = 200;
     let lastTickTime = 0;
+    let lastMoveTime = 0;
     const tickRate = 100;
+    const moveDelay = 150; // Delay entre comandos de movimento
     let font;
     let isDraggingCamera = false;
     let minimapSketch;
+    
+    // Sistema de controle de teclas - GLOBAL
+    let keysPressed = {
+      w: false,
+      a: false,
+      s: false,
+      d: false
+    };
+    
+    let lastTargetPos = { x: -1, y: -1 };
     
     // Cache de modelos carregados globalmente
     let modelsCache = {
@@ -242,12 +254,29 @@
       p.mouseReleased = () => {
         isDraggingCamera = false;
       };
+      
+      p.keyPressed = () => {
+        const key = p.key.toLowerCase();
+        if (key === 'w' || key === 'a' || key === 's' || key === 'd') {
+          keysPressed[key] = true;
+        }
+      };
+      
+      p.keyReleased = () => {
+        const key = p.key.toLowerCase();
+        if (key === 'w' || key === 'a' || key === 's' || key === 'd') {
+          keysPressed[key] = false;
+        }
+      };
 
       p.draw = () => {
         const currentTime = p.millis();
         if (currentTime - lastTickTime >= tickRate) {
           world.pass();
           lastTickTime = currentTime;
+          
+          // Processar movimento contínuo
+          handleMovement();
           
           // Atualizar frames de animação de todas as criaturas no tickrate
           for (let creature of world.creatures) {
@@ -357,6 +386,69 @@
       };
     });
     
+    // Função para lidar com movimento contínuo
+    function handleMovement() {
+      const currentTime = Date.now();
+      
+      // Limitar frequência de comandos de movimento
+      if (currentTime - lastMoveTime < moveDelay) return;
+      
+      const player = world.creatures[0];
+      if (!player || !player.alive || player.room === -1) return;
+      
+      // Só processar se alguma tecla WASD estiver pressionada
+      if (!keysPressed.w && !keysPressed.a && !keysPressed.s && !keysPressed.d) return;
+      
+      const room = world.rooms[player.room];
+      let targetX = player.position.x;
+      let targetY = player.position.y;
+      
+      // Calcular direção baseada na câmera
+      const forward = { x: Math.cos(cameraAngle), y: Math.sin(cameraAngle) };
+      const right = { x: -Math.sin(cameraAngle), y: Math.cos(cameraAngle) };
+      
+      const moveDistance = 8; // Distância de movimento
+      
+      // Acumular movimento de todas as teclas pressionadas
+      if (keysPressed.s) {
+        targetX += forward.x * moveDistance;
+        targetY += forward.y * moveDistance;
+      }
+      if (keysPressed.w) {
+        targetX -= forward.x * moveDistance;
+        targetY -= forward.y * moveDistance;
+      }
+      if (keysPressed.a) {
+        targetX += right.x * moveDistance;
+        targetY += right.y * moveDistance;
+      }
+      if (keysPressed.d) {
+        targetX -= right.x * moveDistance;
+        targetY -= right.y * moveDistance;
+      }
+      
+      // Garantir que está dentro dos limites da sala
+      targetX = Math.max(0, Math.min(room.size.x - 1, Math.round(targetX)));
+      targetY = Math.max(0, Math.min(room.size.y - 1, Math.round(targetY)));
+      
+      // Só mover se a posição mudou e é diferente do último alvo
+      if ((Math.round(targetX) !== Math.round(player.position.x) || 
+           Math.round(targetY) !== Math.round(player.position.y)) &&
+          (targetX !== lastTargetPos.x || targetY !== lastTargetPos.y)) {
+        
+        lastTargetPos.x = targetX;
+        lastTargetPos.y = targetY;
+        lastMoveTime = currentTime;
+        
+        // Limpar fila de eventos de movimento anteriores
+        player.eventQueue = player.eventQueue.filter(e => e.name !== 'move-to');
+        
+        player.queueEvent('move-to', function() {
+          this.setTarget(targetX, targetY, world);
+        });
+      }
+    }
+    
     // Função para atualizar animação da criatura
     function updateCreatureAnimation(creature) {
       const render = creature._render;
@@ -416,39 +508,6 @@
         p.model(anim.models[frame]);
         p.pop();
       }
-    }
-    
-    // Função para converter coordenadas 3D para 2D na tela
-    function worldToScreen(p, worldPos, camX, camY, camZ, lookX, lookY, lookZ) {
-      // Criar matriz de câmera manualmente
-      const cam = p.createVector(camX, camY, camZ);
-      const look = p.createVector(lookX, lookY, lookZ);
-      const up = p.createVector(0, 1, 0);
-      
-      // Direção da câmera
-      const forward = p5.Vector.sub(look, cam).normalize();
-      const right = p5.Vector.cross(forward, up).normalize();
-      const newUp = p5.Vector.cross(right, forward).normalize();
-      
-      // Posição relativa à câmera
-      const relPos = p5.Vector.sub(worldPos, cam);
-      
-      // Projetar na base da câmera
-      const x = relPos.dot(right);
-      const y = relPos.dot(newUp);
-      const z = -relPos.dot(forward); // Negativo porque olhamos para -Z
-      
-      if (z <= 0) return null; // Atrás da câmera
-      
-      // Projeção perspectiva
-      const fov = p.PI / 3; // 60 graus
-      const aspect = p.width / p.height;
-      const f = 1 / Math.tan(fov / 2);
-      
-      const screenX = (x / z) * f / aspect * p.width / 2 + p.width / 2;
-      const screenY = -(y / z) * f * p.height / 2 + p.height / 2;
-      
-      return { x: screenX, y: screenY, z: z };
     }
     
     // Minimapa
